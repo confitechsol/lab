@@ -7,6 +7,7 @@ use App\Model\Service;
 use App\Model\ServiceLog;
 use App\Model\Microscopy;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
 use App\Model\RequestServices;
@@ -21,6 +22,7 @@ class MicroscopyReviewController extends Controller
      */
     public function index()
     {
+
       try{
         $data = [];
         $data['sample'] = ServiceLog::select('t_service_log.updated_at as ID','m.enroll_id', 'e.label','m.sample_quality' ,
@@ -174,4 +176,117 @@ class MicroscopyReviewController extends Controller
         $data['services'] = Service::select('id','name')->get();
         return view('admin.microscopyreview.print',compact('data'));
     }
+
+
+    /**
+     *
+     * Bulk send to Microscopy Review.
+     *
+     * @param Request $request
+     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
+     */
+    public function bulkStore( Request $request ){      
+
+
+        // Validate User Inputs ===========================================
+        $this->validate( $request, [
+            'sample_ids' => 'required',
+            //'test_date'  => 'required|date_format:Y-m-d',
+        ] );
+
+       DB::beginTransaction();
+        try {
+            //dd('i am here');
+            // User Inputs ====================================================
+            $sample_ids = trim( $request->input('sample_ids') );
+            $sample_ids = explode(',', $sample_ids);
+           // $test_date  = $request->input('test_date');
+            $comments  = $request->input('comments');
+            $service_id1  = $request->input('service_id1');
+            //$result  = $request->input('result');
+
+            // Get Samples from $sample_ids ===================================
+            // $samples = Sample::query()->findMany( $sample_ids);
+            // dd($sample_ids );
+            $data = array();
+            foreach($sample_ids as $sample_id){   
+           // dd( $sample_id);     
+
+              /*$data['sample'][$sample_id] = ServiceLog::select('s.id as sample_id', 't_service_log.updated_at as ID','t_service_log.enroll_label',
+              't_service_log.enroll_id','t_service_log.sample_label as samples','t_service_log.status',
+              DB::raw('date_format(d.test_date,"%d-%m-%y") as date'),'s.test_reason','m.result','s.fu_month','t_service_log.tag',
+                              't_service_log.status as STATUS','t_service_log.sample_id','t_service_log.service_id','t_service_log.rec_flag','d.sent_for AS Deconta_sent_for')
+                              ->leftjoin('t_microscopy as m','m.sample_id','=','t_service_log.sample_id')
+                              ->leftjoin('t_decontamination as d','d.sample_id','t_service_log.sample_id')
+                              ->leftjoin('sample as s','s.id','t_service_log.sample_id')
+                             ->whereIn('t_service_log.status',[1]) // ->whereIn('t_service_log.status',[1,2,0])
+                             //->where('t_service_log.service_id',3)
+                             ->where('t_service_log.id',$sample_id)
+                             ->orderBy('t_service_log.enroll_label','desc')
+                             ->distinct()
+                             ->get();  
+                //dd($data['sample']); */  
+
+                $data['sample'][$sample_id]  = ServiceLog::where('t_service_log.id',$sample_id)->first();                              
+              }
+            // dd($data['sample']);
+             //dd(count($data['sample']));
+              if(count($data['sample']) > 0){ 
+                 // die(count($data['sample']));
+                foreach($data['sample'] as $key => $value){
+               //dd($value->enroll_id);
+                  // Update if exists or create new if not, in Decontamination ==
+                  /** @var Sample $sample */
+                 /*Microscopy::create([
+                    'enroll_id' => $value[0]['enroll_id'],
+                    'sample_id' => $value[0]['sample_id'],
+                    'status'    => '1',        
+                    //'status'    => Microscopy::STATUS_ACTIVE,        
+                    'test_date' => $test_date,
+                    'result' => $result,
+                    'created_by' => Auth::user()->id,
+                    'updated_by' => Auth::user()->id
+                  ]);*/
+                  // Log this change to ServiceLog ==============================
+                  ServiceLog::where([
+                    'id' => $key,
+                   // 'enroll_id'     => $data['sample'][0]['enroll_id'],
+                   // 'sample_label'  => $data['sample'][0]['enroll_label'],
+                    //'service_id'    => $data['sample'][0]['service_id'],
+                    
+                    //'service_id'    => ServiceLog::TYPE_DECONTAMINATION,
+                  ])->update([
+                    'comments'=> $comments,
+                    //'stage'=> 0,
+                    'status' => 0,
+                    //'status' => Microscopy::SERVICE_STATUS_ACTIVE,
+                    'created_by' => Auth::user()->id,
+                    'updated_by' => Auth::user()->id,
+                  ]); 
+
+
+                  ServiceLog::create([
+                    'enroll_id' => $value->enroll_id,
+                    'sample_id' => $value->sample_id,
+                    'service_id' => $value->service_id,
+                    'status'    => '1',        
+                    //'status'    => Microscopy::STATUS_ACTIVE,        
+                    //'test_date' => $test_date,
+                   // 'result' => $result,
+                    'created_by' => Auth::user()->id,
+                    'updated_by' => Auth::user()->id
+                  ]);
+
+               }             
+            }     
+           DB::commit();
+        }catch(\Exception $e){
+        //dd($e->getMessage()); 
+       DB::rollback();
+        /*return redirect('/dash_decontamination')->withErrors(['Sorry!! Action already taken of the selected Sample']);*/
+        return back(); // Return back from where the request has come.
+    }  
+   return back(); // Return back from where the request has come.
+
+}
 }

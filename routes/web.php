@@ -87,7 +87,7 @@ Route::group(['middleware' => 'auth:web'], function () {
 
     Route::group(['middleware' => ['role:microscopy_review,can_view']], function () {
         Route::resource('/review_microscopy', 'Web\Admin\MicroscopyReviewController');
-        Route::post('/dash_microscopy_bulk', 'Web\Admin\MicroscopyController@bulkStore')->name('microscopy.send-review.bulk');
+        Route::post('/dash_microscopy_review_bulk', 'Web\Admin\MicroscopyReviewController@bulkStore')->name('microscopy_review.send-review.bulk');
     });
 
     Route::resource('/serviceLog', 'Web\Admin\ServiceLogController');

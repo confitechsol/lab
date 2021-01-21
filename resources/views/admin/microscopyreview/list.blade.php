@@ -115,6 +115,7 @@
                                     <table id="exampl" class="table table-striped table-bordered responsive col-xlg-12" cellspacing="0" width="100%">
                                         <thead>
                                             <tr>
+                                              <th><input type="checkbox" id="bulk-select-all"></th>
                                               <th class="hide">ID</th>
                                               <th>Lab Enrolment ID</th>
                                               <th>Sample ID</th>
@@ -130,8 +131,13 @@
                                         </thead>
                                         <tbody>
 
-                                          @foreach ($data['sample'] as $key=> $samples)
+                                          @foreach ($data['sample'] as $key=> $samples)                                          
                                           <tr>
+                                            <td>
+                                                   
+                                                    <input class="bulk-selected" type="checkbox" value="{{ $samples->log_id}}">
+                                                   
+                                                </td>
                                             <td class="hide">{{$samples->ID}}</td>
                                             <td>{{$samples->label}}</td>
                                             <td>{{$samples->sample_label}}</td>
@@ -210,6 +216,85 @@
 
   </div>
 </div>
+
+
+{{-- MODAL FOR BULK REVIEW --}}
+    <div class="modal fade" id="modal-bulk-review" role="dialog">
+        <div class="modal-dialog">
+
+            <!-- Modal content-->
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title">Microscopy Result</h4>
+                </div>
+
+                <form method="post"
+                      class="form-horizontal form-material"
+                      action="{{ route('microscopy_review.send-review.bulk') }}" id="deconbulkform">
+                    
+                    @if(count($errors))
+                        @foreach ($errors->all() as $error)
+                            <div class="alert alert-danger"><h4>{{ $error }}</h4></div>
+                        @endforeach
+                    @endif
+                    <div class="alert alert-danger hide"><h4></h4></div>
+                    <div class="modal-body">
+
+                        <input type="hidden" name="_token" value="{{ csrf_token() }}">
+                        <input type="hidden" name="sample_ids" value="">                        
+
+                        <div class="row">
+                    <div class="col">
+                        <label class="col-md-12">Result<span class="red">*</span></label>
+                        <div class="col-md-12">
+                           <select name="service_id1" class="form-control form-control-line test_reason" id="service_id1" required>
+                              <option value="">--Select--</option>
+                              <!--<option value="3" id="dna">Decontamination DNA extraction</option>
+                              <option value="3" id="lc">Decontamination for AFB Culture Liquid</option>
+                              <option value="3" id="lj">Decontamination for AFB Culture Solid</option>
+                              <option value="3" id="Sent_for">Decontamination for Culture LC and LJ both</option>-->
+                              <option value="3" id="dna">Decontamination</option>
+                              <option value="4" id="cbnaat">CBNAAT</option>
+                              <option value="8" id="dna1">LPA 1st Line</option>
+                              <option value="8" id="dna2">LPA 2nd Line</option>
+                              <option value="8" id="dnaboth">LPA 1st and 2nd Line</option>
+                              <option value="16" id="solid_culture">Solid Culture</option>
+                              <option value="16" id="liquid_culture">Liquid Culture</option>
+                              <option value="16" id="both">Solid and Liquid Culture</option>
+                              <option value="11" id="storage">Sent for storage</option>
+                              <option value="25" id="Sent_for">Sent for microbiologist</option>
+                              <!-- <option value="12" id="Sent_for">Sent for microbiologist</option> -->
+                     </select>
+                       </div>
+                    </div>       
+                  </div>
+
+                  <div class="row">
+                    <div class="col">
+                        <label class="col-md-12">Comments</label>
+                        <div class="col-md-12">
+                          <textarea name="comments" class="form-control form-control-line" id="comments" rows="5" cols="5"></textarea>
+                       </div>
+                    </div>
+                </div>
+
+
+                    </div>
+                    <div class="modal-footer">
+                        <!-- <button type="submit" class="btn btn-default" data-dismiss="modal">Save</button> -->
+                        <button class="btn btn-default add-button cancel btn-md"
+                                type="button"
+                                data-dismiss="modal">Cancel</button>
+
+                        <button class="pull-right btn btn-primary btn-md" type="submit">Ok</button>
+                    </div>
+
+                </form>
+            </div>
+        </div>
+    </div>
+    {{-- MODAL FOR BULK REVIEW - ENDS --}}
 
 <script>
 $(document).ready(function(){
@@ -506,12 +591,71 @@ $(document).ready(function() {
             {
                 extend: 'excelHtml5',
                 title: 'LIMS_Review_Microscopy_'+today+''
+            },
+            {
+                text: 'Send Selected to Review',            
+                action: bulk_action_review
             }
         ],
-         "order": [[ 1, "desc" ]]
+         //"order": [[ 1, "desc" ]]
     });
 	
 });
+
+
+// ==================================================
+        // =========== SCRIPT FOR BULK REVIEW ===============
+        // ==================================================
+
+        var $bulk_checkboxes = $('.bulk-selected');
+        var $bulk_select_all_checkbox = $('#bulk-select-all');
+
+
+        // Automatically Check or Uncheck "all select" checkbox
+        // based on the state of checkboxes in the list.
+        $bulk_checkboxes.click(function(){
+            if( $bulk_checkboxes.length === $bulk_checkboxes.filter(':checked').length ){
+                $bulk_select_all_checkbox.prop('checked', true);
+            }
+        });
+
+
+        // Check or Uncheck checkboxes based on the state
+        // of "all select" checkbox.
+        $bulk_select_all_checkbox.click(function(){
+            var checked = $(this).prop('checked');
+            $('.bulk-selected').prop('checked', checked);
+        });
+
+// Open bulk editing modal on clicking "Send Selected to Review" button.
+        function bulk_action_review(){
+            var $modal = $('#modal-bulk-review');
+            var selected = [];
+            var $checkboxes = $('.bulk-selected:checked');
+
+            // Display an error message and stop if no checkboxes are selected.
+            if( $checkboxes.length === 0 ){
+                alert("First select one or more items from the list.");
+                return;
+            }
+
+            $modal.modal('show');
+
+            $checkboxes.each(function(i, e){
+                selected.push( $(e).val() );
+
+                // Last iteration of the loop.
+                if( i === $checkboxes.length - 1 ){
+                    $modal.find('input[name="sample_ids"]').val( selected.join(',') );
+                }
+            });
+        }
+
+        // ==================================================
+        // ========= SCRIPT FOR BULK REVIEW - ENDS ==========
+        // ==================================================
 </script>
+
+
 
 @endsection
