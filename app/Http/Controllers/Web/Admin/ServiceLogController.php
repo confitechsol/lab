@@ -236,9 +236,11 @@ class ServiceLogController extends Controller
 			echo json_encode($servicelog[0]->v_count);
 			exit;
 	}
+	
+
+
 	public function checkForSampleAlreadyInProcessMicroscopyNext($sample_id,$enroll_id,$service_id,$tag=null,$recflag)
-    { 
-	       
+    {   
 		    
 			$statussql=" AND status=0 ";
 				
@@ -252,9 +254,13 @@ class ServiceLogController extends Controller
 			AND rec_flag = ".$recflag);
 			//dd(DB::getQueryLog());
 			//dd($servicelog);
-		    //dd($servicelog[0]->v_count);	   
+			//dd($servicelog[0]->v_count);	
+			$result = array(
+						'result' => $servicelog[0]->v_count,
+						'sample_id' => $sample_id
+			);
 
-			echo json_encode($servicelog[0]->v_count);
+			echo json_encode($result);
 			exit;
 	}
 	

@@ -38,7 +38,9 @@ class DecontaminationController extends Controller
 
             // $data['services_copy'] = ['1' => 'ZN Microscopy', '2' => 'FM Microscopy', '5' => 'Liquid Culture', '4' => 'Solid Culture', '5' => 'Solid and Liquid Culture', '8' => 'DNA Extraction', '6' => 'Request for another sample', '7' => 'For storage', '9' => 'BWM'];
 
-            $data['sample'] = ServiceLog::select('t_service_log.updated_at as ID','t_service_log.enroll_label',
+            $data['sample'] = ServiceLog::select('t_service_log.updated_at as ID',
+            't_service_log.id as log_id',
+            't_service_log.enroll_label',
             't_service_log.sent_to as sent_for_service',
             't_service_log.enroll_id','t_service_log.sample_label as samples',
             't_service_log.sample_id as sample_id','s.test_reason',
@@ -116,8 +118,6 @@ class DecontaminationController extends Controller
 
             //dd($data['sample']);
 
-
-
             $data['decontamination_test'] = ServiceLog::select('id')->whereIn('status',[0,1,2])->where('service_id',3)->count();
 
             $data['decontamination_tested'] = ServiceLog::select('id')->where('status',1)->where('service_id',3)->count();
@@ -125,6 +125,8 @@ class DecontaminationController extends Controller
 
             $data['decontamination_review'] = ServiceLog::select('id')->where('status',2)->where('service_id',3)
                         ->count();
+
+            //dd($data);
 
 
             return view('admin.decontamination.list',compact('data'));
@@ -149,13 +151,34 @@ class DecontaminationController extends Controller
      */
     public function store(Request $request)
     {
-        //dd($request->all());
+        /* foreach($request->sampleID as $sampleID)
+        {
+            echo $request->enrollId.$sampleID;
+        }*/
+        
+        //dd($request->all()); 
+
+        $sample_arr = array();
+        $sample_arr = $request->sampleID;
+        $data_arr = $request->all();
+
+        /* foreach($sample_arr as $sampleID)
+        {
+            echo $data['enrollId'.$sampleID];
+            echo $data['sample_ids'.$sampleID];
+            print_r($request->service_id);
+        }
+
+        dd($request->all());  */
 		 
 		DB::beginTransaction();
         try {
-			//dd($request->all());
-         $en_label = Enroll::select('label as l')->where('id',$request->enrollId)->first();
-         $s_id = Sample::select('id as l')->where('sample_label',$request->sample_ids)->first();
+            //dd($request->all());
+        foreach($sample_arr as $sampleID)
+        {
+
+         $en_label = Enroll::select('label as l')->where('id',$data_arr['enrollId'.$sampleID])->first();
+         $s_id = Sample::select('id as l')->where('sample_label',$data_arr['sample_ids'.$sampleID])->first();
          $enroll_label=$en_label->l;
          $sample_id=$s_id->l;
          $services_sent_to='';
@@ -182,7 +205,7 @@ class DecontaminationController extends Controller
          //dd($services_sent_to);
          //$services_sent_to = implode($services_sent_to,',');
 		 //DB::enableQueryLog();
-         $logservice_query = ServiceLog::where('enroll_id',$request->enrollId)->where('sample_id',$sample_id);
+         $logservice_query = ServiceLog::where('enroll_id',$data_arr['enrollId'.$sampleID])->where('sample_id',$sample_id);
 		 //echo $service_id; die;
          if(\request('from_storage')){			
 				$logservice_query->where('service_id', ServiceLog::TYPE_STORAGE);			
@@ -207,11 +230,11 @@ class DecontaminationController extends Controller
 		 //dd(DB::getQueryLog());
 
          //DB::enableQueryLog();
-         $log = ServiceLog::where('enroll_id',$request->enrollId)
+         $log = ServiceLog::where('enroll_id',$data_arr['enrollId'.$sampleID])
              ->where('sample_id',$sample_id)			 
-			 ->where('sample_label', $request->sample_ids)
+			 ->where('sample_label', $data_arr['sample_ids'.$sampleID])
 			 ->where('service_id', ServiceLog::TYPE_DECONTAMINATION)
-			 ->where('rec_flag', $request->rec_flag)
+			 ->where('rec_flag', $data_arr['rec_flag'.$sampleID])
              //->where('status', '!=', 0) // TODO: Need to check behavior for previous logic
 			 //->orWhere('status', '!=', 9)			 
              //->orderBy('id', 'desc')
@@ -230,7 +253,7 @@ class DecontaminationController extends Controller
          }
          //dd(DB::getQueryLog());
          if($request->request_another =='on'){
-           $log = ServiceLog::where('enroll_id',$request->enrollId)->where('service_id',11)->first();
+           $log = ServiceLog::where('enroll_id',$data_arr['enrollId'.$sampleID])->where('service_id',11)->first();
            if($log){
              $log->service_id = 3;
              $log->status = 1;
@@ -250,23 +273,23 @@ class DecontaminationController extends Controller
         foreach($request->service_id as $key=>$send_to_service_id){
 			
 			if($send_to_service_id==1 || $send_to_service_id==2){
-                $request->tag = 'MICROSCOPY';
+                $data_arr['tag'.$sampleID] = 'MICROSCOPY';
 				$tag = 'MICROSCOPY';
             }
             else if($send_to_service_id==3){
-                $request->tag = 'LC';
+                $data_arr['tag'.$sampleID] = 'LC';
 				$tag = 'LC';
             }elseif($send_to_service_id==4){
-                $request->tag = 'LJ';
+                $data_arr['tag'.$sampleID] = 'LJ';
 				$tag = 'LJ';
             }elseif($send_to_service_id==5){
-                $request->tag = 'LC and LJ Both';
+                $data_arr['tag'.$sampleID] = 'LC and LJ Both';
 				$tag = 'LC and LJ Both';
             }elseif($send_to_service_id==6){
-                $request->tag = 'DECONTAMINATION';
+                $data_arr['tag'.$sampleID] = 'DECONTAMINATION';
 				$tag = 'DECONTAMINATION';
             }elseif($send_to_service_id==9){
-                $request->tag = 'CBNAAT';
+                $data_arr['tag'.$sampleID] = 'CBNAAT';
 				$tag = 'CBNAAT';
             }
 /*Pradip */
@@ -274,26 +297,26 @@ class DecontaminationController extends Controller
 			if( $send_to_service_id == 8 ){
 				
 				if($serviceidpd[$key]==8) {
-					$request->tag = 'LPA 1st line';
+					$data_arr['tag'.$sampleID] = 'LPA 1st line';
 					$tag = 'LPA 1st line';
 				}
 				if($serviceidpd[$key]==10) {
-					$request->tag = 'LPA 2nd line';
+					$data_arr['tag'.$sampleID] = 'LPA 2nd line';
 					$tag = 'LPA 2nd line';
 				}
 				if($serviceidpd[$key]==11) {
-					$request->tag = 'Both LPA 1st & 2nd Line';
+					$data_arr['tag'.$sampleID] = 'Both LPA 1st & 2nd Line';
 				    $tag = 'Both LPA 1st & 2nd Line';
 				}
 			}
 			//echo "tag".$request->tag; die;
             if($send_to_service_id=='Send to BWM') {
-				$decon = Decontamination::select('id')->where('sample_id',$sample_id)->where('enroll_id',$request->enrollId)->first();
+				$decon = Decontamination::select('id')->where('sample_id',$sample_id)->where('enroll_id', $data_arr['enrollId'.$sampleID])->first();
 				if(!empty($decon)) {
 					$decon_obj = Decontamination::find($decon->id);
 				}
                 $microbio = Microbio::create([
-                    'enroll_id' => $request->enrollId,
+                    'enroll_id' => $data_arr['enrollId'.$sampleID],
                     'sample_id' => $sample_id,
                     'service_id' => 26,
                     'next_step' => '',
@@ -312,10 +335,10 @@ class DecontaminationController extends Controller
 					$decon_obj->save();
 				}
                 ServiceLog::create([
-                   'enroll_id' => $request->enrollId,
+                   'enroll_id' => $data_arr['enrollId'.$sampleID],
                    'sample_id' => $sample_id,
                    'enroll_label' => $enroll_label,
-                   'sample_label' => $request->sample_ids,
+                   'sample_label' => $data_arr['sample_ids'.$sampleID],
                    'previous_step' => 'Decontamination',
                    'service_id' => 26,	
                    'reported_dt'=>date('Y-m-d'),
@@ -340,11 +363,11 @@ class DecontaminationController extends Controller
 
 
             //DB::enableQueryLog();
-            ServiceLog::where('enroll_id', $request->enrollId)
+            ServiceLog::where('enroll_id', $data_arr['enrollId'.$sampleID])
                 ->where('sample_id', $sample_id)
-                ->where('sample_label', $request->sample_ids)
+                ->where('sample_label', $data_arr['sample_ids'.$sampleID])
                 ->where('service_id', ServiceLog::TYPE_DECONTAMINATION)
-				->where('rec_flag', $request->rec_flag)
+				->where('rec_flag', $data_arr['rec_flag'.$sampleID])
                 ->update([
                     'status' => 0,
                     'created_by' => Auth::user()->id,
@@ -378,7 +401,7 @@ class DecontaminationController extends Controller
 
 
             Decontamination::create([
-                'enroll_id'  => $request->enrollId,
+                'enroll_id'  => $data_arr['enrollId'.$sampleID],
                 'sample_id'  => $sample_id,
                 'sent_for'   => $send_to_service_id,
                 'status'     => 2,
@@ -419,15 +442,15 @@ class DecontaminationController extends Controller
 	        if($send_to_service_id!='Send to BWM') {
 		    //DB::enableQueryLog();		
             ServiceLog::create([
-              'enroll_id' => $request->enrollId,
+              'enroll_id' => $data_arr['enrollId'.$sampleID],
               'sample_id' => $sample_id,
               'enroll_label' => $enroll_label,
-              'sample_label' => $request->sample_ids,
+              'sample_label' => $data_arr['sample_ids'.$sampleID],
               'service_id' => $send_to_service_id,
               'reported_dt'=>date('Y-m-d'),
               'status' => $status,
-              'tag' => !empty($tag)?$tag:$request->tag,
-			  'rec_flag' => $request->rec_flag,
+              'tag' => !empty($tag)?$tag:$data_arr['tag'.$sampleID],
+			  'rec_flag' => $data_arr['rec_flag'.$sampleID],
               'test_date' => date('Y-m-d H:i:s'),
               'created_by' => Auth::user()->id,
               'updated_by' => Auth::user()->id
@@ -455,6 +478,9 @@ class DecontaminationController extends Controller
         //     $decon_obj->updated_by = $request->user()->id;
         //     $decon_obj->save();
         //   }
+    
+        //DB::commit();
+    }
 
         if( \request('from_storage') ){
 			 DB::commit();
