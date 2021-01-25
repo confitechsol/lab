@@ -233,7 +233,12 @@ class ServiceLogController extends Controller
 			//dd($servicelog);
 		    //dd($servicelog[0]->v_count);	   
 
-			echo json_encode($servicelog[0]->v_count);
+			$result = array(
+				'result' => $servicelog[0]->v_count,
+				'sample_id' => $sample_id
+			);
+
+			echo json_encode($result);
 			exit;
 	}
 	

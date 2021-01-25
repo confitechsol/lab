@@ -80,6 +80,7 @@
                                     <table id="exampl" class="table table-striped table-bordered responsive col-xlg-12" cellspacing="0" width="100%">
                                         <thead>
                                             <tr>
+                                              <th><input type="checkbox" id="bulk-select-all"></th>
                                               <th class="hide">ID</th>
                                               <th>Sample ID</th>
                                               <!-- <th>LPA test requested</th> -->
@@ -93,14 +94,27 @@
                                             </tr>
                                         </thead>
                                         <tbody>
-
                                           @foreach ($data['sample'] as $key=> $samples)
                                           <tr>
+                                            <td>
+                                              @if($samples->status!=0)
+                                                <input class="bulk-selected" type="checkbox" id="smpl_log_id_{{ $samples->sample_id }}" value="{{ $samples->sample_id }}" />                                    
+                                                <input type="hidden" name="samples_{{$samples->sample_id}}" id="samples_{{$samples->sample_id}}" value="{{ $samples->samples }}" />
+                                                <input type="hidden" name="sample_log_id_{{$samples->sample_id}}" id="sample_log_id_{{$samples->sample_id}}" value="{{ $samples->log_id }}" />
+                                                <input type="hidden" name="sample_enroll_id_{{$samples->sample_id}}" id="sample_enroll_id_{{$samples->sample_id}}" value="{{ $samples->enroll_id }}" />
+                                                <input type="hidden" name="sample_tag_{{$samples->sample_id}}" id="sample_tag_{{$samples->sample_id}}" value="{{ $samples->tag }}" />
+                                                <input type="hidden" name="sample_no_sample_{{$samples->sample_id}}" id="sample_no_sample_{{$samples->sample_id}}" value="{{ $samples->no_sample }}" />
+                                                <input type="hidden" name="sample_id_{{$samples->sample_id}}" id="sample_id_{{$samples->sample_id}}" value="{{ $samples->sample_id }}" />
+                                                <input type="hidden" name="sample_service_id_{{$samples->sample_id}}" id="sample_service_id_{{$samples->sample_id}}" value="{{ $samples->service_id }}" />
+                                                <input type="hidden" name="sample_status_{{$samples->sample_id}}" id="sample_status_{{$samples->sample_id}}" value="{{ $samples->STATUS }}" />
+                                                <input type="hidden" name="sample_rec_flag_{{$samples->sample_id}}" id="sample_rec_flag_{{$samples->sample_id}}" value="{{ $samples->rec_flag }}" />
+                                                 
+                                              @endif
+                                            </td>
                                             <td class="hide">{{$samples->ID}}</td>
                                             <td>{{$samples->samples}}</td>
                                            <!--  <td></td> -->
-                                            <td>
-											
+                                            <td>											
                                               @if($samples->tag == '1st line LPA' || $samples->tag =='LPA1' || $samples->tag =='LPA 1st line' || $samples->tag =='LPA 1st Line' )
                                                 LPA 1st Line
                                               @elseif($samples->tag == '2nd line LPA' || $samples->tag == 'LPA2' || $samples->tag =='LPA 2nd line' || $samples->tag =='LPA 2nd Line')
@@ -122,7 +136,7 @@
                                               @if(!$samples->extraction_date)
                                               <!-- <button onclick="openForm('{{$samples->samples}}', {{$samples->log_id}})",  value="" type="button" class = "btn btn-default btn-sm resultbtn">Submit</button> -->
                                               Pending 
-											  @else
+											                        @else
                                               <?php echo date('d/m/Y', strtotime($samples->extraction_date)); ?>
                                               @endif
                                             </td>
@@ -132,14 +146,11 @@
                                               @else
                                               <button onclick="openNextForm('{{$samples->samples}}', {{$samples->log_id}},{{$samples->enroll_id}}, '{{ $samples->tag }}','{{$samples->no_sample}}','{{$samples->sample_id}}','{{$samples->service_id}}','{{$samples->STATUS}}','{{$samples->rec_flag}}')" type="button" class = "btn btn-default btn-sm  nextbtn">Next</button>
                                               @endif
-
                                             </td>
                                           </tr>
                                           @endforeach
-
                                       </tbody>
                                         </table>
-
                                 </div>
                             </div>
                         </div>
@@ -205,9 +216,7 @@ function openNextForm(sample_label, log_id, enroll_id, tag, no,sample_id,service
   $('#next_log_id').val(log_id);
   $('#next_enroll_id').val(enroll_id);
   $('#spantag').text(tag);
-  $('#no_sample').val(no);
-  
-  
+  $('#no_sample').val(no); 
   $("#sampleID").val(sample_id);
   $("#serviceId").val(service_id);
   $("#statusId").val(STATUS);
@@ -242,6 +251,10 @@ $(document).ready(function() {
             {
                 extend: 'excelHtml5',
                 title: 'LIMS_DNAextraction_'+today+''
+            },
+            {
+              text: 'Send Selected to Review',            
+                action: bulk_action_review
             }
         ],
         "order": [[ 1, "desc" ]]
@@ -249,51 +262,147 @@ $(document).ready(function() {
 	
 	//Confirm ok submit
 	$('.nextbtn, #nxtconfirm').click( function(e) {
-		//alert("here");
-		var enroll_id=$("#next_enroll_id").val();
-		var sample_id=$("#sampleID").val();
-		var service_id=$("#serviceId").val();
-		//var STATUS=$("#statusId").val();
-		//var tag=$("#tagId").val();
-		if(typeof $("#tagId").val() !== 'undefined' &&  $("#tagId").val()!= ''){
-		  var tag=$("#tagId").val();
-	    }else{
-			var tag="NULL";
-		}
-		var rec_flag=$("#recFlagId").val();
-	
-		$.ajax({
-				  url: "{{url('check_for_sample_already_process')}}"+'/'+sample_id+'/'+enroll_id+'/'+service_id+'/'+tag+'/'+rec_flag,
-				  type:"GET",
-				  processData: false,
-				  contentType: false,
-				  dataType: 'json',
-				  success: function(response){
-					  console.log(response);
-					  
-                        if(response==1){
-							$('.alert-danger').removeClass('hide');
-							$('.alert-danger').show();
-							$('.alert-danger').html("Sorry!! Action already taken of the selected Sample");
-                            $('#nxtconfirm').prop("type", "button");
-                            e. preventDefault(); 							
-                            
-						}else{
-							$('.alert-danger').addClass('hide');
+
+            $('.alert-danger').addClass('hide');
 							$('.alert-danger').hide();
 							//$('form#cbnaat_result').submit();	
 							$('#nxtconfirm').prop("type", "submit");
-							$("#nxtconfirm").text("OK");
-							
-                        }
-				  },
-				failure: function(response){
-					console.log("err")
-				}
-		});
-		
+							$("#nxtconfirm").text("OK");	
 	});
+
 } );
+
+var $bulk_checkboxes = $('.bulk-selected');
+        var $bulk_select_all_checkbox = $('#bulk-select-all');
+
+        // Automatically Check or Uncheck "all select" checkbox
+        // based on the state of checkboxes in the list.
+        $bulk_checkboxes.click(function(){
+            if( $bulk_checkboxes.length === $bulk_checkboxes.filter(':checked').length ){
+                $bulk_select_all_checkbox.prop('checked', true);
+            }
+        });
+
+
+        // Check or Uncheck checkboxes based on the state
+        // of "all select" checkbox.
+        $bulk_select_all_checkbox.click(function(){
+            var checked = $(this).prop('checked');
+            $('.bulk-selected').prop('checked', checked);
+        });
+
+        function bulk_action_review(){
+          //$('#nextpopupDiv').modal('toggle');
+          var $modal = $('#nextpopupDiv');
+            //var selected = [];
+            var $checkboxes = $('.bulk-selected:checked');          
+
+            // Display an error message and stop if no checkboxes are selected.
+            if( $checkboxes.length === 0 ){
+                alert("First select one or more items from the list.");
+                return;
+            }
+              var smpl_log_id = "";
+              var samples = "";
+              var sample_log_id = "";
+              var sample_enroll_id = "";
+              var sample_tag = "";
+              var sample_no_sample = "";
+              var sample_id = "";
+              var sample_service_id = "";
+              var sample_status = "";
+              var sample_rec_flag = "";
+              
+
+
+              var err_html = "";
+              var success_html = "";
+              var html = "";
+              var full_html = "";              
+              var err_sample_id = [];
+              var success_sample_id = "";
+              var samples_data = [];
+
+            //
+            $checkboxes.each(function(i, e){
+              
+              smpl_log_id = $("#smpl_log_id_"+$(e).val()).val();
+              samples = $("#samples_"+$(e).val()).val();
+              sample_log_id = $("#sample_log_id_"+$(e).val()).val();
+              sample_enroll_id = $("#sample_enroll_id_"+$(e).val()).val();
+
+              if(typeof $("#sample_tag_").val() !== 'undefined' &&  $("#sample_tag_").val()!= ''){
+                var sample_tag=$("#sample_tag_").val();
+                }else{
+                var sample_tag="NULL";
+              }
+
+              //sample_tag = $("#sample_tag_"+$(e).val()).val();
+              sample_no_sample = $("#sample_no_sample_"+$(e).val()).val();
+              sample_id = $("#sample_id_"+$(e).val()).val();
+              sample_service_id = $("#sample_service_id_"+$(e).val()).val();
+              sample_status = $("#sample_status_"+$(e).val()).val();
+              sample_rec_flag = $("#sample_rec_flag_"+$(e).val()).val();
+                        
+
+              samples_data.push({
+                sample_id: sample_id,                
+                enroll_id: sample_enroll_id,
+                service_id: sample_service_id,
+                tag: sample_tag,
+                rec_flag: sample_rec_flag,               
+              });
+
+            });
+
+            console.log(samples_data);
+
+            for(i=0; i < samples_data.length; i++)
+            {
+                      $.ajax({
+                      url: "{{url('check_for_sample_already_process')}}"+'/'+samples_data[i].sample_id+'/'+samples_data[i].enroll_id+'/'+samples_data[i].service_id+'/'+samples_data[i].tag+'/'+samples_data[i].rec_flag,
+                      type:"GET",
+                      processData: false,
+                      contentType: false,
+                      dataType: 'json',
+                      success: function(response){
+                        console.log(response);
+                        
+                      if(response.result == 1){
+                          $('.alert-danger').removeClass('hide');
+                          $('.alert-danger').show();
+                          $('.alert-danger').html("Sorry!! Action already taken of the selected Sample");
+                                        $('#nxtconfirm').prop("type", "button");
+                                        e. preventDefault();                                        
+                        }else{
+                          /* $('.alert-danger').addClass('hide');
+                          $('.alert-danger').hide();                          
+                          $('#nxtconfirm').prop("type", "submit");
+                          $("#nxtconfirm").text("OK"); */
+                            html+='<input type="hidden" name="service_log_id'+response.sample_id+'"  value="'+$("#sample_log_id_"+response.sample_id).val()+'">';
+                            html+='<input type="hidden" name="enroll_id'+response.sample_id+'"  value="'+$("#sample_enroll_id_"+response.sample_id).val()+'">';                          
+                            html+= '<input type="hidden" name="no_sample'+response.sample_id+'" class="form-control form-control-line sampleId" value="'+$("#sample_no_sample_"+response.sample_id).val()+'">';
+                            html+='<input type="hidden" name="sampleID'+response.sample_id+'"  value="'+$("#sample_id_"+response.sample_id).val()+'">';
+                            html+='<input type="hidden" name="logID[]"  value="'+$("#sample_log_id_"+response.sample_id).val()+'">';
+                            html+='<input type="hidden" name="serviceId'+response.sample_id+'"  value="'+$("#sample_service_id_"+response.sample_id).val()+'">';				
+                            html+='<input type="hidden" name="status'+response.sample_id+'"  value="'+$("#sample_status_"+response.sample_id).val()+'">';
+                            html+='<input type="hidden" name="tag'+response.sample_id+'" value="'+$("#sample_tag_"+response.sample_id).val()+'">';
+                            html+='<input type="hidden" name="rec_flag'+response.sample_id+'"  value="'+$("#sample_rec_flag_"+response.sample_id).val()+'">';
+                            html+='<input type="hidden" name="sample_id'+response.sample_id+'"  value="'+$("#samples_"+response.sample_id).val()+'">';
+                            
+                            $("#node").append(html);
+                            html = "";                          
+                          }
+                      },
+                    failure: function(response){
+                      console.log("err")
+                    }
+                });
+            }
+
+            $('#nextpopupDiv').modal('toggle');
+
+        }
 </script>
 
 @endsection

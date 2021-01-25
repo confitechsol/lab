@@ -15,7 +15,9 @@
         <p></p>
         <form class="form-horizontal form-material" action="{{ url('/DNANext') }}" method="post"  id="nxtpopup">
           <input type="hidden" name="_token" value="{{ csrf_token() }}">
-          <input type="hidden" name="service_log_id" id="next_log_id" value="">
+          <div class="col-md-12" id="node"></div>
+
+          {{-- <input type="hidden" name="service_log_id" id="next_log_id" value="">
           <input type="hidden" name="enroll_id" id="next_enroll_id" value="">
           <input type="hidden" name="no_sample" class="form-control form-control-line sampleId" value="" id="no_sample">
 		  
@@ -23,15 +25,15 @@
 		  <input type="hidden" name="serviceId" id="serviceId" value="">
 		  <input type="hidden" name="status" id="statusId" value="">
 		  <input type="hidden" name="tag" id="tagId" value="">
-		  <input type="hidden" name="rec_flag" id="recFlagId" value="">
-          <div class="row">
+		  <input type="hidden" name="rec_flag" id="recFlagId" value=""> --}}
+          {{-- <div class="row">
             <div class="col ">
                 <label class="col-md-12">Sample ID</label>
                 <div class="col-md-12">
                    <input type="text" name="sample_id" class="form-control form-control-line sampleId" value="" id="next_sample_id" required>
                </div>
             </div>
-          </div>
+          </div> --}}
           <div class="row">
             <div class="col ">
                 <label class="col-md-12">Date of extraction</label>
