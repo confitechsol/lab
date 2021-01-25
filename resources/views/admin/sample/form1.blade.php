@@ -154,7 +154,7 @@ border-color: #5cb85c;
                  @endif
 
                  <div class="row" id="scan_code">
-					<!-- Changed by Pradip on 18/05/2020 Start Process --------
+					<!-- Changed by Pradip on 18/05/2020 Start Process -------->
                    <div class="col-md-6" id="toggle">
                      <div class="card">
                         <label class="col-md-6">Barcode Enter Mode <span class="red">*</span> </label>
@@ -164,7 +164,7 @@ border-color: #5cb85c;
 
                      </div>
                    </div>
-				   -- Changed by Pradip on 18/05/2020 End Process ---------->
+				   <!-- Changed by Pradip on 18/05/2020 End Process ---------->
                    <div class="col-md-6" id="scan">
                        <div class="card">
                      <label class="col-md-6">Scan Barcode <span class="red">*</span> </label>
