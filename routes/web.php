@@ -51,6 +51,7 @@ Route::group(['middleware' => 'auth:web'], function () {
     Route::get('/annexurel', 'Web\Admin\SampleController@annexurel');
 
     Route::get('/sample/create/{id}', 'Web\Admin\SampleController@create');
+    Route::get('/sample/editnew/{id}', 'Web\Admin\SampleController@editNew');
     Route::get('/check_for_storage/{enroll_id}', 'Web\Admin\SampleController@checkForStorage');
 	Route::get('/check_for_sample_exist/{enroll_id}/{sentStep}/{tag?}/{recflag}', 'Web\Admin\SampleController@checkForSampleExist');	
     Route::get('/check_for_request_service/{enroll_id}', 'Web\Admin\MicroController@checkForRequestSeviceDataExist');	
@@ -100,6 +101,7 @@ Route::group(['middleware' => 'auth:web'], function () {
 
     Route::group(['middleware' => ['role:hybridization,can_view']], function () {
         Route::resource('/hybridization', 'Web\Admin\HybridizationController');
+        Route::post('/dash_hybridization_bulk', 'Web\Admin\HybridizationController@bulkStore')->name('hybridization.send-review.bulk');
     });
 
     Route::group(['middleware' => ['role:decontamination_review,can_view']], function () {

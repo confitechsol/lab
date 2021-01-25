@@ -1832,5 +1832,48 @@ class SampleController extends Controller
     }
 
 
+    /**
+     * Show the form for edit resource.
+     *
+     * @return \Illuminate\Http\Response
+     */    
+    public function editNew($id)
+    { 
+        $data['lab_details']=Config::select('lab_name as labname','city as labcity')->where('status',1)->first();
+        // dd($data['lab_details']->labname);
+
+        $data['labname']='unknown';
+        $data['labcity']='unknown';
+        if(!empty($data['lab_details']->labname)){
+
+        $data['labname']=$data['lab_details']->labname;
+        }
+
+        if(!empty($data['lab_details']->labcity)){
+        $data['labcity']=$data['lab_details']->labcity;
+
+        }
+
+
+        /*$data['sample'] = Sample::select(DB::raw('sample.id, u.name, sample.others_type,e.patient_id,sample.enroll_id,e.label,group_concat(receive_date) as receive,group_concat(sample.sample_label) as samples,group_concat(test_reason) as reason,group_concat(fu_month) as fu_month,group_concat(sample_type) as sample_type, group_concat(sample_quality) as sample_quality,group_concat(is_accepted) as is_accepted, count(sample_quality) as no_of_samples, group_concat(s.name) as sname'))
+         ->leftjoin('m_services as s','s.id','=','sample.service_id')
+         ->leftjoin('enrolls as e','e.id','=','sample.enroll_id')
+         ->leftJoin('users as u','u.id','=','sample.user_id')
+         ->where('sample.id',$id)
+         ->groupBy('sample.enroll_id')
+         ->orderBy('sample.enroll_id','desc')         
+         ->limit(20)->first();*/
+        $data['fu_month_list'] = array('End IP','End CP','6 M','12 M','18 M','24 M');
+        $data['other_sample_type'] = array('BAL','Pus','CSF','GA','Pericardial fluid','EB tissue', 'Urine', 'AFB MTB positive culture (LJ or LC)', 'Pleural fluid','FNAC');
+        $data['enroll']=DB::table('enrolls')->select('label as enroll')->where('id',$id)->get();
+        $data['sample_detail']=Sample::select('name','no_of_samples')->where('enroll_id',$id)->get();
+        $data['sample'] = Sample::where('enroll_id',$id)->get();
+
+         //dd($data['sample'][0]);
+        //dd($data['sample']);
+        return view('admin.sample.form1edit',compact('data'));        
+    }
+
+
 
 }
