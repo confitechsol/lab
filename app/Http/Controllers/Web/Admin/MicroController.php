@@ -55,10 +55,10 @@ class MicroController extends Controller
             $data['services'] = "fddg,gdg,gdg";
             //dd($data['services']);
 			//DASHBOARD DISPLAY START
-            $data['summary']['todo']=DB::select('select m.id as ID,  s.name,  ifnull(count(m.id),0) as cnt from t_microbiologist m join m_services as s on m.service_id = s.id where m.status = 0 and s.id in (1,2,3,4,8,14,15,16,17,20,21,22) group by m.service_id');
+            $data['summary']['todo']=DB::select('select m.id as ID,  s.name,  ifnull(count(m.id),0) as cnt from t_microbiologist m join m_services as s on m.service_id = s.id where m.status = 0 and s.id in (1,2,3,4,8,14,15,16,17,20,21,22,25) group by m.service_id');
 
-            $data['summary']['done']=DB::select('select m.id as ID, s.name, ifnull(count(m.id),0) as cnt from t_microbiologist m join m_services as s on m.service_id = s.id where m.status = 1 and m.print_15A = 1 and s.id in (1,2,3,4,8,14,15,16,17,20,21,22) group by m.service_id');
-            //dd($data['summary']);
+            $data['summary']['done']=DB::select('select m.id as ID, s.name, ifnull(count(m.id),0) as cnt from t_microbiologist m join m_services as s on m.service_id = s.id where m.status = 1 and m.print_15A = 1 and s.id in (1,2,3,4,8,14,15,16,17,20,21,22,25) group by m.service_id');
+           // dd($data['summary']);
             $ret = [];
             foreach($data['summary']['todo'] as $sample){
                 $data1 = $sample;
@@ -219,7 +219,7 @@ class MicroController extends Controller
 			$data['sendtolist'] = Master_addtest::select('*')->get();
 			$data['addtestlist'] = DB::table('m_test_request')->select('id','name')->where('status',1)->get();
             //dd($data['addtestlist']);
-			//dd($data['sample']);
+			//dd($data);
             return view('admin.microbiologist.list',compact('data'));
     }
 	public function ajaxMicrobiologistList(Request $request){
@@ -248,7 +248,7 @@ class MicroController extends Controller
 			AND   B.enroll_id = A.enroll_id
 			AND   A.status = 0 AND IFNULL(A.print_15a,1) = 1 
 			AND   IFNULL(A.sent_to_nikshay,0) = 0 AND A.sent_to_nikshay_date IS NULL
-			AND  A.service_id in (4,14,15, 17, 20, 21, 22)");
+			AND  A.service_id in (1,2,4,14,15, 17, 20, 21, 22)");
         //dd(DB::getQueryLog());
         //echo "<pre>"; print_r($sel);	echo "</pre>";	die();
 	    $totalRecords =$sel[0]->count;
@@ -263,8 +263,8 @@ class MicroController extends Controller
 			AND   `t_service_log`.`sample_id` = `sample`.`id`
 			AND   t_service_log.status = 0 AND IFNULL(t_service_log.print_15a,1) = 1 
 			AND   IFNULL(t_service_log.sent_to_nikshay,0) = 0 AND t_service_log.sent_to_nikshay_date IS NULL
-			AND   t_service_log.service_id in (4,14,15, 17, 20, 21, 22)".$searchQuery);
-				
+			AND   t_service_log.service_id in (1,2,4,14,15, 17, 20, 21, 22)".$searchQuery);
+			//dd($sel);	
 		//dd(DB::getQueryLog());			  
 		$totalRecordwithFilter = $sel[0]->count_filtered;
 		//dd('totalRecordwithFilter'.$totalRecordwithFilter);
@@ -308,7 +308,7 @@ class MicroController extends Controller
 				->whereRaw(" t_service_log.print_15a=1 ".$searchQuery." group by sample.id,s.service_id,t_service_log.service_id,t_service_log.tag  limit ".$row.",".$rowperpage)
                 ->get();*/
 	   // DB::enableQueryLog();			
-		$microQry=DB::select("select `s`.`id` as `ID`, `s`.`tag` as `tag`, `t_service_log`.`id` as `tslID`, `t_service_log`.`tag` as `stag`, 
+		 $microQry=DB::select("select `s`.`id` as `ID`, `s`.`tag` as `tag`, `t_service_log`.`id` as `tslID`, `t_service_log`.`tag` as `stag`, 
 			`t_service_log`.`print_15a` as `print_15a`, `t_service_log`.`sent_to_nikshay` as `sent_to_nikshay`,
 			`f`.`DMC_PHI_Name` as `facility_id`, `sample`.`id` as `sampleID`,
 			`s`.`enroll_id` as `enroll`, `enrolls`.`label` as `enroll_l`, 
@@ -328,13 +328,14 @@ class MicroController extends Controller
 			left join `m_dmcs_phi_relation` as `f` on `rq`.`facility_id` = `f`.`id` 
 			left join `m_services` as `m` on `m`.`id` = `t_service_log`.`service_id` 
 			left join `patient` as `patient` on `patient`.`id` = `enrolls`.`patient_id`
-			left join `t_cbnaat` as `cbnaat` on `s`.`sample_id` = `cbnaat`.`sample_id` and `s`.`enroll_id` = `cbnaat`.`enroll_id`
+            left join `t_cbnaat` as `cbnaat` on `s`.`sample_id` = `cbnaat`.`sample_id` and `s`.`enroll_id` = `cbnaat`.`enroll_id`
+			left join `t_microscopy` as `microscopy` on `s`.`sample_id` = `microscopy`.`sample_id` and `s`.`enroll_id` = `microscopy`.`enroll_id`
 			left join `t_decontamination` as `d` on `s`.`sample_id` = `d`.`sample_id` and `s`.`enroll_id` = `d`.`enroll_id`
 			left join `t_culture_inoculation` as `ci` on `s`.`sample_id` = `ci`.`sample_id`  and `s`.`enroll_id` = `ci`.`enroll_id`
 			left join `t_lc_dst_inoculation` as `ldi` on `s`.`sample_id` = `ldi`.`sample_id` and `s`.`enroll_id` = `ldi`.`enroll_id`
 			left join `t_dst_drugs_tr` as `ddt` on `s`.`enroll_id` = `ddt`.`enroll_id` and `s`.`service_id` = `ddt`.`service_id` 
 			where `t_service_log`.`sent_to_nikshay` = 0 and `t_service_log`.`sent_to_nikshay_date` is null and `t_service_log`.`status` = 0 ".$searchQuery." 
-			and `t_service_log`.`service_id` in (4,14,15, 17, 20, 21, 22) and  t_service_log.print_15a=1  
+			and `t_service_log`.`service_id` in (1,2,4,14,15, 17, 20, 21, 22) and  t_service_log.print_15a=1  
 			and (CONCAT(CONVERT(s.service_id,CHAR(2)),s.next_step) NOT IN ('14Send Sample'))
 			group by s.enroll_id, s.service_id, s.tag  order by `enrolls`.`label` desc limit ".$row.",".$rowperpage);
 			//".$columnSortOrder."

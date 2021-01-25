@@ -308,7 +308,7 @@ class MicroscopyController extends Controller
 
     /**
      *
-     * Bulk send to Decontamination Review.
+     * Bulk send to Microscopy Review.
      *
      * @param Request $request
      * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
@@ -319,7 +319,7 @@ class MicroscopyController extends Controller
         // Validate User Inputs ===========================================
         $this->validate( $request, [
             'sample_ids' => 'required',
-            //'test_date'  => 'required|date_format:Y-m-d',
+            'test_date'  => 'required|date_format:Y-m-d',
         ] );
 
        DB::beginTransaction();
@@ -327,7 +327,7 @@ class MicroscopyController extends Controller
             // User Inputs ====================================================
             $sample_ids = trim( $request->input('sample_ids') );
             $sample_ids = explode(',', $sample_ids);
-            //$test_date  = $request->input('test_date');
+            $test_date  = $request->input('test_date');
             $result  = $request->input('result');
 
             // Get Samples from $sample_ids ===================================
@@ -364,7 +364,7 @@ class MicroscopyController extends Controller
                     'sample_id' => $value[0]['sample_id'],
                     'status'    => '1',        
                     //'status'    => Microscopy::STATUS_ACTIVE,        
-                    'test_date' => ' ',
+                    'test_date' => $test_date,
                     'result' => $result,
                     'created_by' => Auth::user()->id,
                     'updated_by' => Auth::user()->id
@@ -396,5 +396,5 @@ class MicroscopyController extends Controller
     }  
    return back(); // Return back from where the request has come.
 
-    }
+}
 }

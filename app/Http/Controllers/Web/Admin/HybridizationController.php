@@ -410,4 +410,122 @@ class HybridizationController extends Controller
         return view('admin.hybridization.print',compact('data'));
 
     }
+    /**
+     *
+     * Bulk send to hybridization Review.
+     *
+     * @param Request $request
+     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
+     */
+    public function bulkStore( Request $request ){ 
+      // Validate User Inputs ===========================================
+        $this->validate( $request, [
+            'sample_ids' => 'required',
+           // 'test_date'  => 'required|date_format:Y-m-d',
+        ] );  
+        DB::beginTransaction();
+        //try {
+        $sample_ids = trim( $request->input('sample_ids') );
+        $sample_ids = explode(',', $sample_ids); 
+       // dd($sample_ids);
+        $data = array();
+         foreach($sample_ids as $sample_id){  
+           //dd($sample_id);
+              $data['sample'] = ServiceLog::select('t_service_log.updated_at as ID','m.enroll_id','m.id as sample_id',
+                      'm.receive_date as receive','m.test_reason as reason','is_accepted','s.result',
+                      't_service_log.sample_label as samples','t_service_log.service_id','t_service_log.id as log_id',
+                       't_service_log.status','t_service_log.enroll_label','t_service_log.sample_label','m.no_of_samples','t.status as dna_status','t.created_at as date_of_extraction',
+                       'p.completed as pcr_completed','t_service_log.tag','d.test_date as decontamination_date','t_service_log.status as STATUS','t_service_log.sample_id','t_service_log.service_id','t_service_log.rec_flag')
+            ->leftjoin('sample as m','m.id','=','t_service_log.sample_id')
+            ->leftjoin('t_dnaextraction as t', function ($join) {
+                  $join->on('t.sample_id','=','t_service_log.sample_id')
+                       ->where('t.status', 1);
+              })
+            ->leftjoin('t_decontamination as d', function ($join) {
+                  $join->on('d.sample_id','=','t_service_log.sample_id')
+                       ->where('d.status', 1);
+              })
+            ->leftjoin('t_pcr as p','p.sample_id','=','t_service_log.sample_id')
+            ->leftjoin('t_microscopy as s','s.sample_id','=','t_service_log.sample_id')
+            ->where('t_service_log.service_id',14)
+            ->where('t_service_log.id',$sample_id)
+            ->whereIn('t_service_log.status',[1]) //  ->whereIn('t_service_log.status',[0,1,2])
+            ->orderBy('enroll_id','desc')
+            ->groupBy('log_id') // made changes for multiple records displaying in Hybridisation
+            ->groupBy('samples')
+            ->get();
+         //  dd($data['sample'][0]);
+
+            if($request->service_id==0){
+                $result = 'Valid';
+            }
+            else if($request->service_id==1){
+              $result = 'Invalid';
+            }
+            else if($request->service_id==2){
+              $result = 'Repeat DNA Extraction from same sample';
+            }
+            else if($request->service_id==3){
+              $result = 'Repeat DNA Extraction from standby sample';
+            }
+            else{
+              $result = 'Repeat Hybridization from same DNA extract';
+            }
+
+
+          if(($request->service_id == 0)||($request->service_id == 1)){//VALID & INVALID
+              Hybridization::where('enroll_id', $data['sample'][0]->enroll_id)->where('tag',$data['sample'][0]->tag)->delete();
+              $hybridization = Hybridization::create([
+               'enroll_id' => $data['sample'][0]->enroll_id,
+               'sample_id' => $data['sample'][0]->sample_id,
+               'result' => $result,
+               'status' => 1 ,
+               'tag' => $data['sample'][0]->tag   
+             ]);
+
+
+              $log = ServiceLog::find($data['sample'][0]->log_id);
+              //dd($data['sample'][0]->id );
+              $log->released_dt=date('Y-m-d');
+              $log->comments=$request->comments;
+             $log->tested_by=$request->user()->name;
+              $log->tested_by = 'Administrator';
+              $log->status = 0;             
+              $log->updated_by = $request->user()->id;
+              $log->save();
+      
+          $new_service = [
+            'enroll_id' => $data['sample'][0]->enroll_id,
+            'sample_id' => $data['sample'][0]->sample_id,
+            'service_id' => $data['sample'][0]->service_id,
+            'status' => 1,
+            'reported_dt'=>date('Y-m-d'),
+            'tag' => $data['sample'][0]->tag,
+            'rec_flag' => $data['sample'][0]->rec_flag,
+            'created_by' => $request->user()->id,
+            'updated_by' => $request->user()->id,
+            'enroll_label' => $data['sample'][0]->enroll_label,
+            'sample_label' => $data['sample'][0]->sample_label,
+          ];
+
+          $nwService = ServiceLog::create($new_service);
+
+          }
+
+
+         // dd($data);
+
+         }
+
+
+
+        DB::commit();
+        //}catch(\Exception $e){
+        //dd($e->getMessage()); 
+      // DB::rollback();
+       // return redirect('/dash_decontamination')->withErrors(['Sorry!! Action already taken of the selected Sample']);
+      //  return back();
+     // }
+      return back(); 
+    }
 }

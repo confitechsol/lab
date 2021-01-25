@@ -6,6 +6,7 @@ use App\Model\Sample;
 use App\Model\Service;
 use App\Model\ServiceLog;
 use App\Model\Microscopy;
+use App\Model\Microbio;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -195,89 +196,79 @@ class MicroscopyReviewController extends Controller
         ] );
 
        DB::beginTransaction();
-        try {
-            //dd('i am here');
+        try {            
             // User Inputs ====================================================
             $sample_ids = trim( $request->input('sample_ids') );
-            $sample_ids = explode(',', $sample_ids);
-           // $test_date  = $request->input('test_date');
+            $sample_ids = explode(',', $sample_ids);           
             $comments  = $request->input('comments');
             $service_id1  = $request->input('service_id1');
-            //$result  = $request->input('result');
+            
 
             // Get Samples from $sample_ids ===================================
-            // $samples = Sample::query()->findMany( $sample_ids);
-            // dd($sample_ids );
+            // $samples = Sample::query()->findMany( $sample_ids);           
             $data = array();
-            foreach($sample_ids as $sample_id){   
-           // dd( $sample_id);     
-
-              /*$data['sample'][$sample_id] = ServiceLog::select('s.id as sample_id', 't_service_log.updated_at as ID','t_service_log.enroll_label',
-              't_service_log.enroll_id','t_service_log.sample_label as samples','t_service_log.status',
-              DB::raw('date_format(d.test_date,"%d-%m-%y") as date'),'s.test_reason','m.result','s.fu_month','t_service_log.tag',
-                              't_service_log.status as STATUS','t_service_log.sample_id','t_service_log.service_id','t_service_log.rec_flag','d.sent_for AS Deconta_sent_for')
-                              ->leftjoin('t_microscopy as m','m.sample_id','=','t_service_log.sample_id')
-                              ->leftjoin('t_decontamination as d','d.sample_id','t_service_log.sample_id')
-                              ->leftjoin('sample as s','s.id','t_service_log.sample_id')
-                             ->whereIn('t_service_log.status',[1]) // ->whereIn('t_service_log.status',[1,2,0])
-                             //->where('t_service_log.service_id',3)
-                             ->where('t_service_log.id',$sample_id)
-                             ->orderBy('t_service_log.enroll_label','desc')
-                             ->distinct()
-                             ->get();  
-                //dd($data['sample']); */  
+            foreach($sample_ids as $sample_id){ 
 
                 $data['sample'][$sample_id]  = ServiceLog::where('t_service_log.id',$sample_id)->first();                              
-              }
-            // dd($data['sample']);
-             //dd(count($data['sample']));
-              if(count($data['sample']) > 0){ 
-                 // die(count($data['sample']));
+            }            
+            if(count($data['sample']) > 0){                  
                 foreach($data['sample'] as $key => $value){
-               //dd($value->enroll_id);
-                  // Update if exists or create new if not, in Decontamination ==
-                  /** @var Sample $sample */
-                 /*Microscopy::create([
-                    'enroll_id' => $value[0]['enroll_id'],
-                    'sample_id' => $value[0]['sample_id'],
-                    'status'    => '1',        
-                    //'status'    => Microscopy::STATUS_ACTIVE,        
-                    'test_date' => $test_date,
-                    'result' => $result,
-                    'created_by' => Auth::user()->id,
-                    'updated_by' => Auth::user()->id
-                  ]);*/
+                   // dd($value);
+
                   // Log this change to ServiceLog ==============================
-                  ServiceLog::where([
-                    'id' => $key,
-                   // 'enroll_id'     => $data['sample'][0]['enroll_id'],
-                   // 'sample_label'  => $data['sample'][0]['enroll_label'],
-                    //'service_id'    => $data['sample'][0]['service_id'],
-                    
-                    //'service_id'    => ServiceLog::TYPE_DECONTAMINATION,
+                  
+                  if($service_id1 == 25){
+                      Microbio::create([
+                        'enroll_id' => $value->enroll_id,
+                        'sample_id' => $value->sample_id,
+                        'service_id' => $value->service_id,
+                        //'service_id' => $service_id1,
+                        'status'    => '0',        
+                        'report_type'    => 'End Of Report',        
+                        'tag' => $value->tag,
+                        'next_step' => '',
+                        'created_by' => Auth::user()->id,
+                        'updated_by' => Auth::user()->id
+                      ]);
+
+
+                        ServiceLog::where([
+                            'id' => $key,                   
+                          ])->update([
+                            'comments'=> $comments,
+                            //'stage'=> 0,
+                            'status' => 0,                    
+                            'created_by' => Auth::user()->id,
+                            'updated_by' => Auth::user()->id,
+                          ]);
+
+
+                  }else{
+
+                ServiceLog::where([
+                    'id' => $key,                   
                   ])->update([
                     'comments'=> $comments,
                     //'stage'=> 0,
-                    'status' => 0,
-                    //'status' => Microscopy::SERVICE_STATUS_ACTIVE,
+                    'status' => 0,                    
                     'created_by' => Auth::user()->id,
                     'updated_by' => Auth::user()->id,
                   ]); 
-
-
                   ServiceLog::create([
                     'enroll_id' => $value->enroll_id,
                     'sample_id' => $value->sample_id,
                     'service_id' => $value->service_id,
-                    'status'    => '1',        
-                    //'status'    => Microscopy::STATUS_ACTIVE,        
-                    //'test_date' => $test_date,
-                   // 'result' => $result,
+                    //'service_id' => $service_id1,
+                    'status'    => '1', 
+                    'enroll_label'    => $value->enroll_label, 
+                    'sample_label'    => $value->sample_label, 
+                    'tag'    => $value->tag, 
+                    //'status'    => '0', 
                     'created_by' => Auth::user()->id,
                     'updated_by' => Auth::user()->id
                   ]);
-
-               }             
+                  }
+                }             
             }     
            DB::commit();
         }catch(\Exception $e){
