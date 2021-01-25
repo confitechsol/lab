@@ -179,10 +179,15 @@ class DNAextractionController extends Controller
     /*store datqa from dnaextraction popup*/
     public function DNANext(Request $request)
     {
+     dd($request->all());
 
-     //dd($request->all());
+     $sample_arr = array();
+        $sample_arr = $request->logID;
+        $data_arr = $request->all();
+
 	 DB::beginTransaction();
      try { 
+       
       $log = ServiceLog::find($request->service_log_id);
        if(($request->service_id==4)||($request->service_id== 5)||($request->service_id ==6)){
 			  //DB::enableQueryLog();	
@@ -266,7 +271,6 @@ class DNAextractionController extends Controller
 				$storagelog->updated_by = $request->user()->id;
 			    $storagelog->status = 0;           
                 $storagelog->save();
-
           }
           //return redirect('/DNAextraction');
         }elseif($request->service_id == 3){

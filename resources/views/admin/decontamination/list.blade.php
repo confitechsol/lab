@@ -536,7 +536,7 @@ var $bulk_checkboxes = $('.bulk-selected');
 
 function bulk_action_review(){
             var $modal = $('#myModal');
-            var selected = [];
+            //var selected = [];
             var $checkboxes = $('.bulk-selected:checked');          
 
             // Display an error message and stop if no checkboxes are selected.
