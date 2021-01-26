@@ -179,7 +179,7 @@ class DNAextractionController extends Controller
     /*store datqa from dnaextraction popup*/
     public function DNANext(Request $request)
     {
-     dd($request->all());
+     //dd($request->all());
 
      $sample_arr = array();
         $sample_arr = $request->logID;
@@ -187,174 +187,179 @@ class DNAextractionController extends Controller
 
 	 DB::beginTransaction();
      try { 
-       
-      $log = ServiceLog::find($request->service_log_id);
-       if(($request->service_id==4)||($request->service_id== 5)||($request->service_id ==6)){
-			  //DB::enableQueryLog();	
-			  $data = DNAextraction::create([
-				'enroll_id' => $log->enroll_id,
-				'sample_id' => $log->sample_id,
-				'created_by' => $request->user()->id,
-				'updated_by' => $request->user()->id,
-				'tag'=>$request->tag,				
-				'created_at' => date("Y-m-d H:i:s",strtotime($request->date_ext)),
-				'status' => 1
-			  ]);
-			  //dd(DB::getQueryLog());
-	   }
-      //dd('ddd');
-        if($request->service_id == 1){
-		  $storagelog = ServiceLog::where('enroll_id',$request->enroll_id)->where('service_id',11)->first();     
-          
-          if($storagelog){
-			  $log = ServiceLog::find($request->service_log_id);
-			  $log->status =99;
-			  $log->updated_by = $request->user()->id;			 
-			  $log->save();
-            
-			$new_service = [
-				  'enroll_id' => $log->enroll_id,
-				  'sample_id' => $storagelog->sample_id,
-				  'service_id' => $request->service_id == 1?3:8,
-				  'status' => 1,
-				  'tag' => $log->tag,
-				  'rec_flag' => $log->rec_flag,
-				  'reported_dt'=>date('Y-m-d'),
-				  'created_by' => $request->user()->id,
-				  'updated_by' => $request->user()->id,
-				  'enroll_label' => $storagelog->enroll_label,
-				  'sample_label' => $storagelog->sample_label,
-				 ];
 
-				 $nwService = ServiceLog::create($new_service);
-				 
-				 //Update storage sample
-				$storagelog->updated_by = $request->user()->id;
-			    $storagelog->status = 0;           
-                $storagelog->save();
+      foreach($sample_arr as $sampleID)
+      {
 
-          }
-          //return redirect('/DNAextraction');
-        }elseif($request->service_id == 2){//Extraction with stand by sample
-          
-          $storagelog = ServiceLog::where('enroll_id',$request->enroll_id)->where('service_id',11)->first();
-          if($storagelog){
-			  $log = ServiceLog::find($request->service_log_id);
-			  //$log->status = 0;
-			  $log->status = 99;
-			  $log->updated_by = $request->user()->id;
-			  //$data = $log;
-			  $log->save();
-			  
-            /*$log->service_id = $request->service_id == 2?8:3;
-            $log->updated_by = $request->user()->id;
-			$log->rec_flag = $request->rec_flag;
-            //$data = $log;
-            $log->save();*/
-			$new_service = [
-				  'enroll_id' => $log->enroll_id,
-				  'sample_id' => $storagelog->sample_id,
-				  'service_id' => $request->service_id == 2?8:3,
-				  'status' => 1,
-				  'tag' => $log->tag,
-				  'rec_flag' => $log->rec_flag,
-				  'reported_dt'=>date('Y-m-d'),
-				  'created_by' => $request->user()->id,
-				  'updated_by' => $request->user()->id,
-				  'enroll_label' => $storagelog->enroll_label,
-				  'sample_label' => $storagelog->sample_label,
-				 ];
-
-				 $nwService = ServiceLog::create($new_service);
-				 
-				 //Update storage sample
-				$storagelog->updated_by = $request->user()->id;
-			    $storagelog->status = 0;           
-                $storagelog->save();
-          }
-          //return redirect('/DNAextraction');
-        }elseif($request->service_id == 3){
-          $old_sample = Sample::select('sample_label')->where('id',$log->sample_id)->first();
-          $new_sample = $old_sample->sample_label.'R';
-          Sample::where('id',$log->sample_id)->update(['sample_label'=>$new_sample]);
-          ServiceLog::where('sample_id',$log->sample_id)->where('status','!=',0)->update(['sample_label'=>$new_sample]);
-          $log = ServiceLog::find($request->service_log_id);
-          $log->status = 1;
-		  $log->rec_flag = $request->rec_flag;
-          $log->sample_label = $new_sample;
-          $log->updated_by = $request->user()->id;
-          //$data = $log;
-          $log->save();
-		  
-          /*DNAextraction::where('sample_id', $log->sample_id)
-          ->where('enroll_id', $request->enroll_id)
-          ->where('status',1)
-          ->update(['status' => 0]);*/
-          //return redirect('/DNAextraction');
-        }elseif($request->service_id == 4 || $request->service_id == 5 || $request->service_id == 6){
-          if($request->service_log_id > 0){
-            $service = ServiceLog::find($request->service_log_id);
-			//dd($service);
-            $service->released_dt=date('Y-m-d');
-            $service->comments=$request->comments;
-            $service->tested_by=$request->user()->name;
-            $service->status = 0;
-            $service->updated_by = $request->user()->id;
-            $service->save();
-            if($request->service_id == 4 ) {
-              $tag = '1st line LPA';
-            }
-			if($request->service_id == 5){
-              $tag = '2nd line LPA';
-            }
-			
-			/*else{
-              $tag = '1st line LPA  and for 2nd line LPA';
-            }*/
-			if($request->service_id == 6){//1st line LPA  and for 2nd line LPA
-			  for($i=1;$i<=2;$i++){
-				  if($i==1){
-					  $tag = '1st line LPA';
-				  }else{
-					  $tag = '2nd line LPA';
-				  }
-				  $new_service = [
-				  'enroll_id' => $service->enroll_id,
-				  'sample_id' => $service->sample_id,
-				  'service_id' => 12,
-				  'status' => 1,
-				  'tag' => $tag,
-				  'rec_flag' => $request->rec_flag,
-				  'reported_dt'=>date('Y-m-d'),
-				  'created_by' => $request->user()->id,
-				  'updated_by' => $request->user()->id,
-				  'enroll_label' => $service->enroll_label,
-				  'sample_label' => $service->sample_label,
-				 ];
-
-				 $nwService = ServiceLog::create($new_service);
-			  }
-			}else{	
-				$new_service = [
-				  'enroll_id' => $service->enroll_id,
-				  'sample_id' => $service->sample_id,
-				  'service_id' => 12,
-				  'status' => 1,
-				  'tag' => $tag,
-				   'rec_flag' => $request->rec_flag,
-				  'reported_dt'=>date('Y-m-d'),
-				  'created_by' => $request->user()->id,
-				  'updated_by' => $request->user()->id,
-				  'enroll_label' => $service->enroll_label,
-				  'sample_label' => $service->sample_label,
-				];
-
-				$nwService = ServiceLog::create($new_service);
-			}
-            //return $nwService;
-            //return redirect('/DNAextraction');
-         }
+          $log = ServiceLog::find($data_arr['service_log_id'.$sampleID]);
+          if(($request->service_id==4)||($request->service_id== 5)||($request->service_id ==6)){
+            //DB::enableQueryLog();	
+            $data = DNAextraction::create([
+            'enroll_id' => $log->enroll_id,
+            'sample_id' => $log->sample_id,
+            'created_by' => $request->user()->id,
+            'updated_by' => $request->user()->id,
+            'tag'=>$data_arr['tag'.$sampleID],				
+            'created_at' => date("Y-m-d H:i:s",strtotime($request->date_ext)),
+            'status' => 1
+            ]);
+            //dd(DB::getQueryLog());
         }
+          //dd('ddd');
+            if($request->service_id == 1){
+          $storagelog = ServiceLog::where('enroll_id',$data_arr['enroll_id'.$sampleID])->where('service_id',11)->first();     
+              
+              if($storagelog){
+            $log = ServiceLog::find($data_arr['service_log_id'.$sampleID]);
+            $log->status =99;
+            $log->updated_by = $request->user()->id;			 
+            $log->save();
+                
+          $new_service = [
+              'enroll_id' => $log->enroll_id,
+              'sample_id' => $storagelog->sample_id,
+              'service_id' => $request->service_id == 1?3:8,
+              'status' => 1,
+              'tag' => $log->tag,
+              'rec_flag' => $log->rec_flag,
+              'reported_dt'=>date('Y-m-d'),
+              'created_by' => $request->user()->id,
+              'updated_by' => $request->user()->id,
+              'enroll_label' => $storagelog->enroll_label,
+              'sample_label' => $storagelog->sample_label,
+            ];
+
+            $nwService = ServiceLog::create($new_service);
+            
+            //Update storage sample
+            $storagelog->updated_by = $request->user()->id;
+              $storagelog->status = 0;           
+                    $storagelog->save();
+
+              }
+              //return redirect('/DNAextraction');
+            }elseif($request->service_id == 2){//Extraction with stand by sample
+              
+              $storagelog = ServiceLog::where('enroll_id',$data_arr['enroll_id'.$sampleID])->where('service_id',11)->first();
+              if($storagelog){
+            $log = ServiceLog::find($data_arr['service_log_id'.$sampleID]);
+            //$log->status = 0;
+            $log->status = 99;
+            $log->updated_by = $request->user()->id;
+            //$data = $log;
+            $log->save();
+            
+                /*$log->service_id = $request->service_id == 2?8:3;
+                $log->updated_by = $request->user()->id;
+          $log->rec_flag = $request->rec_flag;
+                //$data = $log;
+                $log->save();*/
+          $new_service = [
+              'enroll_id' => $log->enroll_id,
+              'sample_id' => $storagelog->sample_id,
+              'service_id' => $request->service_id == 2?8:3,
+              'status' => 1,
+              'tag' => $log->tag,
+              'rec_flag' => $log->rec_flag,
+              'reported_dt'=>date('Y-m-d'),
+              'created_by' => $request->user()->id,
+              'updated_by' => $request->user()->id,
+              'enroll_label' => $storagelog->enroll_label,
+              'sample_label' => $storagelog->sample_label,
+            ];
+
+            $nwService = ServiceLog::create($new_service);
+            
+            //Update storage sample
+            $storagelog->updated_by = $request->user()->id;
+              $storagelog->status = 0;           
+                    $storagelog->save();
+              }
+              //return redirect('/DNAextraction');
+            }elseif($request->service_id == 3){
+              $old_sample = Sample::select('sample_label')->where('id',$log->sample_id)->first();
+              $new_sample = $old_sample->sample_label.'R';
+              Sample::where('id',$log->sample_id)->update(['sample_label'=>$new_sample]);
+              ServiceLog::where('sample_id',$log->sample_id)->where('status','!=',0)->update(['sample_label'=>$new_sample]);
+              $log = ServiceLog::find($data_arr['service_log_id'.$sampleID]);
+              $log->status = 1;
+          $log->rec_flag = $data_arr['rec_flag'.$sampleID];
+              $log->sample_label = $new_sample;
+              $log->updated_by = $request->user()->id;
+              //$data = $log;
+              $log->save();
+          
+              /*DNAextraction::where('sample_id', $log->sample_id)
+              ->where('enroll_id', $request->enroll_id)
+              ->where('status',1)
+              ->update(['status' => 0]);*/
+              //return redirect('/DNAextraction');
+            }elseif($request->service_id == 4 || $request->service_id == 5 || $request->service_id == 6){
+              if($data_arr['service_log_id'.$sampleID] > 0){
+                $service = ServiceLog::find($data_arr['service_log_id'.$sampleID]);
+          //dd($service);
+                $service->released_dt=date('Y-m-d');
+                $service->comments=$request->comments;
+                $service->tested_by=$request->user()->name;
+                $service->status = 0;
+                $service->updated_by = $request->user()->id;
+                $service->save();
+                if($request->service_id == 4 ) {
+                  $tag = '1st line LPA';
+                }
+          if($request->service_id == 5){
+                  $tag = '2nd line LPA';
+                }
+          
+          /*else{
+                  $tag = '1st line LPA  and for 2nd line LPA';
+                }*/
+          if($request->service_id == 6){//1st line LPA  and for 2nd line LPA
+            for($i=1;$i<=2;$i++){
+              if($i==1){
+                $tag = '1st line LPA';
+              }else{
+                $tag = '2nd line LPA';
+              }
+              $new_service = [
+              'enroll_id' => $service->enroll_id,
+              'sample_id' => $service->sample_id,
+              'service_id' => 12,
+              'status' => 1,
+              'tag' => $tag,
+              'rec_flag' => $data_arr['rec_flag'.$sampleID],
+              'reported_dt'=>date('Y-m-d'),
+              'created_by' => $request->user()->id,
+              'updated_by' => $request->user()->id,
+              'enroll_label' => $service->enroll_label,
+              'sample_label' => $service->sample_label,
+            ];
+
+            $nwService = ServiceLog::create($new_service);
+            }
+          }else{	
+            $new_service = [
+              'enroll_id' => $service->enroll_id,
+              'sample_id' => $service->sample_id,
+              'service_id' => 12,
+              'status' => 1,
+              'tag' => $tag,
+              'rec_flag' => $data_arr['rec_flag'.$sampleID],
+              'reported_dt'=>date('Y-m-d'),
+              'created_by' => $request->user()->id,
+              'updated_by' => $request->user()->id,
+              'enroll_label' => $service->enroll_label,
+              'sample_label' => $service->sample_label,
+            ];
+
+            $nwService = ServiceLog::create($new_service);
+          }
+                //return $nwService;
+                //return redirect('/DNAextraction');
+            }
+            }
+      }
+
 		 DB::commit();
        }catch(\Exception $e){
 			DB::rollback();

@@ -144,7 +144,7 @@
                                               @if($samples->status==0)
                                               Done
                                               @else
-                                              <button onclick="openNextForm('{{$samples->samples}}', {{$samples->log_id}},{{$samples->enroll_id}}, '{{ $samples->tag }}','{{$samples->no_sample}}','{{$samples->sample_id}}','{{$samples->service_id}}','{{$samples->STATUS}}','{{$samples->rec_flag}}')" type="button" class = "btn btn-default btn-sm  nextbtn">Next</button>
+                                              <button onclick="openNextForm('{{$samples->sample_id}}')" type="button" class = "btn btn-default btn-sm  nextbtn">Next</button>
                                               @endif
                                             </td>
                                           </tr>
@@ -211,8 +211,12 @@ function openForm(sample_label, log_id){
   $('#log_id').val(log_id);
   $('#extractionpopupDiv').modal('toggle');
 }
-function openNextForm(sample_label, log_id, enroll_id, tag, no,sample_id,service_id,STATUS,rec_flag){
-  $('#next_sample_id').val(sample_label);
+function openNextForm(sample_id){
+
+  $('#smpl_log_id_'+sample_id).prop('checked', true);
+    bulk_action_review();
+
+  /* $('#next_sample_id').val(sample_label);
   $('#next_log_id').val(log_id);
   $('#next_enroll_id').val(enroll_id);
   $('#spantag').text(tag);
@@ -222,7 +226,7 @@ function openNextForm(sample_label, log_id, enroll_id, tag, no,sample_id,service
   $("#statusId").val(STATUS);
   $("#tagId").val(tag);
   $("#recFlagId").val(rec_flag);
-  $('#nextpopupDiv').modal('toggle');
+  $('#nextpopupDiv').modal('toggle'); */
 }
 </script>
 
@@ -312,9 +316,6 @@ var $bulk_checkboxes = $('.bulk-selected');
               var sample_service_id = "";
               var sample_status = "";
               var sample_rec_flag = "";
-              
-
-
               var err_html = "";
               var success_html = "";
               var html = "";
@@ -342,8 +343,7 @@ var $bulk_checkboxes = $('.bulk-selected');
               sample_id = $("#sample_id_"+$(e).val()).val();
               sample_service_id = $("#sample_service_id_"+$(e).val()).val();
               sample_status = $("#sample_status_"+$(e).val()).val();
-              sample_rec_flag = $("#sample_rec_flag_"+$(e).val()).val();
-                        
+              sample_rec_flag = $("#sample_rec_flag_"+$(e).val()).val();                        
 
               samples_data.push({
                 sample_id: sample_id,                
@@ -379,16 +379,16 @@ var $bulk_checkboxes = $('.bulk-selected');
                           $('.alert-danger').hide();                          
                           $('#nxtconfirm').prop("type", "submit");
                           $("#nxtconfirm").text("OK"); */
-                            html+='<input type="hidden" name="service_log_id'+response.sample_id+'"  value="'+$("#sample_log_id_"+response.sample_id).val()+'">';
-                            html+='<input type="hidden" name="enroll_id'+response.sample_id+'"  value="'+$("#sample_enroll_id_"+response.sample_id).val()+'">';                          
-                            html+= '<input type="hidden" name="no_sample'+response.sample_id+'" class="form-control form-control-line sampleId" value="'+$("#sample_no_sample_"+response.sample_id).val()+'">';
-                            html+='<input type="hidden" name="sampleID'+response.sample_id+'"  value="'+$("#sample_id_"+response.sample_id).val()+'">';
+                            html+='<input type="hidden" name="service_log_id'+$("#sample_log_id_"+response.sample_id).val()+'"  value="'+$("#sample_log_id_"+response.sample_id).val()+'">';
+                            html+='<input type="hidden" name="enroll_id'+$("#sample_log_id_"+response.sample_id).val()+'"  value="'+$("#sample_enroll_id_"+response.sample_id).val()+'">';                          
+                            html+= '<input type="hidden" name="no_sample'+$("#sample_log_id_"+response.sample_id).val()+'" class="form-control form-control-line sampleId" value="'+$("#sample_no_sample_"+response.sample_id).val()+'">';
+                            html+='<input type="hidden" name="sampleID'+$("#sample_log_id_"+response.sample_id).val()+'"  value="'+$("#sample_id_"+response.sample_id).val()+'">';
                             html+='<input type="hidden" name="logID[]"  value="'+$("#sample_log_id_"+response.sample_id).val()+'">';
-                            html+='<input type="hidden" name="serviceId'+response.sample_id+'"  value="'+$("#sample_service_id_"+response.sample_id).val()+'">';				
-                            html+='<input type="hidden" name="status'+response.sample_id+'"  value="'+$("#sample_status_"+response.sample_id).val()+'">';
-                            html+='<input type="hidden" name="tag'+response.sample_id+'" value="'+$("#sample_tag_"+response.sample_id).val()+'">';
-                            html+='<input type="hidden" name="rec_flag'+response.sample_id+'"  value="'+$("#sample_rec_flag_"+response.sample_id).val()+'">';
-                            html+='<input type="hidden" name="sample_id'+response.sample_id+'"  value="'+$("#samples_"+response.sample_id).val()+'">';
+                            html+='<input type="hidden" name="serviceId'+$("#sample_log_id_"+response.sample_id).val()+'"  value="'+$("#sample_service_id_"+response.sample_id).val()+'">';				
+                            html+='<input type="hidden" name="status'+$("#sample_log_id_"+response.sample_id).val()+'"  value="'+$("#sample_status_"+response.sample_id).val()+'">';
+                            html+='<input type="hidden" name="tag'+$("#sample_log_id_"+response.sample_id).val()+'" value="'+$("#sample_tag_"+response.sample_id).val()+'">';
+                            html+='<input type="hidden" name="rec_flag'+$("#sample_log_id_"+response.sample_id).val()+'"  value="'+$("#sample_rec_flag_"+response.sample_id).val()+'">';
+                            html+='<input type="hidden" name="sample_id'+$("#sample_log_id_"+response.sample_id).val()+'"  value="'+$("#samples_"+response.sample_id).val()+'">';
                             
                             $("#node").append(html);
                             html = "";                          
