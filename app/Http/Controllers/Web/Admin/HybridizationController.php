@@ -424,13 +424,11 @@ class HybridizationController extends Controller
            // 'test_date'  => 'required|date_format:Y-m-d',
         ] );  
         DB::beginTransaction();
-        //try {
+        try {
         $sample_ids = trim( $request->input('sample_ids') );
-        $sample_ids = explode(',', $sample_ids); 
-       // dd($sample_ids);
+        $sample_ids = explode(',', $sample_ids);        
         $data = array();
-         foreach($sample_ids as $sample_id){  
-           //dd($sample_id);
+         foreach($sample_ids as $sample_id){
               $data['sample'] = ServiceLog::select('t_service_log.updated_at as ID','m.enroll_id','m.id as sample_id',
                       'm.receive_date as receive','m.test_reason as reason','is_accepted','s.result',
                       't_service_log.sample_label as samples','t_service_log.service_id','t_service_log.id as log_id',
@@ -453,8 +451,7 @@ class HybridizationController extends Controller
             ->orderBy('enroll_id','desc')
             ->groupBy('log_id') // made changes for multiple records displaying in Hybridisation
             ->groupBy('samples')
-            ->get();
-         //  dd($data['sample'][0]);
+            ->get();        
 
             if($request->service_id==0){
                 $result = 'Valid';
@@ -483,49 +480,146 @@ class HybridizationController extends Controller
                'tag' => $data['sample'][0]->tag   
              ]);
 
-
+          } 
+          if($request->service_id == 0){//VALID
               $log = ServiceLog::find($data['sample'][0]->log_id);
               //dd($data['sample'][0]->id );
               $log->released_dt=date('Y-m-d');
               $log->comments=$request->comments;
-             $log->tested_by=$request->user()->name;
-              $log->tested_by = 'Administrator';
+              $log->tested_by=$request->user()->name;
+              //$log->tested_by = 'Administrator';
               $log->status = 0;             
               $log->updated_by = $request->user()->id;
               $log->save();
       
-          $new_service = [
+            $new_service = [
+              'enroll_id' => $data['sample'][0]->enroll_id,
+              'sample_id' => $data['sample'][0]->sample_id,
+              'service_id' => 15,
+              'status' => 1,
+              'reported_dt'=>date('Y-m-d'),
+              'tag' => $data['sample'][0]->tag,
+              'rec_flag' => $data['sample'][0]->rec_flag,
+              'created_by' => $request->user()->id,
+              'updated_by' => $request->user()->id,
+              'enroll_label' => $data['sample'][0]->enroll_label,
+              'sample_label' => $data['sample'][0]->sample_label,
+            ];
+            $nwService = ServiceLog::create($new_service);
+             DB::commit();
+            //return $nwService;          
+          }elseif($request->service_id == 1){//INVALID
+
+            $log = ServiceLog::find($data['sample'][0]->log_id);
+            $log->released_dt=date('Y-m-d');
+            $log->comments=$request->comments;
+            $log->tested_by=$request->user()->name;
+            $log->status = 0;
+            $log->updated_by = $request->user()->id;
+            $log->save();
+
+            $microbio = Microbio::create([
+              'enroll_id' => $data['sample'][0]->enroll_id,
+              'sample_id' => $data['sample'][0]->sample_id,
+                'service_id' => 14,
+                //'rec_flag' => $request->rec_flag,
+                'rec_flag' => $data['sample'][0]->rec_flag,
+                'next_step' => '',
+                'detail' => '',
+                'remark' => '',
+                'status' => 0,
+                'created_by' => $request->user()->id,
+                'updated_by' => $request->user()->id,
+              ]);
+            DB::commit();
+           // return $nwService;
+          }elseif($request->service_id == 3){//Repeat DNA Extraction from standby sample
+
+            $storagelog = ServiceLog::where('enroll_id',$data['sample'][0]->enroll_id)->where('service_id',11)->first(); 
+            if($storagelog){
+              //UPDATE STATUS=0 SERVICE LOG WITH SERVICE_ID=14
+                $log_data = ServiceLog::find($data['sample'][0]->log_id);          
+                $log_data->status = 0;
+                $log_data->released_dt=date('Y-m-d');
+                $log_data->updated_by = $request->user()->id;      
+                $log_data->save();   
+
+                //UPDATE STATUS=0 SERVICE LOG of storage WITH SERVICE_ID=11                
+                $storagelog->status = 0;
+                $storagelog->released_dt=date('Y-m-d');
+                $storagelog->updated_by = $request->user()->id;       
+                $storagelog->save();  
+
+                //DELETE FROM 2 TABLES
+              DNAextraction::where('enroll_id', $data['sample'][0]->enroll_id)->where('sample_id',$data['sample'][0]->sample_id)->delete();                                    
+              Pcr::where('enroll_id',$data['sample'][0]->enroll_id)->where('sample_id',$data['sample'][0]->sample_id)->where('tag','like',$data['sample'][0]->tag)->delete();
+              
+            //INSERT IN TO SERVICE LOG   
+            $new_service = [
+              'enroll_id' => $data['sample'][0]->enroll_id,
+              'sample_id' => $data['sample'][0]->sample_id,
+             // 'sample_id' => $storagelog->sample_id,
+              'service_id' => 8,
+              'status' => 1,
+              'tag' => $data['sample'][0]->tag,
+              'rec_flag' =>  $data['sample'][0]->rec_flag,
+              'reported_dt'=>date('Y-m-d'),
+              'created_by' => $request->user()->id,
+              'updated_by' => $request->user()->id,
+              'enroll_label' => $data['sample'][0]->enroll_label,
+              'sample_label' => $data['sample'][0]->sample_label,
+             ];   
+              $nwService = ServiceLog::create($new_service);
+              //UPDATE SERVICE LOG AGAIN with old service id=8
+              ServiceLog::where('sample_id',$data['sample'][0]->sample_id)->where('enroll_id',$data['sample'][0]->enroll_id)->where('service_id',8)->update(['status'=>99]);
+              DB::commit();
+             //return $nwService;
+            }
+          }elseif($request->service_id == 4){
+            $log = ServiceLog::find($data['sample'][0]->log_id);
+            $old_sample = Sample::select('sample_label')->where('id',$data['sample'][0]->sample_id)->first();
+            $new_sample = $old_sample->sample_label.'R';
+
+            Sample::where('id',$data['sample'][0]->sample_id)->update(['sample_label'=>$new_sample]);
+
+                           
+            Pcr::where('enroll_id',$data['sample'][0]->enroll_id)->where('sample_id',$data['sample'][0]->sample_id)->where('tag','like',$data['sample'][0]->tag)->delete();
+
+            //ServiceLog::where('sample_id',$log->sample_id)->where('status','!=',0)->update(['sample_label'=>$new_sample]);
+
+            //INSERT IN TO SERVICE LOG   
+            $new_service = [
             'enroll_id' => $data['sample'][0]->enroll_id,
             'sample_id' => $data['sample'][0]->sample_id,
-            'service_id' => $data['sample'][0]->service_id,
+            'service_id' => 12,
             'status' => 1,
+            'tag' => $log->tag,
+            'rec_flag' => $data['sample'][0]->rec_flag + 1,
             'reported_dt'=>date('Y-m-d'),
-            'tag' => $data['sample'][0]->tag,
-            'rec_flag' => $data['sample'][0]->rec_flag,
             'created_by' => $request->user()->id,
             'updated_by' => $request->user()->id,
             'enroll_label' => $data['sample'][0]->enroll_label,
-            'sample_label' => $data['sample'][0]->sample_label,
-          ];
+            'sample_label' => $new_sample,
+            ];
 
-          $nwService = ServiceLog::create($new_service);
+            $nwService = ServiceLog::create($new_service);
 
+            //update service log with 99          
+            $log->status = 99;      
+            $log->updated_by = $request->user()->id;          
+            $log->save();
+            //dd($data);
+            DB::commit();
+           // return $nwService;
           }
-
-
-         // dd($data);
-
          }
-
-
-
         DB::commit();
-        //}catch(\Exception $e){
+        }catch(\Exception $e){
         //dd($e->getMessage()); 
-      // DB::rollback();
+         DB::rollback();
        // return redirect('/dash_decontamination')->withErrors(['Sorry!! Action already taken of the selected Sample']);
-      //  return back();
-     // }
+       return back();
+      }
       return back(); 
     }
 }
