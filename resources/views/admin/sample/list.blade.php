@@ -81,6 +81,7 @@
                                             <td>
                                               <a class="btn btn-default btn-sm" target="_blank"
                                               href="{{url('samplePreview/'.$samples->enroll_id)}}">View Details </a>
+                                              <a  href="{{url('sample/editnew/'.$samples->enroll_id)}}" class="btn btn btn-sm">Edit</a>
                                             </td>
                                             <!-- <td>
                                               <button type="button" class="btn btn-info btn-sm" onclick="openPrintModal($(this))"  data-sample="{{$samples->samples}}">Print</button>
@@ -89,9 +90,10 @@
 
 
 
-                                             <!-- <td>
-                                                <a target="_blank" href="{{url('interimview/'.$samples->id)}}" class="btn btn btn-sm">Result</a>
-                                              </td> -->
+                                             <td>
+                                                <!-- <a target="_blank" href="{{url('sample/editnew/'.$samples->enroll_id)}}" class="btn btn btn-sm">Edit</a> -->
+                                                <!-- <a target="_blank" href="{{url('interimview/'.$samples->id)}}" class="btn btn btn-sm">Result</a> -->
+                                              </td>
 <!--
                                               <td>
                                                 <a target="_blank" href="{{ url('pdfview/'.$samples->id,['download'=>'pdf']) }}" class="btn btn btn-sm">Open PDF Mode</a>
