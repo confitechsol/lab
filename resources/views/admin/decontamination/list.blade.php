@@ -589,7 +589,7 @@ function bulk_action_review(){
               {
                 //var smap = samples_data[i].sample_id;
                 $.ajax({
-                      url: "{{url('check_for_sample_already_process_mcroscopy_next')}}"+'/'+samples_data[i].sample_id+'/'+samples_data[i].enroll_id+'/'+samples_data[i].service_id+'/'+samples_data[i].tag+'/'+samples_data[i].rec_flag,
+                      url: "{{url('check_for_sample_already_process_mcroscopy_next_deconta')}}"+'/'+samples_data[i].sample_id+'/'+samples_data[i].enroll_id+'/'+samples_data[i].service_id+'/'+samples_data[i].tag+'/'+samples_data[i].rec_flag,
                       type:"GET",
                       processData: false,
                       contentType: false,
@@ -599,7 +599,11 @@ function bulk_action_review(){
                         console.log(response);
                         if(response.result == 1)
                         {
-                          
+                          $('.alert-danger').removeClass('hide');
+                          $('.alert-danger').show();
+                          $('.alert-danger').html("Sorry!! Action already taken of the selected Sample");
+                                        $('#nxtconfirm').prop("type", "button");
+                                        e. preventDefault();
                         }
                         else
                         {

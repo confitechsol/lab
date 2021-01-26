@@ -89,55 +89,63 @@ class PCRController extends Controller
     public function store(Request $request)
     {
         //dd($request->all());
+
+        $sample_arr = array();
+        $sample_arr = $request->sampleID;
+        $data_arr = $request->all();
+
 		DB::beginTransaction();
         try {
-        $en_label = Enroll::select('label')->where('id',$request->enrollId)->first();
-        $s_id = Sample::select('id')->where('sample_label','like',$request->sampleid.'%')->first();
-      //dd($s_id);
-        $enroll_label=$en_label->label;
-        $sample_id=$s_id->id;
+                foreach($sample_arr as $sampleID)
+                {
+                    $en_label = Enroll::select('label')->where('id', $data_arr['enrollId'.$sampleID])->first();
+                    $s_id = Sample::select('id')->where('sample_label','like', $data_arr['sample_ids'.$sampleID].'%')->first();
+                //dd($s_id);
+                    $enroll_label=$en_label->label;
+                    $sample_id=$s_id->id;
 
-        //Pcr::where('enroll_id', $request->enrollId)->where('sample_id', $sample_id)->delete();
-		Pcr::where('enroll_id', $request->enrollId)->where('tag',$request->tag)->delete();
-		if($request->completed == 1)
-        {
-        $pcr = Pcr::create([
-            'enroll_id' => $request->enrollId,
-            'sample_id' => $sample_id,
-            'completed' => $request->completed,
-            'status' => 1,
-			'tag' => $request->tag,
-            'test_date' => date('Y-m-d H:i:s'),
-            'created_by' => Auth::user()->id,
-            'updated_by' => Auth::user()->id
-          ]);
+                    //Pcr::where('enroll_id', $request->enrollId)->where('sample_id', $sample_id)->delete();
+                    Pcr::where('enroll_id', $data_arr['enrollId'.$sampleID])->where('tag',$data_arr['tag'.$sampleID])->delete();
+                    if($request->completed == 1)
+                    {
+                    $pcr = Pcr::create([
+                        'enroll_id' => $data_arr['enrollId'.$sampleID],
+                        'sample_id' => $sample_id,
+                        'completed' => $request->completed,
+                        'status' => 1,
+                        'tag' => $data_arr['tag'.$sampleID],
+                        'test_date' => date('Y-m-d H:i:s'),
+                        'created_by' => Auth::user()->id,
+                        'updated_by' => Auth::user()->id
+                    ]);
 
-        
-            ServiceLog::create([
-                    'enroll_id' => $request->enrollId,
-                    'sample_id' => $sample_id,
-                    'enroll_label' => $enroll_label,
-                    'sample_label' => $request->sampleid,
-                    'service_id' => 14,
-                    'status' => 1,
-                    'reported_dt'=>date('Y-m-d'),
-                    'tag' => $request->tag,
-					'rec_flag' => $request->rec_flag,
-                    'test_date' => date('Y-m-d H:i:s'),
-                    'created_by' => Auth::user()->id,
-                     'updated_by' => Auth::user()->id
-                  ]);
-            ServiceLog::where('enroll_id', $request->enrollId)
-            ->where('sample_id', $sample_id)
-            ->where('service_id',12)
-			->where('tag',$request->tag)
-            ->update(['status' => 0 ,'released_dt'=>date('Y-m-d'),'tested_by'=>Auth::user()->name,'comments'=>$request->comments,'created_by' => Auth::user()->id,'updated_by' => Auth::user()->id]);
-        }else{
-          $old_sample = Sample::select('sample_label')->where('id',$sample_id)->first();
-          $new_sample = $old_sample->sample_label.'R';
-          Sample::where('id',$sample_id)->update(['sample_label'=>$new_sample]);
-          ServiceLog::where('sample_id',$sample_id)->where('status','!=',0)->update(['sample_label'=>$new_sample,'rec_flag' => $request->rec_flag]);
-        }
+                    
+                        ServiceLog::create([
+                                'enroll_id' => $data_arr['enrollId'.$sampleID],
+                                'sample_id' => $sample_id,
+                                'enroll_label' => $enroll_label,
+                                'sample_label' => $data_arr['sample_ids'.$sampleID],
+                                'service_id' => 14,
+                                'status' => 1,
+                                'reported_dt'=>date('Y-m-d'),
+                                'tag' => $data_arr['tag'.$sampleID],
+                                'rec_flag' => $data_arr['rec_flag'.$sampleID],
+                                'test_date' => date('Y-m-d H:i:s'),
+                                'created_by' => Auth::user()->id,
+                                'updated_by' => Auth::user()->id
+                            ]);
+                        ServiceLog::where('enroll_id', $data_arr['enrollId'.$sampleID])
+                        ->where('sample_id', $sample_id)
+                        ->where('service_id',12)
+                        ->where('tag',$data_arr['tag'.$sampleID])
+                        ->update(['status' => 0 ,'released_dt'=>date('Y-m-d'),'tested_by'=>Auth::user()->name,'comments'=>$request->comments,'created_by' => Auth::user()->id,'updated_by' => Auth::user()->id]);
+                    }else{
+                    $old_sample = Sample::select('sample_label')->where('id',$sample_id)->first();
+                    $new_sample = $old_sample->sample_label.'R';
+                    Sample::where('id',$sample_id)->update(['sample_label'=>$new_sample]);
+                    ServiceLog::where('sample_id',$sample_id)->where('status','!=',0)->update(['sample_label'=>$new_sample,'rec_flag' => $data_arr['rec_flag'.$sampleID]]);
+                    }
+                }
 
        //  $data = Cbnaat::create($request->all());
      // return $data;

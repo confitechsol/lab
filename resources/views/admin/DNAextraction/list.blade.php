@@ -351,12 +351,12 @@ var $bulk_checkboxes = $('.bulk-selected');
 
             });
 
-            console.log(samples_data);
+            //console.log(samples_data);
 
             for(i=0; i < samples_data.length; i++)
             {
                       $.ajax({
-                      url: "{{url('check_for_sample_already_process')}}"+'/'+samples_data[i].sample_id+'/'+samples_data[i].enroll_id+'/'+samples_data[i].service_id+'/'+samples_data[i].tag+'/'+samples_data[i].rec_flag,
+                      url: "{{url('check_for_sample_already_process_dnr')}}"+'/'+samples_data[i].sample_id+'/'+samples_data[i].enroll_id+'/'+samples_data[i].service_id+'/'+samples_data[i].tag+'/'+samples_data[i].rec_flag,
                       type:"GET",
                       processData: false,
                       contentType: false,

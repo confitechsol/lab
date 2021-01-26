@@ -80,6 +80,7 @@
                                     <table id="exampl" class="table table-striped table-bordered responsive col-xlg-12" cellspacing="0" width="100%">
                                         <thead>
                                             <tr>
+                                              <th><input type="checkbox" id="bulk-select-all"></th>
                                               <th class="hide">ID</th>
                                               <th>Enrollment ID</th>
                                               <th>Sample ID</th>
@@ -97,12 +98,22 @@
                                             @foreach ($data['sample'] as $key=> $samples)
 
                                                   <tr>
+                                                    <td>
+                                                      @if($samples->STATUS!=0)
+                                                        <input class="bulk-selected" type="checkbox" id="sample_id_{{ $samples->sample_id }}" value="{{ $samples->sample_id }}" />
+                                                        <input type="hidden" name="enroll_id_{{$samples->sample_id}}" id="enroll_id_{{$samples->sample_id}}" value="{{ $samples->enroll_id }}" />
+                                                        <input type="hidden" name="samples_{{$samples->sample_id}}" id="samples_{{$samples->sample_id}}" value="{{ $samples->samples }}" />
+                                                        <input type="hidden" name="tag_{{$samples->sample_id}}" id="tag_{{$samples->sample_id}}" value="{{ $samples->tag }}" />
+                                                        <input type="hidden" name="service_id_{{$samples->sample_id}}" id="service_id_{{$samples->sample_id}}" value="{{ $samples->service_id }}" />
+                                                        <input type="hidden" name="rec_flag_{{$samples->sample_id}}" id="rec_flag_{{$samples->sample_id}}" value="{{ $samples->rec_flag }}" />
+                                                      @endif
+                                                    </td>
                                                     <td class="hide">{{$samples->ID}}</td>
                                                     <td>{{$samples->enroll_label}}</td>
                                                     <td>{{$samples->samples}}</td>
                                                     <td>
                                                     <?php
-													if(!empty($samples->test_date))
+													                          if(!empty($samples->test_date))
                                                        echo date('d/m/Y', strtotime($samples->test_date)); 
                                                     ?>
                                                     </td>
@@ -120,7 +131,7 @@
                                                       @if($samples->STATUS==0)
                                                       Done
                                                       @else
-                                                    <button type="button" onclick="openCbnaatForm({{$samples->enroll_id}},'{{$samples->samples}}','{{$samples->tag}}',{{$samples->sample_id}},{{$samples->service_id}},{{$samples->rec_flag}})" class="btn btn-info btn-sm resultbtn" >Submit</button>
+                                                    <button type="button" onclick="openCbnaatForm({{$samples->sample_id}})" class="btn btn-info btn-sm resultbtn" >Submit</button>
                                                     @endif
                                                     </td>
 
@@ -162,19 +173,21 @@
             <div class="modal-body">
 
                 <input type="hidden" name="_token" value="{{ csrf_token() }}">
-                <input type="hidden" name="enrollId" id="enrollId" value="">
-                <input type="hidden" name="tag" id="tag" value="">
-				
-				<input type="hidden" name="sampleID" id="sampleID" value="">
-				<input type="hidden" name="serviceId" id="serviceId" value="">				
-				<input type="hidden" name="rec_flag" id="recFlagId" value="">
+
+                <div class="col-md-12" id="node"></div>
+
+                {{-- <input type="hidden" name="enrollId" id="enrollId" value="">
+                <input type="hidden" name="tag" id="tag" value="">				
+                <input type="hidden" name="sampleID" id="sampleID" value="">
+                <input type="hidden" name="serviceId" id="serviceId" value="">				
+                <input type="hidden" name="rec_flag" id="recFlagId" value="">
 
                 <label class="col-md-12"><h5>Sample ID:</h5></label>
                     <div class="col-md-12">
                        <select class="form-control form-control-line sampleId" name="sampleid" id="sampleid">
 
                        </select>
-                   </div>
+                   </div> --}}
                 <br>
 
                 <label class="col-md-12"><h5>PCR Completed:</h5></label>
@@ -240,11 +253,124 @@ $(function(){
 
 
 
+var $bulk_checkboxes = $('.bulk-selected');
+        var $bulk_select_all_checkbox = $('#bulk-select-all');
+
+        // Automatically Check or Uncheck "all select" checkbox
+        // based on the state of checkboxes in the list.
+        $bulk_checkboxes.click(function(){
+            if( $bulk_checkboxes.length === $bulk_checkboxes.filter(':checked').length ){
+                $bulk_select_all_checkbox.prop('checked', true);
+            }
+        });
 
 
- function openCbnaatForm(enroll_id, sample_ids, tag,sample_id,service_id,rec_flag){
+        // Check or Uncheck checkboxes based on the state
+        // of "all select" checkbox.
+        $bulk_select_all_checkbox.click(function(){
+            var checked = $(this).prop('checked');
+            $('.bulk-selected').prop('checked', checked);
+        });
+
+        function bulk_action_review(){
+
+          //var $modal = $('#myModal')
+          ;
+            //var selected = [];
+            var $checkboxes = $('.bulk-selected:checked');          
+
+            // Display an error message and stop if no checkboxes are selected.
+            if( $checkboxes.length === 0 ){
+                alert("First select one or more items from the list.");
+                return;
+            }
+
+            var err_html = "";
+              var success_html = "";
+              var html = "";
+              var full_html = "";
+              var enroll_id="";
+              var sample_id="";
+              var service_id="";
+              var tag="";
+              var rec_flag="";
+              var no_sample ="";             
+              var sampleids ="";
+              var err_sample_id = [];
+              var success_sample_id = "";
+              var samples_data = [];
+
+            //
+            $checkboxes.each(function(i, e){
+              //console.log($("#enroll_id_7").val());
+              enroll_id=$("#enroll_id_"+$(e).val()).val();
+              sampleids = $("#samples_"+$(e).val()).val();
+              tag=$("#tag_"+$(e).val()).val();
+              service_id=$("#service_id_"+$(e).val()).val();
+              rec_flag=$("#rec_flag_"+$(e).val()).val();
+              sample_id=$(e).val();             
+
+              samples_data.push({
+                sample_id: sample_id,
+                enroll_id: enroll_id,
+                service_id: service_id,
+                tag: tag,
+                rec_flag: rec_flag,               
+              });
+        
+            });
+
+            for(i=0; i < samples_data.length; i++)
+            {
+                      $.ajax({
+                      url: "{{url('check_for_sample_already_process_pcr')}}"+'/'+samples_data[i].sample_id+'/'+samples_data[i].enroll_id+'/'+samples_data[i].service_id+'/'+samples_data[i].tag+'/'+samples_data[i].rec_flag,
+                      type:"GET",
+                      processData: false,
+                      contentType: false,
+                      dataType: 'json',
+                      success: function(response){
+                        console.log(response);
+                        
+                      if(response.result == 1){
+                          $('.alert-danger').removeClass('hide');
+                          $('.alert-danger').show();
+                          $('.alert-danger').html("Sorry!! Action already taken of the selected Sample");
+                                        $('#nxtconfirm').prop("type", "button");
+                                        e. preventDefault();                                        
+                        }else{
+                          /* $('.alert-danger').addClass('hide');
+                          $('.alert-danger').hide();                          
+                          $('#nxtconfirm').prop("type", "submit");
+                          $("#nxtconfirm").text("OK"); */
+                            
+                          html+= '<input type="hidden" name="enrollId'+response.sample_id+'" value="'+$("#enroll_id_"+response.sample_id).val()+'">';                                          
+                          html+='<input type="hidden" name="tag'+response.sample_id+'"  value="'+$("#tag_"+response.sample_id).val()+'">';
+                          html+='<input type="hidden" name="sampleID[]"  value="'+response.sample_id+'">';
+                          html+='<input type="hidden" name="serviceId'+response.sample_id+'"  value="'+$("#service_id_"+response.sample_id).val()+'">';				
+                          html+='<input type="hidden" name="rec_flag'+response.sample_id+'"  value="'+$("#rec_flag_"+response.sample_id).val()+'">';                         
+                          html+='<input type="hidden" name="sample_ids'+response.sample_id+'"  value="'+$("#samples_"+response.sample_id).val()+'">';
+                            
+                            $("#node").append(html);
+                            html = "";                          
+                          }
+                      },
+                    failure: function(response){
+                      console.log("err")
+                    }
+                });
+            }
+
+            $('#myModal').modal('toggle');
+
+        }
+
+ function openCbnaatForm(sample_id){
+
+  $('#sample_id_'+sample_id).prop('checked', true);
+    bulk_action_review();
+
   //console.log("sample_ids", sample_ids.split(','));
-  $("#enrollId").val(enroll_id);
+  /* $("#enrollId").val(enroll_id);
   $("#tag").val(tag);
   
   $("#sampleID").val(sample_id);
@@ -258,8 +384,8 @@ $(function(){
           text : item
       }));
   });
+  $('#myModal').modal('toggle'); */
 
-  $('#myModal').modal('toggle');
  }
 
 </script>
@@ -287,6 +413,10 @@ $(document).ready(function() {
             {
                 extend: 'excelHtml5',
                 title: 'LIMS_Pcr_'+today+''
+            },
+            {
+              text: 'Send Selected to Review',            
+                action: bulk_action_review
             }
         ],
         "order": [[ 1, "desc" ]]
@@ -294,45 +424,14 @@ $(document).ready(function() {
 	
 	//Confirm ok submit
 	$('.resultbtn, #confirm').click( function(e) {
-		//alert("here");
-		var enroll_id=$("#enrollId").val();
-		var sample_id=$("#sampleID").val();
-		var service_id=$("#serviceId").val();
-		//var STATUS=$("#statusId").val();
-		var tag=$("#tag").val();
-		var rec_flag=$("#recFlagId").val();
-	
-		$.ajax({
-				  url: "{{url('check_for_sample_already_process')}}"+'/'+sample_id+'/'+enroll_id+'/'+service_id+'/'+tag+'/'+rec_flag,
-				  type:"GET",
-				  processData: false,
-				  contentType: false,
-				  dataType: 'json',
-				  success: function(response){
-					  //console.log(response);
-					  
-                        if(response==1){
-							$('.alert-danger').removeClass('hide');
-							$('.alert-danger').show();
-							$('.alert-danger').html("Sorry!! Action already taken of the selected Sample");
-                            $('#confirm').prop("type", "button");
-                            e. preventDefault(); 							
-                            
-						}else{
-							$('.alert-danger').addClass('hide');
+            $('.alert-danger').addClass('hide');
 							$('.alert-danger').hide();
 							//$('form#cbnaat_result').submit();	
 							$('#confirm').prop("type", "submit");
-							$("#confirm").text("OK");
-							
-                        }
-				  },
-				failure: function(response){
-					console.log("err")
-				}
-		});
-		
+							$("#confirm").text("OK");		
 	});
+
+
 } );
 </script>
 
