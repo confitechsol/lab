@@ -162,10 +162,6 @@
             <footer class="footer"> © Copyright Reserved 2017-2018, LIMS </footer>
         </div>
 
-
-
-
-
 <!-- Modal -->
 <div id="myModal" class="modal fade" role="dialog">
   <div class="modal-dialog">
