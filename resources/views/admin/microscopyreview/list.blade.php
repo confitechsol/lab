@@ -120,13 +120,14 @@
                                               <th>Lab Enrolment ID</th>
                                               <th>Sample ID</th>
                                               <th>Visual appearance</th>
+                                              <th>Next Step </th>
                                               <th>Microscopy method (ZN OR FM)</th>
 											   <th>Test Requested</th>
                                               <th>Reason for test (DX/FU)</th>
                                                <th>Follow up month</th>
                                               <th>Date of Receipt</th>
                                               <th>Microscopy result</th>
-                                              <th>Next Step </th>
+                                              
                                             </tr>
                                         </thead>
                                         <tbody>
@@ -142,7 +143,16 @@
                                             <td>{{$samples->label}}</td>
                                             <td>{{$samples->sample_label}}</td>
                                             <td>{{$samples->sample_quality}}</td>
+                                            <td>
+                                              @if($samples->status==2)
+                                              <button onclick="openNextForm('{{$samples->sample_label}}', {{$samples->log_id}},'{{$samples->service_id}}',{{$samples->enrollID}},{{$samples->sample_id}},'{{$samples->tag}}',{{$samples->rec_flag}})" type="button" class = "btn btn-info btn-sm  nextbtn">Submit</button>
+                                              @elseif($samples->status==0)
+                                              Done
+                                              @else
+                                              Storage
+                                              @endif
 
+                                            </td>
                                             <td>
                                               {{$samples->service_id == 1? "ZN Microscopy" : "FM Microscopy"}}
                                             </td>
@@ -165,16 +175,7 @@
                                                <a href="#" onclick="openResultForm('{{$samples->sample_label}}', {{$samples->log_id}}, '{{$samples->result}}','{{$samples->serviceID}}','{{$samples->service_id}}',{{$samples->enrollID}},{{$samples->sample_id}},'{{$samples->tag}}',{{$samples->rec_flag}} )">{{$samples->stage}}</a>
                                                @endif
                                              </td>
-                                            <td>
-                                              @if($samples->status==2)
-                                              <button onclick="openNextForm('{{$samples->sample_label}}', {{$samples->log_id}},'{{$samples->service_id}}',{{$samples->enrollID}},{{$samples->sample_id}},'{{$samples->tag}}',{{$samples->rec_flag}})" type="button" class = "btn btn-default btn-sm  nextbtn">Next</button>
-                                              @elseif($samples->status==0)
-                                              Done
-                                              @else
-                                              Storage
-                                              @endif
-
-                                            </td>
+                                            
                                           </tr>
                                           @endforeach
 

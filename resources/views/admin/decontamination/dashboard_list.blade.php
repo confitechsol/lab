@@ -124,11 +124,12 @@
                                         <th>Enrolment ID</th>
                                         <th>Sample ID</th>
                                         <th>Date of Decontamination</th>
+                                        <th>Action</th>
 										<th>Test Requested</th>
                                         <th>DX/FU</th>
                                         <th>Follow up month</th>
                                         <th>Microscopy Result</th>
-                                        <th>Action</th>
+                                        
                                     </tr>
                                     </thead>
                                     <tbody>
@@ -144,6 +145,7 @@
                                                 <td class="hide">{{$samples->ID}}</td>
                                                 <td>{{$samples->enroll_label}}</td>
                                                 <td>{{$samples->samples}}</td>
+                                                
                                                 <td>
                                                     @if($samples->date=='')
                                                         pending
@@ -151,10 +153,6 @@
                                                         {{$samples->date}}
                                                     @endif
                                                 </td>
-												<td  <?php echo $data['services_col_color['.$samples->enroll_id.']']=='Y'?'bgcolor="#ccffcc"':""; ?>><?php echo $data['test_requested['.$samples->enroll_id.']'];?></td>
-                                                <td>{{$samples->test_reason}}</td>
-                                                <td>{{$samples->fu_month}}</td>
-                                                <td>{{$samples->result}}</td>
                                                 @if($samples->status && $samples->status==1)
                                                     <td>
                                                         <button type="button"
@@ -165,6 +163,11 @@
                                                 @else
                                                     <td>sent</td>
                                                 @endif
+												<td  <?php echo $data['services_col_color['.$samples->enroll_id.']']=='Y'?'bgcolor="#ccffcc"':""; ?>><?php echo $data['test_requested['.$samples->enroll_id.']'];?></td>
+                                                <td>{{$samples->test_reason}}</td>
+                                                <td>{{$samples->fu_month}}</td>
+                                                <td>{{$samples->result}}</td>
+                                                
 
                                             </tr>
                                         @endforeach
