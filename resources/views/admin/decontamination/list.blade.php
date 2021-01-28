@@ -138,12 +138,13 @@
                                               <th>Enrolment ID</th>
                                               <th>Sample ID</th>
                                               <th>Date of Decontamination</th>
+                                              <th>Action</th>
 											                        <th>Test Requested</th>
                                               <th>DX/FU</th>
                                               <th>Follow up month</th>
                                               <th>Microscopy Result</th>
                                               <th>Next Step</th>
-                                              <th>Action</th>
+                                              
                                             </tr>
                                         </thead>
                                         <tbody>
@@ -174,11 +175,6 @@
                                               <td>{{$samples->enroll_label}}</td>
                                               <td>{{$samples->samples}}</td>
                                               <td>{{$samples->date}}</td>
-											                        <td <?php echo $data['services_col_color['.$samples->enroll_id.']']=='Y'?'bgcolor="#ccffcc"':""; ?>><?php echo $data['test_requested['.$samples->enroll_id.']'];?></td>
-                                              <td>{{$samples->test_reason}}</td>
-                                              <td>{{$samples->fu_month}}</td>
-                                              <td>{{$samples->result}}</td>
-                                              <td>{{$samples->sent_for_service}}</td>
                                               <td>                                                
                                                 @if($samples->sent_for_service=='' && $samples->status!=0)
                                                 <button type="button" onclick="openCbnaatForm({{$samples->sample_id}})"  class="btn btn-info btn-sm resultbtn" >Submit</button>
@@ -189,6 +185,12 @@
 
                                                 @endif
                                               </td>
+											                        <td <?php echo $data['services_col_color['.$samples->enroll_id.']']=='Y'?'bgcolor="#ccffcc"':""; ?>><?php echo $data['test_requested['.$samples->enroll_id.']'];?></td>
+                                              <td>{{$samples->test_reason}}</td>
+                                              <td>{{$samples->fu_month}}</td>
+                                              <td>{{$samples->result}}</td>
+                                              <td>{{$samples->sent_for_service}}</td>
+                                              
 
 
                                           </tr>

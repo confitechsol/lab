@@ -88,13 +88,14 @@
                                             <th>Sample ID</th>
 											<th>Test Requested</th>
                                             <th>Visual Appearance</th>
+                                            <th>Next Step</th>
                                             <th>Date of Receipt</th>
                                             <th>Samples submitted</th>
                                             <th>Sample Type</th>
                                             <th>Result MTB</th>
                                             <th>Result RIF</th>
                                             <th>Date Tested</th>
-                                            <th>Next Step</th>
+                                            
                                             <!-- <th>Action</th> -->
                                           </tr>
                                       </thead>
@@ -106,6 +107,13 @@
                                           <td>{{$samples->samples}}</td>
 										  <td  <?php echo $data['services_col_color['.$samples->enroll_id.']']=='Y'?'bgcolor="#ccffcc"':""; ?>><?php echo $data['test_requested['.$samples->enroll_id.']'];?></td>
                                           <td>{{$samples->sample_quality}}</td>
+                                          <td>
+                                            @if($samples->STATUS == 1)
+                                            <button type="button" onclick="openCbnaatForm({{$samples->enroll_id}},'{{$samples->samples}}','{{$samples->result_MTB}}','{{$samples->result_RIF}}','{{$samples->next_step}}','{{$samples->error}}','{{$samples->no_sample}}','{{$samples->sample_id}}','{{$samples->service_id}}','{{$samples->STATUS}}','{{$samples->tag}}','{{$samples->rec_flag}}')"  class="btn btn-info btn-sm resultbtn" >Submit</button>
+                                            @else
+                                            Done
+                                            @endif
+                                          </td>
                                           <td><?php echo date('d-m-Y',strtotime($samples->receive)) ?></td>
                                           <td>{{$samples->no_of_samples}}</td>
                                           <td>{{$samples->sample_type}}</td>
@@ -125,13 +133,7 @@
                                           <td>Pending</td>
                                           @endif
 
-                                          <td>
-                                            @if($samples->STATUS == 1)
-                                            <button type="button" onclick="openCbnaatForm({{$samples->enroll_id}},'{{$samples->samples}}','{{$samples->result_MTB}}','{{$samples->result_RIF}}','{{$samples->next_step}}','{{$samples->error}}','{{$samples->no_sample}}','{{$samples->sample_id}}','{{$samples->service_id}}','{{$samples->STATUS}}','{{$samples->tag}}','{{$samples->rec_flag}}')"  class="btn btn-info btn-sm resultbtn" >Submit</button>
-                                            @else
-                                            Done
-                                            @endif
-                                          </td>
+                                          
                                         </tr>
                                         @endforeach
                                       </tbody>

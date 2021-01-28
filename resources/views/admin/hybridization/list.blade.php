@@ -81,11 +81,12 @@
                                             <th>Sample ID</th>
                                             <th>Samples submitted</th>
                                             <th>Date of Decontamination</th>
+                                            <th>Results/ Next Step (Drop down)</th>
                                             <th>Microscopy result</th>
                                             <th>Date of Extraction</th>
                                             <th>LPA test type</th>
                                             <th>PCR completed</th>
-                                            <th>Results/ Next Step (Drop down)</th>
+                                            
                                           </tr>
                                         </thead>
                                         <tbody>
@@ -105,6 +106,13 @@
                                               <?php echo date('d/m/Y', strtotime($samples->decontamination_date)); ?>
                                               @endif
                                             </td>
+                                            <td>
+                                              @if($samples->STATUS == 0)
+                                              Done
+                                              @else
+                                              <button onclick="openNextForm('{{$samples->samples}}', {{$samples->log_id}}, {{$samples->enroll_id}},'{{$samples->tag}}','{{$samples->no_sample}}',{{$samples->sample_id}},{{$samples->service_id}},{{$samples->rec_flag}})" type="button" class = "btn btn-info btn-sm  nextbtn">Submit</button>
+                                              @endif
+                                            </td>
                                             <td>{{$samples->result}}</td>
                                             <td>
                                               @if($samples->date_of_extraction)
@@ -119,13 +127,7 @@
                                               no
                                               @endif
                                             </td>
-                                            <td>
-                                              @if($samples->STATUS == 0)
-                                              Done
-                                              @else
-                                              <button onclick="openNextForm('{{$samples->samples}}', {{$samples->log_id}}, {{$samples->enroll_id}},'{{$samples->tag}}','{{$samples->no_sample}}',{{$samples->sample_id}},{{$samples->service_id}},{{$samples->rec_flag}})" type="button" class = "btn btn-default btn-sm  nextbtn">Next</button>
-                                              @endif
-                                            </td>
+                                            
                                           </tr>
                                           @endforeach
 

@@ -85,11 +85,12 @@
                                               <th>Enrollment ID</th>
                                               <th>Sample ID</th>
                                               <th>Date of Decontamination </th>
+                                              <th>Action</th>
                                               <th>Microscopy result</th>
                                               <th>Date of Extraction</th>
                                               <th>LPA test type</th>
                                               <th>PCR completed</th>
-                                              <th>Action</th>
+                                              
 
                                             </tr>
                                         </thead>
@@ -111,11 +112,19 @@
                                                     <td class="hide">{{$samples->ID}}</td>
                                                     <td>{{$samples->enroll_label}}</td>
                                                     <td>{{$samples->samples}}</td>
+                                                    
                                                     <td>
                                                     <?php
 													                          if(!empty($samples->test_date))
                                                        echo date('d/m/Y', strtotime($samples->test_date)); 
                                                     ?>
+                                                    </td>
+                                                    <td>
+                                                      @if($samples->STATUS==0)
+                                                      Done
+                                                      @else
+                                                    <button type="button" onclick="openCbnaatForm({{$samples->sample_id}})" class="btn btn-info btn-sm resultbtn" >Submit</button>
+                                                    @endif
                                                     </td>
                                                     <td>{{$samples->result}}</td>
                                                      <td><?php echo date('d/m/Y', strtotime($samples->created_extraction)); ?></td>
@@ -127,13 +136,7 @@
                                                       no
                                                       @endif
                                                     </td>
-                                                    <td>
-                                                      @if($samples->STATUS==0)
-                                                      Done
-                                                      @else
-                                                    <button type="button" onclick="openCbnaatForm({{$samples->sample_id}})" class="btn btn-info btn-sm resultbtn" >Submit</button>
-                                                    @endif
-                                                    </td>
+                                                    
 
 
                                                 </tr>
