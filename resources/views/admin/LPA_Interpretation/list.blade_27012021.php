@@ -152,10 +152,11 @@
 
                 <input type="hidden" name="_token" value="{{ csrf_token() }}">
                 <input type="hidden" name="enrollId" id="enrollId" value="">
-                <input type="hidden" name="tag" id="tag" value="">				
-                <input type="hidden" name="sampleID" id="sampleID" value="">
-                <input type="hidden" name="serviceId" id="serviceId" value="">				
-                <input type="hidden" name="rec_flag" id="recFlagId" value="">
+                <input type="hidden" name="tag" id="tag" value="">
+				
+				<input type="hidden" name="sampleID" id="sampleID" value="">
+				<input type="hidden" name="serviceId" id="serviceId" value="">				
+				<input type="hidden" name="rec_flag" id="recFlagId" value="">
 
                 <label class="col-md-12"><h6>Sample ID:</h6></label>
                     <div class="col-md-12">
@@ -827,15 +828,6 @@
                  </div>
 
                  <br>
-
-                 <div class="row">
-                  <div class="col">
-                             <label class="col-md-12"><h6>Final Interpretation 1 : <span class="red">*</span></h6></label>
-                             <div class="col-md-12">
-                                <input class="form-control form-control-line" name="final_interpretation1" value="" id="final_interpretation1" disabled>                                 
-                            </div>
-                           </div>
-                  </div><br/>
                 
 				<div class="row">
 				 <div class="col">
@@ -850,28 +842,25 @@
 				  
                  <div class="row">
 
-                  <!--ui date input field incoprated by Amrita start------> 
-				  <div class="col">
-                    <label class="col-md-12"><h6>Date Result : <span class="red">*</span></h6></label>
+                  <div class="col">
+                    <label class="col-md-12"><h6>Date Result :</h6></label>
                     <div class="col-md-12">
-					   <div class="col-md-12">
-						   <!--<input type="text" name="test_date" value="{{ date('d-m-Y',strtotime($data['today'])) }}" class="form-control form-control-line" disabled>---->
-						   <input type="date" name="test_date" id="test_date" class="form-control form-control-line" value="<?php echo date("Y-m-d");?>" max="<?php echo date("Y-m-d");?>" required  >				   
-					   </div>
-                    </div>
+                       <div class="col-md-12">
+                       <input type="text" name="test_date" value="{{ date('d-m-Y',strtotime($data['today'])) }}" class="form-control form-control-line" disable>
+                   </div>
+                   </div>
+
                   </div>
-				  <!--ui date input field incoprated by Amrita End------> 
-				  
                   <div class="col">
                     <label class="col-md-12"><h6>Date Reported :</h6></label>
                     <div class="col-md-12">
-                       <input type="text" name="test_date" id="date_reported" value="{{ date('d-m-Y',strtotime($data['today'])) }}" class="form-control form-control-line" disabled>
+                       <input type="text" name="test_date" value="{{ date('d-m-Y',strtotime($data['today'])) }}" class="form-control form-control-line" disable>
                    </div>
                   </div>
                   <div class="col">
                     <label class="col-md-12"><h6>Reported By :</h6></label>
                     <div class="col-md-12">
-                      <input type="text" name="created_by" value="{{$data['user']}}" class="form-control form-control-line" disabled>
+                      <input type="text" name="created_by" value="{{$data['user']}}" class="form-control form-control-line" disable>
                    </div>
                   </div>
                  </div>
@@ -896,81 +885,7 @@
     </div>
  </div>
 <script>
-
 $(document).ready(function(){
-	/*Changes made by amrita*/
-
-  $("#mtb_result").on("change", function() {
-    var final_interpretation = "";
-    //$('#final_interpretation1').val("");
-    if($(this).val() != "")
-    {
-      final_interpretation = $("#mtb_result option:selected").text();
-      //console.log(final_interpretation);
-      $('#final_interpretation1').val(final_interpretation);
-    }
-
-    
-    $('#final_interpretation1').val(final_interpretation);
-    
-  });
-
-  $("#rif").on("change", function() {
-    var final_interpretation = "";
-    //$('#final_interpretation1').val("");
-
-    if($('#mtb_result').val() != "")
-    {
-      final_interpretation = $("#mtb_result option:selected").text();      
-    }
-
-    if($(this).val() != "")
-    {
-      final_interpretation += ", " + $("#rif option:selected").text();
-      //console.log(final_interpretation);
-    }
-    
-    if($('#inh').val() != "")
-    {
-      final_interpretation += ", " + $("#inh option:selected").text();      
-    }
-    //console.log(final_interpretation);
-    $('#final_interpretation1').val(final_interpretation);
-
-  });
-
-
-  $("#inh").on("change", function() {
-    var final_interpretation = "";
-    //$('#final_interpretation1').val("");
-
-    if($('#mtb_result').val() != "")
-    {
-      final_interpretation = $("#mtb_result option:selected").text();      
-    }
-
-    if($("#rif").val() != "")
-    {
-      final_interpretation += ", " + $("#rif option:selected").text();
-      //console.log(final_interpretation);
-    }
-    
-    if($(this).val() != "")
-    {
-      final_interpretation += ", " + $("#inh option:selected").text();      
-    }
-    //console.log(final_interpretation);
-    $('#final_interpretation1').val(final_interpretation);
-
-  });
-
-	$("#test_date").on("change",function (){ 
-      //alert('inp changed');	  
-	  var dateAr = $(this).val().split('-');
-      var newDate = dateAr[2] + '-' + dateAr[1] + '-' + dateAr[0];
-	  $("#date_reported").val(newDate);
-   });
-   
   $("#cbnaat_result").on("submit", function(){
     $("#pageloader").fadeIn();
 	var zIndex = 9999;

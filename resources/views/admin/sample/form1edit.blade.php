@@ -238,13 +238,19 @@ border-color: #5cb85c;
                                                         </select>
                                                      </div>
                                                   </div>
-                                                  @if($value['sample_type']  == 'Others')
-                                                  <div class="col @if($value['sample_type']  != 'Others') hide @endif; other_sample_type" id="other_sample_typeA">
+                                                  {{-- @if($value['sample_type']  == 'Others') --}}
+                                                  <div class="col {{-- @if($value['sample_type']  != 'Others') hide @endif; --}} other_sample_type" id="other_sample_typeA">
                                                       <label class="col-md-12">Other sample type <span class="red">*</span> </label>
                                                       <div class="col-md-12">
+                                                        {{-- {{ dd($data['other_sample_type']) }} --}}
                                                         <select id="other_sample_type" name="other_sample_type[]" class="form-control form-control-line">
                                                           <option value="">--Select--</option>
-                                                          <option value="BAL" @if(in_array($value['sample_type'] ,$data['other_sample_type'])) selected="selected" @endif >BAL</option>
+                                                          @foreach($data['other_sample_type'] as $smp_val)
+                                                            <option value="{{ $smp_val }}" {{ $value['sample_type'] == $smp_val ? 'selected="selected"' : '' }}>{{ $smp_val }}</option>
+                                                          @endforeach
+
+
+                                                          {{-- <option value="BAL" @if(in_array($value['sample_type'] ,$data['other_sample_type'])) selected="selected" @endif >BAL</option>
                                                           <option value="Pus" @if(in_array($value['sample_type'] ,$data['other_sample_type'])) selected="selected" @endif>Pus</option>
                                                           <option value="CSF" @if(in_array($value['sample_type'] ,$data['other_sample_type'])) selected="selected" @endif >CSF</option>
                                                           <option value="GA"  @if(in_array($value['sample_type'] ,$data['other_sample_type'])) selected="selected" @endif >GA</option>
@@ -254,11 +260,11 @@ border-color: #5cb85c;
                                                           <option value="AFB MTB positive culture (LJ or LC)" @if(in_array($value['sample_type'] ,$data['other_sample_type'])) selected="selected" @endif >AFB MTB positive culture (LJ or LC)</option>
                                                           <option value="Pleural fluid" @if(in_array($value['sample_type'] ,$data['other_sample_type'])) selected="selected" @endif >Pleural fluid</option>
                                                           <option value="FNAC" @if(in_array($value['sample_type'] ,$data['other_sample_type'])) selected="selected" @endif >FNAC</option>
-                                                          <option value="Others" @if(!in_array($value['sample_type'] ,$data['other_sample_type'])) selected="selected" @endif >Others</option>
+                                                          <option value="Others" @if(!in_array($value['sample_type'] ,$data['other_sample_type'])) selected="selected" @endif >Others</option> --}}
                                                         </select>
                                                      </div>
                                                   </div>
-                                                    @endif 
+                                                    {{-- @endif  --}}
                                                     @if($value['sample_type'] == 'Others')
                                                   <div class="col" >
                                                   <div class="col @if($value['sample_type'] !='Others') hide @endif others" id="othersA">
