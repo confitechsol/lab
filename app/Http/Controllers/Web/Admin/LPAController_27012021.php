@@ -156,7 +156,7 @@ class LPAController extends Controller
                 'mut3aT8C' => $request->tbu_band==1?$request->mut3aT8C:"",
                 'mut3bT8A' => $request->tbu_band==1?$request->mut3bT8A:"",
                 'status' => 1,
-                'test_date' => !empty($request->test_date)?$request->test_date:date('Y-m-d H:i:s'),//Incorporated by Amrita
+                'test_date' => date('Y-m-d H:i:s'),
                 'created_by' => Auth::user()->id,
                 'updated_by' => Auth::user()->id,
 				'tub_band'=>$request->tbu_band,
@@ -193,7 +193,7 @@ class LPAController extends Controller
                 'wt32' => $request->tbu_band==1?$request->wt32:"",
                 'mut1c14t' => $request->tbu_band==1?$request->mut1c14t:"",
                 'status' => 1,
-                'test_date' => !empty($request->test_date)?$request->test_date:date('Y-m-d H:i:s'), //Incorporated by Amrita
+                'test_date' => date('Y-m-d H:i:s'),
                 'created_by' => Auth::user()->id,
                 'updated_by' => Auth::user()->id,
 				'tub_band'=>$request->tbu_band,
@@ -230,7 +230,7 @@ class LPAController extends Controller
                   'mut3aT8C' => $request->tbu_band==1?$request->mut3aT8C:"",
                   'mut3bT8A' => $request->tbu_band==1?$request->mut3bT8A:"",
                   'status' => 1,
-                  'test_date' => !empty($request->test_date)?$request->test_date:date('Y-m-d H:i:s'),//Incorporated by Amrita
+                  'test_date' => date('Y-m-d H:i:s'),
                   'created_by' => Auth::user()->id,
                   'updated_by' => Auth::user()->id,
 				  'tub_band'=>$request->tbu_band,
