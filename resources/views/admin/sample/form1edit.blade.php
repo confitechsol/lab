@@ -199,11 +199,10 @@ border-color: #5cb85c;
                             </div>
                         </div>
                     </div>  
-
+                      {{-- {{ dd($data) }} --}}
                       @if(count($data['sample_detail']) > 0 )
                         @if(count($data['sample']) > 0 )                       
-                          @foreach($data['sample'] as $key => $value)  
-
+                          @foreach($data['sample'] as $key => $value) 
 
                               <div class="row sampleForm" id="sampleForm">
                                   <div class="col-12">
@@ -233,8 +232,8 @@ border-color: #5cb85c;
                                                       <div class="col-md-12">
                                                         <select name="sample_type[]" class="form-control form-control-line sample_type" id="sample_typeA" required>
                                                           <option value="">--Select--</option>
-                                                          <option value="{{ $value['sample_type'] }}" @if($value['sample_type'] =='Sputum') selected="selected" @endif>Sputum</option>
-                                                          <option value="{{ $value['sample_type'] }}" @if($value['sample_type'] =='Others') selected="selected" @endif >Other</option>
+                                                          <option value="Sputum" @if($value['sample_quality'] =='Sputum') selected="selected" @endif>Sputum</option>
+                                                          <option value="Other" @if($value['sample_quality'] =='Others') selected="selected" @endif >Other</option>
                                                         </select>
                                                      </div>
                                                   </div>
@@ -245,22 +244,17 @@ border-color: #5cb85c;
                                                         {{-- {{ dd($data['other_sample_type']) }} --}}
                                                         <select id="other_sample_type" name="other_sample_type[]" class="form-control form-control-line">
                                                           <option value="">--Select--</option>
-                                                          @foreach($data['other_sample_type'] as $smp_val)
-                                                            <option value="{{ $smp_val }}" {{ $value['sample_type'] == $smp_val ? 'selected="selected"' : '' }}>{{ $smp_val }}</option>
-                                                          @endforeach
-
-
-                                                          {{-- <option value="BAL" @if(in_array($value['sample_type'] ,$data['other_sample_type'])) selected="selected" @endif >BAL</option>
-                                                          <option value="Pus" @if(in_array($value['sample_type'] ,$data['other_sample_type'])) selected="selected" @endif>Pus</option>
-                                                          <option value="CSF" @if(in_array($value['sample_type'] ,$data['other_sample_type'])) selected="selected" @endif >CSF</option>
-                                                          <option value="GA"  @if(in_array($value['sample_type'] ,$data['other_sample_type'])) selected="selected" @endif >GA</option>
-                                                          <option value="Pericardial fluid" @if(in_array($value['sample_type'] ,$data['other_sample_type'])) selected="selected" @endif>Pericardial fluid</option>
-                                                          <option value="EB tissue" @if(in_array($value['sample_type'] ,$data['other_sample_type'])) selected="selected" @endif >EB tissue</option>
-                                                          <option value="Urine" @if(in_array($value['sample_type'] ,$data['other_sample_type'])) selected="selected" @endif>Urine</option>
-                                                          <option value="AFB MTB positive culture (LJ or LC)" @if(in_array($value['sample_type'] ,$data['other_sample_type'])) selected="selected" @endif >AFB MTB positive culture (LJ or LC)</option>
-                                                          <option value="Pleural fluid" @if(in_array($value['sample_type'] ,$data['other_sample_type'])) selected="selected" @endif >Pleural fluid</option>
-                                                          <option value="FNAC" @if(in_array($value['sample_type'] ,$data['other_sample_type'])) selected="selected" @endif >FNAC</option>
-                                                          <option value="Others" @if(!in_array($value['sample_type'] ,$data['other_sample_type'])) selected="selected" @endif >Others</option> --}}
+                                                          <option value="BAL" @if($value['sample_type'] == 'BAL') selected="selected" @endif >BAL</option>
+                                                          <option value="Pus" @if($value['sample_type'] == 'Pus') selected="selected" @endif >Pus</option>
+                                                          <option value="CSF" @if($value['sample_type'] == 'CSF') selected="selected" @endif >CSF</option>
+                                                          <option value="GA"  @if($value['sample_type'] == 'GA') selected="selected" @endif >GA</option>
+                                                          <option value="Pericardial fluid" @if($value['sample_type'] == 'Pericardial fluid') selected="selected" @endif>Pericardial fluid</option>
+                                                          <option value="EB tissue" @if($value['sample_type'] == 'EB tissue') selected="selected" @endif >EB tissue</option>
+                                                          <option value="Urine" @if($value['sample_type'] == 'Urine') selected="selected" @endif>Urine</option>
+                                                          <option value="AFB MTB positive culture (LJ or LC)" @if($value['sample_type'] == 'AFB MTB positive culture (LJ or LC)') selected="selected" @endif >AFB MTB positive culture (LJ or LC)</option>
+                                                          <option value="Pleural fluid" @if($value['sample_type'] == 'Pleural fluid') selected="selected" @endif >Pleural fluid</option>
+                                                          <option value="FNAC" @if($value['sample_type'] == 'FNAC') selected="selected" @endif >FNAC</option>
+                                                          <option value="Others" @if($value['sample_type'] == 'Others') selected="selected" @endif >Others</option>                                                          
                                                         </select>
                                                      </div>
                                                   </div>
