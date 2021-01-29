@@ -163,7 +163,7 @@ class HybridizationController extends Controller
           $log->status = 0;
           $log->updated_by = $request->user()->id;
           $log->save();
-          $microbio = Microbio::create([
+          /*$microbio = Microbio::create([
                 'enroll_id' => $log->enroll_id,
                 'sample_id' => $log->sample_id,
                 'service_id' => 14,
@@ -175,8 +175,23 @@ class HybridizationController extends Controller
                 'created_by' => $request->user()->id,
                  'updated_by' => $request->user()->id,
               ]);
-		   DB::commit();	  
-          return $log;
+		   DB::commit();	  */
+       $new_service = [
+              'enroll_id' =>  $log->enroll_id,
+              'sample_id' =>  $log->sample_id,
+              'service_id' => 15,
+              'status' => 1,
+              'reported_dt'=>date('Y-m-d'),
+              'tag' => $request->tag,
+              'rec_flag' =>$request->rec_flag,
+              'created_by' => $request->user()->id,
+              'updated_by' => $request->user()->id,
+              'enroll_label' =>  $log->enroll_label,
+              'sample_label' => $log->sample_label,
+            ];
+            $nwService = ServiceLog::create($new_service);
+            DB::commit();
+          //return $log;
         }elseif($request->service_id == 2){//Repeat DNA Extraction from same sample
           $log = ServiceLog::find($request->service_log_id);
 
@@ -518,7 +533,7 @@ class HybridizationController extends Controller
             $log->updated_by = $request->user()->id;
             $log->save();
 
-            $microbio = Microbio::create([
+            /*$microbio = Microbio::create([
               'enroll_id' => $data['sample'][0]->enroll_id,
               'sample_id' => $data['sample'][0]->sample_id,
                 'service_id' => 14,
@@ -530,7 +545,21 @@ class HybridizationController extends Controller
                 'status' => 0,
                 'created_by' => $request->user()->id,
                 'updated_by' => $request->user()->id,
-              ]);
+              ]);*/
+            $new_service = [
+              'enroll_id' => $data['sample'][0]->enroll_id,
+              'sample_id' => $data['sample'][0]->sample_id,
+              'service_id' => 15,
+              'status' => 1,
+              'reported_dt'=>date('Y-m-d'),
+              'tag' => $data['sample'][0]->tag,
+              'rec_flag' => $data['sample'][0]->rec_flag,
+              'created_by' => $request->user()->id,
+              'updated_by' => $request->user()->id,
+              'enroll_label' => $data['sample'][0]->enroll_label,
+              'sample_label' => $data['sample'][0]->sample_label,
+            ];
+            $nwService = ServiceLog::create($new_service);
             DB::commit();
            // return $nwService;
           }elseif($request->service_id == 3){//Repeat DNA Extraction from standby sample

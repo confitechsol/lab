@@ -576,7 +576,7 @@ $(document).ready(function() {
             },
             ,
             {
-                text: 'Add Result',            
+                text: 'Submit',            
                 action: bulk_action_review
             }
         ]

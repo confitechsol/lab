@@ -201,7 +201,10 @@ class MicroscopyReviewController extends Controller
             $sample_ids = trim( $request->input('sample_ids') );
             $sample_ids = explode(',', $sample_ids);           
             $comments  = $request->input('comments');
-            $service_id1  = $request->input('service_id1');
+            $service_id1  = $request->input('service_id1');           
+            $service_data = Service::where('id',$service_id1)->first();  
+            //dd($service_data['name']); 
+
             
 
             // Get Samples from $sample_ids ===================================
@@ -213,8 +216,8 @@ class MicroscopyReviewController extends Controller
             }            
             if(count($data['sample']) > 0){                  
                 foreach($data['sample'] as $key => $value){
+                    
                    // dd($value);
-
                   // Log this change to ServiceLog ==============================
                   
                   if($service_id1 == 25){
@@ -226,7 +229,7 @@ class MicroscopyReviewController extends Controller
                         'status'    => '0',        
                         'report_type'    => 'End Of Report',        
                         'tag' => $value->tag,
-                        'next_step' => '',
+                        'next_step' => null,
                         'created_by' => Auth::user()->id,
                         'updated_by' => Auth::user()->id
                       ]);
@@ -244,7 +247,7 @@ class MicroscopyReviewController extends Controller
 
 
                   }else{
-
+                    //dd($value);
                 ServiceLog::where([
                     'id' => $key,                   
                   ])->update([
@@ -257,12 +260,13 @@ class MicroscopyReviewController extends Controller
                   ServiceLog::create([
                     'enroll_id' => $value->enroll_id,
                     'sample_id' => $value->sample_id,
-                    'service_id' => $value->service_id,
-                    //'service_id' => $service_id1,
+                    //'service_id' => $value->service_id,
+                    'service_id' => $service_id1,
                     'status'    => '1', 
                     'enroll_label'    => $value->enroll_label, 
                     'sample_label'    => $value->sample_label, 
-                    'tag'    => $value->tag, 
+                    'tag'    => $service_data['name'], 
+                    //'tag'    => $value->tag, 
                     //'status'    => '0', 
                     'created_by' => Auth::user()->id,
                     'updated_by' => Auth::user()->id
