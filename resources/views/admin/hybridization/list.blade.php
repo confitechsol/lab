@@ -274,7 +274,7 @@ $(document).ready(function() {
             }
             ,
             {
-                text: 'Send Selected to Review',            
+                text: 'Submit',            
                 action: bulk_action_review
             }
         ],
@@ -303,10 +303,11 @@ $(document).ready(function() {
                         if(response==1){
 							$('.alert-danger').removeClass('hide');
 							$('.alert-danger').show();
-							$('.alert-danger').html("Sorry!! Action already taken of the selected Sample");
-                            $('#nxtconfirm').prop("type", "button");
-                            e. preventDefault(); 							
-                            
+							// $('.alert-danger').html("Sorry!! Action already taken of the selected Sample");
+              //               $('#nxtconfirm').prop("type", "button");
+              //               e. preventDefault(); 							
+              location.reload();
+
 						}else{
 							$('.alert-danger').addClass('hide');
 							$('.alert-danger').hide();

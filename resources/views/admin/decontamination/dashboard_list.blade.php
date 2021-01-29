@@ -460,7 +460,7 @@
                         title: 'LIMS_Decontamination_' + today + ''
                     },
                     {
-                        text: 'Send Selected to Review',						
+                        text: 'Send for Review',						
                         action: bulk_action_review
                     }
                 ]

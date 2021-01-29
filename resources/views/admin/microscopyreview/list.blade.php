@@ -594,7 +594,7 @@ $(document).ready(function() {
                 title: 'LIMS_Review_Microscopy_'+today+''
             },
             {
-                text: 'Send Selected to Review',            
+                text: 'Submit',            
                 action: bulk_action_review
             }
         ],

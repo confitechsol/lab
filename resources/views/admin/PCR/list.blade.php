@@ -418,7 +418,7 @@ $(document).ready(function() {
                 title: 'LIMS_Pcr_'+today+''
             },
             {
-              text: 'Send Selected to Review',            
+              text: 'Submit',            
                 action: bulk_action_review
             }
         ],

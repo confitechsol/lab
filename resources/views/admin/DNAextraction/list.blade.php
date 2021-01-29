@@ -255,7 +255,7 @@ $(document).ready(function() {
                 title: 'LIMS_DNAextraction_'+today+''
             },
             {
-              text: 'Send Selected to Review',            
+              text: 'Submit',            
                 action: bulk_action_review
             }
         ],
