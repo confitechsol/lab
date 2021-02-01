@@ -179,7 +179,13 @@ class SampleController extends Controller
      */
     public function update(Request $request, $id)
     {
-        //
+        dd($request);
+    }
+
+    public function newUpdate(Request $request)
+    {
+
+        dd($request->all());
     }
 
     /**

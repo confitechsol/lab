@@ -145,8 +145,9 @@ border-color: #5cb85c;
 				<div id="pageloader">
 				  <div class="loader"></div>
 				</div>
-				<!----------loader------------>
-                <form class="form-horizontal form-material" id="addsampleform" action="{{ url('/sample') }}" method="post" enctype='multipart/form-data'>
+        <!----------loader------------>
+        <form class="form-horizontal form-material" id="addsampleform" action="{{ url('/sample/sample-update') }}" method="post" enctype='multipart/form-data'>
+                {{-- <form class="form-horizontal form-material" id="addsampleform" action="{{ action('SampleController@update', $data['sample'][0]->id) }}" method="post" enctype='multipart/form-data'> --}}
                   @if(count($errors))
                     @foreach ($errors->all() as $error)
                        <div class="alert alert-danger"><h4>{{ $error }}</h4></div>
@@ -215,6 +216,7 @@ border-color: #5cb85c;
                                                       <div class="col-md-12">
                                                          <!-- <input type="text" name="sample_id[]" class="form-control form-control-line sampleId" value="<?php //echo str_pad($data['enroll_id'], 10, "0", STR_PAD_LEFT); ?>A" id="sampleId" required> -->
                                                          <input style="width: 88%;" type="text" name="sample_id[]" class="form-control form-control-line sampleId" id="sampleId" readonly required value="{{ $value['sample_label'] }} ">
+                                                         <input type="text" name="sample_ID[]" class="sampID" value="{{ $value['id'] }}" />
                                                      </div>
                                                   </div>
                                                   <div class="col ">
@@ -232,17 +234,17 @@ border-color: #5cb85c;
                                                       <div class="col-md-12">
                                                         <select name="sample_type[]" class="form-control form-control-line sample_type" id="sample_typeA" required>
                                                           <option value="">--Select--</option>
-                                                          <option value="Sputum" @if($value['sample_quality'] =='Sputum') selected="selected" @endif>Sputum</option>
-                                                          <option value="Other" @if($value['sample_quality'] =='Others') selected="selected" @endif >Other</option>
+                                                          <option value="Sputum" @if($value['sample_type'] =='Sputum') selected="selected" @endif>Sputum</option>
+                                                          <option value="Other" @if($value['sample_type'] =='Others') selected="selected" @endif >Other</option>
                                                         </select>
                                                      </div>
                                                   </div>
-                                                  {{-- @if($value['sample_type']  == 'Others') --}}
+                                                   @if($value['sample_type']  == 'Others')
                                                   <div class="col {{-- @if($value['sample_type']  != 'Others') hide @endif; --}} other_sample_type" id="other_sample_typeA">
                                                       <label class="col-md-12">Other sample type <span class="red">*</span> </label>
                                                       <div class="col-md-12">
                                                         {{-- {{ dd($data['other_sample_type']) }} --}}
-                                                        <select id="other_sample_type" name="other_sample_type[]" class="form-control form-control-line">
+                                                        <select id="other_sample_type" name="other_sample_type[]" class="form-control form-control-line ed_other_sample_type">
                                                           <option value="">--Select--</option>
                                                           <option value="BAL" @if($value['sample_type'] == 'BAL') selected="selected" @endif >BAL</option>
                                                           <option value="Pus" @if($value['sample_type'] == 'Pus') selected="selected" @endif >Pus</option>
@@ -258,13 +260,43 @@ border-color: #5cb85c;
                                                         </select>
                                                      </div>
                                                   </div>
-                                                    {{-- @endif  --}}
+                                                  @else
+                                                  <div class="col @if($value['sample_type']  != 'Others') hide @endif;  other_sample_type" id="other_sample_typeA">
+                                                    <label class="col-md-12">Other sample type <span class="red">*</span> </label>
+                                                    <div class="col-md-12">
+                                                      {{-- {{ dd($data['other_sample_type']) }} --}}
+                                                      <select id="other_sample_type" name="other_sample_type[]" class="form-control form-control-line ed_other_sample_type">
+                                                        <option value="">--Select--</option>
+                                                        <option value="BAL" @if($value['sample_type'] == 'BAL') selected="selected" @endif >BAL</option>
+                                                        <option value="Pus" @if($value['sample_type'] == 'Pus') selected="selected" @endif >Pus</option>
+                                                        <option value="CSF" @if($value['sample_type'] == 'CSF') selected="selected" @endif >CSF</option>
+                                                        <option value="GA"  @if($value['sample_type'] == 'GA') selected="selected" @endif >GA</option>
+                                                        <option value="Pericardial fluid" @if($value['sample_type'] == 'Pericardial fluid') selected="selected" @endif>Pericardial fluid</option>
+                                                        <option value="EB tissue" @if($value['sample_type'] == 'EB tissue') selected="selected" @endif >EB tissue</option>
+                                                        <option value="Urine" @if($value['sample_type'] == 'Urine') selected="selected" @endif>Urine</option>
+                                                        <option value="AFB MTB positive culture (LJ or LC)" @if($value['sample_type'] == 'AFB MTB positive culture (LJ or LC)') selected="selected" @endif >AFB MTB positive culture (LJ or LC)</option>
+                                                        <option value="Pleural fluid" @if($value['sample_type'] == 'Pleural fluid') selected="selected" @endif >Pleural fluid</option>
+                                                        <option value="FNAC" @if($value['sample_type'] == 'FNAC') selected="selected" @endif >FNAC</option>
+                                                        <option value="Others" @if($value['sample_type'] == 'Others') selected="selected" @endif >Others</option>                                                          
+                                                      </select>
+                                                   </div>
+                                                </div>
+                                                  @endif 
                                                     @if($value['sample_type'] == 'Others')
                                                   <div class="col" >
                                                   <div class="col @if($value['sample_type'] !='Others') hide @endif others" id="othersA">
                                                       <label class="col-md-12">Other</label>
                                                       <div class="col-md-12">
                                                            <input type="text" id="others_typeA" name="others_type[]" class="form-control form-control-line others_type" value="{{ $value['others_type'] }}" >
+                                                     </div>
+                                                  </div>
+                                                </div>
+                                                @else
+                                                <div class="col" >
+                                                  <div class="col hide others" id="othersA">
+                                                      <label class="col-md-12">Other</label>
+                                                      <div class="col-md-12">
+                                                           <input type="text" id="others_typeA" name="others_type[]" class="form-control form-control-line others_type" >
                                                      </div>
                                                   </div>
                                                 </div>
@@ -339,9 +371,16 @@ border-color: #5cb85c;
                                                  <div class="col other_sample_quality">
                                                       <label class="col-md-12 qualitylabel @if($value['sample_quality'] !='other') hide @endif; ">Other Sample Quality <span class="red">*</span></label>
                                                       <div class="col-md-12">
-                                                  <input @if($value['sample_quality'] !='other') type="hidden" @else type="text" @endif; id="othersample_quality" name="othersample_quality" class="form-control othersample_quality" @if($value['sample_quality'] !='other')  @else value="{{ $value['other_samplequality'] }}" @endif;  />
+                                                  <input @if($value['sample_quality'] !='other') type="hidden" @else type="text" @endif; id="othersample_quality" name="othersample_quality[]" class="form-control othersample_quality" @if($value['sample_quality'] !='other')  @else value="{{ $value['other_samplequality'] }}" @endif;  />
                                                      </div>
                                                   </div>
+                                              @else
+                                              <div class="col other_sample_quality">
+                                                <label class="col-md-12 qualitylabel hide">Other Sample Quality <span class="red">*</span></label>
+                                                <div class="col-md-12">
+                                              <input type="hidden" id="othersample_quality" name="othersample_quality[]" class="form-control othersample_quality"/>
+                                               </div>
+                                            </div>
                                               @endif
                                               </div>
                                               <div class="row">
@@ -470,6 +509,10 @@ $(document).on('change',"#next_testA", function(){
 });
 $(document).ready(function(){
   $("#addsampleform").on("submit", function(){
+    if($("#noOfSample option:selected" ).val() > 2)
+    {
+      return false;
+    }
     $("#pageloader").fadeIn();
   });//submit
 });//document ready
@@ -521,14 +564,20 @@ var alpha = ["A","B","C","D","E"];
             }
             var enroll_id = $("#enroll_label").val();
             $(".sampleForm").each(function(i){
+              $(this).find(".sampID").attr('id', 'sampID'+alpha[i]);
               $(this).find(".sampleId").val(enroll_id+alpha[i]);
               $(this).find(".sample_type").attr('id', "sample_type"+alpha[i]);
+              $(this).find(".sample_type").addClass(alpha[i]);
               $(this).find(".other_sample_type").attr('id', "other_sample_type"+alpha[i]);
+              $(this).find(".ed_other_sample_type").addClass(alpha[i]);
               $(this).find(".test_reason").attr('id', "test_reason"+alpha[i]);
               $(this).find(".next_test").attr('id', "next_test"+alpha[i]);
               $(this).find(".followup-other").attr('id', "followup-other"+alpha[i]);
               $(this).find(".followup_other").attr('id', "followup_other"+alpha[i]);
               $(this).find(".sample_quality").attr('id', "sample_quality"+alpha[i]);
+              $(this).find(".sample_quality").addClass(alpha[i]);
+              $(this).find(".other_sample_quality").addClass(alpha[i]);
+              $(this).find(".othersample_quality").attr('id', "othersample_quality"+alpha[i]);
               $(this).find(".fu_month").attr('id', "fu_month"+alpha[i]);
               $(this).find(".fu_month_value").attr('id', "fu_month_value"+alpha[i]);
               $(this).find(".sample_status").attr('id', "sample_status"+alpha[i]);
@@ -538,6 +587,13 @@ var alpha = ["A","B","C","D","E"];
               $(this).find(".others").attr('id', "others"+alpha[i]);
               $(this).find(".others_type").attr('id', "others_type"+alpha[i]);
             })
+
+            if(_noOfSample > 1)
+            {
+              $('#sample_statusB').attr('disabled', false);
+              $('#next_testB').attr('disabled', false);
+              $("#sampIDB").val('0');
+            }
         });
         $(".sampleId").change(function(){
           var sample = $(this).val().slice(0,-1);
@@ -569,13 +625,23 @@ var alpha = ["A","B","C","D","E"];
 
         });
 
-        $("#other_sample_type").change(function(){
-            var _sample = $(this).find(":selected").val();
+        $(".ed_other_sample_type").live('change', function(){
+          //alert($(this).val());
+            var _sample = $(this).val();
+            //alert(_sample);
             if(_sample=='Others'){
-              $("#othersA").removeClass("hide");
-              $("#othersB").removeClass("hide");
-              $("#othersC").removeClass("hide");
-              $("#othersD").removeClass("hide");
+              if($(this).hasClass("A"))
+              {
+                $("#othersA").removeClass("hide");
+              }
+              if($(this).hasClass("B"))
+              {
+                $("#othersB").removeClass("hide");
+              }
+              
+              
+              /* $("#othersC").removeClass("hide");
+              $("#othersD").removeClass("hide"); */
               // document.getElementById("others_typeA").setAttribute("required","required");
             }else{
               $("#othersA").addClass("hide");
@@ -1263,9 +1329,19 @@ $(document).ready(function(){
 		var qualityval=$(this).val();
 		// alert(qualityval);
 		if(qualityval== 'other'){
-		  $(".qualitylabel").removeClass("hide");
-		  $(".othersample_quality").attr("required",true);
-			$(".othersample_quality").prop("type","text");
+      if($(this).hasClass('B'))
+      {       
+        $(".qualitylabel").removeClass("hide");
+		    $("#othersample_qualityB").attr("required",true);
+			  $("#othersample_qualityB").prop("type","text");
+      }
+      if($(this).hasClass('A'))
+      {
+        $(".qualitylabel").removeClass("hide");
+		    $("#othersample_qualityA").attr("required",true);
+			  $("#othersample_qualityA").prop("type","text");
+      }
+		 
 		}else{
 
 		  $(".qualitylabel").addClass("hide");
