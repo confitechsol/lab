@@ -338,7 +338,7 @@ class MicroscopyController extends Controller
            // dd( $sample_id);     
 
               $data['sample'][$sample_id] = ServiceLog::select('s.id as sample_id', 't_service_log.updated_at as ID','t_service_log.enroll_label',
-              't_service_log.enroll_id','t_service_log.sample_label as samples','t_service_log.status',
+              't_service_log.enroll_id','t_service_log.sample_label as samples', 't_service_log.stage as stage','t_service_log.status',
               DB::raw('date_format(d.test_date,"%d-%m-%y") as date'),'s.test_reason','m.result','s.fu_month','t_service_log.tag',
                               't_service_log.status as STATUS','t_service_log.sample_id','t_service_log.service_id','t_service_log.rec_flag','d.sent_for AS Deconta_sent_for')
                               ->leftjoin('t_microscopy as m','m.sample_id','=','t_service_log.sample_id')
@@ -356,7 +356,7 @@ class MicroscopyController extends Controller
               if(count($data['sample']) > 0){ 
                  // die(count($data['sample']));
                 foreach($data['sample'] as $key => $value){
-               // dd($value);
+               //dd($value);
                   // Update if exists or create new if not, in Decontamination ==
                   /** @var Sample $sample */
                  Microscopy::create([
@@ -380,11 +380,27 @@ class MicroscopyController extends Controller
                   ])->update([
                     'tag'=> $value[0]['tag'],
                     'stage'=> $result,
-                    'status' => '2',
+                    'status' => '0',
                     //'status' => Microscopy::SERVICE_STATUS_ACTIVE,
                     'created_by' => Auth::user()->id,
                     'updated_by' => Auth::user()->id,
                   ]); 
+
+
+                  ServiceLog::create([
+                    'enroll_id' => $value[0]['enroll_id'],
+                    'sample_id' => $value[0]['sample_id'],
+                    'service_id' => $value[0]['service_id'],                  
+                    'status'    => '2', 
+                    'enroll_label'    => $value[0]['enroll_label'], 
+                    'sample_label'    => $value[0]['samples'],
+                    'tag'    => $value[0]['tag'],
+                    //'tag'    => $value->tag, 
+                    //'stage'    => $value[0]['stage'], 
+                    'stage'=> $result,
+                    'created_by' => Auth::user()->id,
+                    'updated_by' => Auth::user()->id
+                  ]);
                }             
             }     
            DB::commit();

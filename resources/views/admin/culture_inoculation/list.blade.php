@@ -87,6 +87,7 @@
                                           <th>Sample ID</th>
                                           <th>Action</th>
                                           <th>Microscopy result</th>
+                                          <th>Tag</th>
                                           <th>MGIT  sequence ID (LC)</th>
                                           <th>Date of Inoculation</th>
 										  <th>Test Requested</th>
@@ -112,12 +113,13 @@
                                           <td>{{$samples->samples}}</td>
                                           <td>
                                             @if($samples->status==1)
-                                            <button onclick="openForm('{{$samples->samples}}', {{$samples->log_id}}, '{{$samples->lpa_type}}','{{$samples->tag}}',{{$samples->enrollID}},{{$samples->sampleID}},{{$samples->service_id}},{{$samples->rec_flag}})",  value="" type="button" class = "btn btn-default btn-sm resultbtn">Submit</button>
+                                            <button onclick="openForm('{{$samples->samples}}', {{$samples->log_id}}, '{{$samples->lpa_type}}','{{$samples->tag}}',{{$samples->enrollID}},{{$samples->sampleID}},{{$samples->service_id}},{{$samples->rec_flag}})",  value="" type="button" class = "btn btn-info btn-sm resultbtn">Submit</button>
                                             @else
                                             Done
                                             @endif
                                           </td>
                                           <td>{{$samples->result}}</td>
+                                          <td>{{$samples->tag}}</td>
                                           @if(empty($samples->mgit))
                                           <td>pending</td>
                                           @else
@@ -234,7 +236,23 @@ function openForm(sample_label, log_id, lpa_type, tag,enroll_id,sample_id,servic
   $("#sampleID").val(sample_id);
   $("#serviceId").val(service_id);	
   $("#recFlagId").val(rec_flag);
-  
+  $("#heading").text(tag);  
+  var service_html = '<option value="">--Select--</option>';
+  if(tag =='LC'){
+    service_html +='<option value="1">LC</option><option value="2" disabled>LJ</option><option value="3" disabled>LC & LJ Both</option><option value="Send to BWM">Send to BWM</option>';
+
+  }else if(tag =='LJ'){
+
+    service_html +='<option value="1" disabled>LC</option><option value="2" >LJ</option><option value="3" disabled>LC & LJ Both</option><option value="Send to BWM">Send to BWM</option>';
+
+  }
+  else if(tag =='LC and LJ Both'){
+    service_html +='<option value="1" disabled>LC</option><option value="2" disabled>LJ</option><option value="3" >LC & LJ Both</option><option value="Send to BWM">Send to BWM</option>';
+
+  }else{
+    service_html +='<option value="1">LC</option><option value="2">LJ</option><option value="3">LC & LJ Both</option><option value="Send to BWM">Send to BWM</option>';
+  }
+  $("#service_id").html(service_html);
   $.ajax({
 				  url: "{{url('get_mgit_id')}}"+'/'+enroll_id,
 				  type:"GET",
