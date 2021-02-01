@@ -303,10 +303,7 @@ border-color: #5cb85c;
                                            </div>
                                         </div>
                                       </div>
-
-
                                     </div>
-
                                     <div class="row">
                                        <div class="col">
                                             <label class="col-md-12">Sample Accepted/Rejected <span class="red">*</span> </label>
