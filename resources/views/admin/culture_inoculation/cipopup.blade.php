@@ -9,7 +9,7 @@
       </div>
 	  <div class="alert alert-danger hide"><h4></h4></div>
       <div class="modal-body">
-        <p></p>
+        <p style="text-align:center">Type: <span id="heading"></span> </p>
         <form class="form-horizontal form-material" action="{{ url('/culture_inoculation') }}" method="post" id="extractionpopup">
           <input type="hidden" name="_token" value="{{ csrf_token() }}">
           <input type="hidden" name="log_id" id="log_id" value="">
@@ -78,11 +78,11 @@
                   <label class="col-md-12">Sample Sent for:(<span id="ssentfor"></span>)</label>
                   <div class="col-md-12">
                      <select name="service_id" class="form-control form-control-line test_reason" id="service_id" required>
-                       <option value="">--Select--</option>
+                       <!-- <option value="">--Select--</option>
                        <option value="1">LC</option>
                        <option value="2">LJ</option>
                        <option value="3">LC & LJ Both</option>
-                       <option value="Send to BWM">Send to BWM</option>
+                       <option value="Send to BWM">Send to BWM</option> -->
                      </select>
                  </div>
               </div>
@@ -105,6 +105,7 @@
         <button type="button" class="pull-right btn btn-primary btn-md" id="submit">Ok</button>
       </div>
       </form>
+     
     </div>
   </div>
 </div>
@@ -296,4 +297,5 @@ if(/^[a-z0-9_]+$/i.test(scanval) == false){
 
 });
 });
+
 </script>
