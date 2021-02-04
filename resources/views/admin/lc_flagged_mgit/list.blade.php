@@ -1,6 +1,14 @@
 @extends('admin.layout.app')
 @section('content')
 <style>
+  .setradio{
+      position: static !important;
+      left: 0 !important;
+      opacity: 1 !important;
+  
+  }
+  </style>
+<style>
 #pageloader
 {
 	top: 0;
@@ -94,38 +102,39 @@
             
                     <div class="col-lg-12 col-xlg-12 col-md-12 col-sm-12" style="margin-top: 16px;">
                         <div class="card" style="border: none;">
-                            <div class="card-block">
-                              
+                            <div class="card-block">                              
                                 <div class="col-lg-12 col-xlg-12 col-md-12 col-sm-12 col-sm-12" style="width: auto;overflow-y: scroll;">
                                   <div class="col-md-12 my_con">
-                                    <input type="radio" name="sector_radio" class="sector_radio" value="1" checked="" required="">>= 42 days
+                                    <input type="radio" name="sector_radio" class="setradio" value="1" checked="" required="">&nbsp;>= 42 days
                                     <br>
-                                    <input type="radio" name="sector_radio" class="sector_radio" value="2" required="">< 42 days
-                                           </div>
+                                    <input type="radio" name="sector_radio" class="setradio" value="2" required="">&nbsp;< 42 days
+                                    </div>
                                     <table id="exampl" class="table table-striped table-bordered responsive col-xlg-12" cellspacing="0" width="100%">
                                       <thead>
-                                        <tr>
+                                        <tr>                                         
                                           <th class="hide">ID</th>
+                                          <th><input type="checkbox" id="bulk-select-all"></th>
                                           <th>Sample ID</th>
                                           <th>MGIT Tube sequence ID</th>
                                           <th>Date of Inoculation</th>
+                                          <th>Results</th>
                                           <th>Initial Smear  result</th>
-										  <th>Test Requested</th>
+										                      <th>Test Requested</th>
                                           <th>Reason for test (DX/FU)</th>
                                           <th>Follow up month</th>
-                                          <th>GU</th>
-                                          <th>Date of flagging  by MGIT</th>										 
-                                          <th>Results</th>
+                                          <th>No. of days <br>left after Inoculation</th>
+                                          <th>Date of flagging  by MGIT</th>                                  
                                         </tr>
                                       </thead>
                                       <tbody>                                       
                                         <tr class="sel">
                                           <td class="hide"></td>
+                                          <td></td>
                                           <td></td>                                          
                                           <td></td>
                                           <td></td>
                                           <td></td>
-										  <td></td>
+										                      <td></td>
                                           <td></td>
                                           <td></td>
                                           <td></td>
@@ -163,7 +172,112 @@ $(document).ready(function(){
 
     setTimeout(function(){$("#pageloader").css("display", "none");}, 5000);
   });//submit
+
+  $('.setradio').on('click', function() {
+      var id = ($(this).val());
+      arrangeTable(id);
+  });
 });//document ready
+
+function arrangeTable(rd_val)
+{
+  //alert(rd_val);
+  var today = new Date();
+  var dd = today.getDate();
+  var mm = today.getMonth()+1; //January is 0!
+  var yyyy = today.getFullYear();
+
+  if(dd<10) {
+      dd = '0'+dd
+  }
+
+  if(mm<10) {
+      mm = '0'+mm
+  }
+
+  today = dd + '-' + mm + '-' + yyyy;
+
+  var url = '{{ route("ajax_lc_flagged_mgit_list", ":id") }}';
+    url = url.replace(':id', rd_val );
+      
+	//Ajax call 
+
+ 
+	$('#exampl').DataTable({
+        dom: 'Bfrtip',
+		pageLength:25,
+    bDestroy: true,
+        processing: true,
+        language: {
+            loadingRecords: '&nbsp;',
+            //processing: 'Loading...'
+            processing: '<div class="spinner"></div>'
+        } , 		
+        serverSide: true,
+        serverMethod: 'post',
+       //searching: false, // Remove default Search Control
+		ajax: {
+			    url: url,			  
+				headers: 
+				{
+					'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+				}
+		  },
+		 columns: [
+       { data: 'ID',className: "hide_column"},
+       { data: 'inputs'},
+		   { data: 'sample_id'},		   
+		   { data: 'mgit_tube_seq_id'},		   
+		   { data: 'date_of_inocculation'},
+       { data: 'submit_btn' },	
+		   { data: 'sample_result'},		   
+		   { data: 'test_requested' },		   
+		   { data: 'reason_for_test' },		   
+		   { data: 'follow_up_month' },		   
+		   { data: 'no_of_days' },
+		   { data: 'flagging_date'},		   
+		   		   
+		],
+        buttons: [
+            {
+                extend: 'excelHtml5',
+                title: 'LIMS_lc_flagged_mgit_'+today+'',
+                 exportOptions: {
+                    /*columns: [  1, 2, 3,4,5,6,7]*/
+					columns: "thead th:not(.noExport)"
+                }
+            },
+            {
+              text: 'Submit',            
+                action: bulk_action_review
+            }
+        ],
+        order: [[ 1, 'desc' ]],
+		columnDefs: [
+			  { targets: [1,2,3,4,5,6,7,8,9,10], orderable: false }
+		  ]
+    });
+}
+
+var $bulk_checkboxes = $('.bulk-selected');
+        var $bulk_select_all_checkbox = $('#bulk-select-all');
+
+
+        // Automatically Check or Uncheck "all select" checkbox
+        // based on the state of checkboxes in the list.
+        $bulk_checkboxes.click(function(){
+            if( $bulk_checkboxes.length === $bulk_checkboxes.filter(':checked').length ){
+                $bulk_select_all_checkbox.prop('checked', true);
+            }
+        });
+
+
+        // Check or Uncheck checkboxes based on the state
+        // of "all select" checkbox.
+        $bulk_select_all_checkbox.click(function(){
+            var checked = $(this).prop('checked');
+            $('.bulk-selected').prop('checked', checked);
+        });
 
 function openForm(sample_label, log_id, lpa_type, gu, flagging_date, tag,enroll_id,sample_id,service_id,rec_flag){
   $('#sample_id').val(sample_label);
@@ -199,73 +313,10 @@ function openNextForm(sample_label, log_id, enroll_id){
 <script>
 
 $(document).ready(function() {
-  var today = new Date();
-  var dd = today.getDate();
-  var mm = today.getMonth()+1; //January is 0!
-  var yyyy = today.getFullYear();
 
-  if(dd<10) {
-      dd = '0'+dd
-  }
+  var radio_val = $('input[name="sector_radio"]:checked').val();  
 
-  if(mm<10) {
-      mm = '0'+mm
-  }
-
-  today = dd + '-' + mm + '-' + yyyy;
-      
-	//Ajax call 
-	$('#exampl').DataTable({
-        dom: 'Bfrtip',
-		pageLength:25,
-        processing: true,
-        language: {
-            loadingRecords: '&nbsp;',
-            //processing: 'Loading...'
-            processing: '<div class="spinner"></div>'
-        } , 		
-        serverSide: true,
-        serverMethod: 'post',
-       //searching: false, // Remove default Search Control
-		ajax: {
-			    url: "{{url('ajax_lc_flagged_mgit_list')}}",			  
-				headers: 
-				{
-					'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-				}
-		  },
-		 columns: [
-		   { data: 'ID',className: "hide_column"},
-		   { data: 'sample_id'},		   
-		   { data: 'mgit_tube_seq_id'},		   
-		   { data: 'date_of_inocculation'},	
-		   { data: 'sample_result'},		   
-		   { data: 'test_requested' },		   
-		   { data: 'reason_for_test' },		   
-		   { data: 'follow_up_month' },		   
-		   { data: 'gu' },
-		   { data: 'flagging_date'},		   
-		   { data: 'submit_btn' },		   
-		],
-        buttons: [
-            {
-                extend: 'excelHtml5',
-                title: 'LIMS_lc_flagged_mgit_'+today+'',
-                 exportOptions: {
-                    /*columns: [  1, 2, 3,4,5,6,7]*/
-					columns: "thead th:not(.noExport)"
-                }
-            },
-            {
-              text: 'Submit',            
-                action: bulk_action_review
-            }
-        ],
-        order: [[ 1, 'desc' ]],
-		columnDefs: [
-			  { targets: [1,2,3,4,5,6,7,8,9,10], orderable: false }
-		  ]
-    });
+  arrangeTable(radio_val);  
 	
 	//Confirm ok submit
 	$('.resultbtn, #submit').click( function(e) {
@@ -278,7 +329,7 @@ $(document).ready(function() {
 		var rec_flag=$("#recFlagId").val();
 	
 		$.ajax({
-				  url: "{{url('check_for_sample_already_process')}}"+'/'+sample_id+'/'+enroll_id+'/'+service_id+'/'+tag+'/'+rec_flag,
+				  url: "{{url('check_for_sample_already_process_migit')}}"+'/'+sample_id+'/'+enroll_id+'/'+service_id+'/'+tag+'/'+rec_flag,
 				  type:"GET",
 				  processData: false,
 				  contentType: false,
@@ -312,7 +363,91 @@ $(document).ready(function() {
 
 function bulk_action_review()
 {
-  
+  ar $modal = $('#myModal');
+            //var selected = [];
+            var $checkboxes = $('.bulk-selected:checked');          
+
+            // Display an error message and stop if no checkboxes are selected.
+            if( $checkboxes.length === 0 ){
+                alert("First select one or more items from the list.");
+                return;
+            }
+
+            var err_html = "";
+              var success_html = "";
+              var html = "";
+              var full_html = "";
+              var enroll_id="";
+              var sample_id="";
+              var service_id="";
+              var tag="";
+              var rec_flag="";            
+              var log_id = "";
+              var lpa_type = "";
+              var gu = "";
+              var flagging_date = "";             
+              var samples ="";
+              var err_sample_id = [];
+              var success_sample_id = "";
+              var samples_data = [];
+
+            //
+            $checkboxes.each(function(i, e){
+              //console.log($("#enroll_id_7").val());
+
+              enroll_id=$("#enrollID_"+$(e).val()).val();
+              log_id=$("#log_id_"+$(e).val()).val();
+              lpa_type = $("#lpa_type_"+$(e).val()).val();
+              gu = $("#gu_"+$(e).val()).val();
+              flagging_date = $("#flagging_date_"+$(e).val()).val();
+              tag=$("#tag_"+$(e).val()).val();
+              service_id=$("#service_id_"+$(e).val()).val();
+              sample_id=$(e).val();
+              rec_flag=$("#rec_flag_"+$(e).val()).val();
+              samples = $("#samples_"+$(e).val()).val();             
+
+              samples_data.push({
+                sample_id: sample_id,
+                enroll_id: enroll_id,
+                service_id: service_id,
+                tag: tag,
+                rec_flag: rec_flag,               
+              });
+        
+            });
+
+            for(i=0; i < samples_data.length; i++)
+            {
+              $.ajax({
+                    url: "{{url('check_for_sample_already_process_migit')}}"+'/'+samples_data[i].sample_id+'/'+samples_data[i].enroll_id+'/'+samples_data[i].service_id+'/'+samples_data[i].tag+'/'+samples_data[i].rec_flag,
+                    type:"GET",
+                    processData: false,
+                    contentType: false,
+                    dataType: 'json',
+                    success: function(response){
+                      //console.log(response);
+                      
+                    if(response.result == 1==1){
+                        $('.alert-danger').removeClass('hide');
+                        $('.alert-danger').show();
+                        $('.alert-danger').html("Sorry!! Action already taken of the selected Sample");
+                                      $('#submit').prop("type", "button");
+                                      e. preventDefault(); 							
+                                      
+                      }else{
+                        $('.alert-danger').addClass('hide');
+                        $('.alert-danger').hide();
+                        //$('form#cbnaat_result').submit();	
+                        $('#submit').prop("type", "submit");
+                        //$("#submit").text("OK");
+                        
+                                  }
+                    },
+                  failure: function(response){
+                    console.log("err")
+                  }
+              });
+            }
 }
 </script>
 @endsection

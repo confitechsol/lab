@@ -100,6 +100,8 @@ Route::group(['middleware' => 'auth:web'], function () {
     
     Route::get('/check_for_sample_already_process_dnr/{sample_id}/{enroll_id}/{service_id}/{tag?}/{recflag}', 'Web\Admin\ServiceLogController@checkForSampleAlreadyInProcessDnr')->name('check_for_sample_already_process_dnr');
 
+    Route::get('/check_for_sample_already_process_migit/{sample_id}/{enroll_id}/{service_id}/{tag?}/{recflag}', 'Web\Admin\ServiceLogController@checkForSampleAlreadyInProcessMigit')->name('check_for_sample_already_process_migit');
+
     //Route::get('/check_for_sample_already_process_from_microbiologist/{enroll_id}/{service_id}/{tag?}/{recflag}', 'Web\Admin\ServiceLogController@checkForSampleAlreadyInProcessFromMicrobio')->name('check_for_sample_already_process_from_microbiologist');
     Route::group(['middleware' => ['role:dna_extraction,can_view']], function () {
         Route::resource('/DNAextraction', 'Web\Admin\DNAextractionController');
@@ -158,7 +160,7 @@ Route::group(['middleware' => 'auth:web'], function () {
     Route::group(['middleware' => ['role:lc_flagged_mgit,can_view']], function () {
         Route::resource('/lc_flagged_mgit', 'Web\Admin\LCFlaggedMGITController');
     });
-    Route::post('/ajax_lc_flagged_mgit_list','Web\Admin\LCFlaggedMGITController@ajaxLCFlaggedMGITList');
+    Route::post('/ajax_lc_flagged_mgit_list/{id}','Web\Admin\LCFlaggedMGITController@ajaxLCFlaggedMGITList')->name('ajax_lc_flagged_mgit_list');
 	
     Route::group(['middleware' => ['role:lc_flagged_mgit_further,can_view']], function () {
         Route::resource('/further_lc_flagged_mgit', 'Web\Admin\LCFlaggedMGITFurtherController');

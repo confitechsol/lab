@@ -102,8 +102,9 @@ class LCFlaggedMGITController extends Controller
         return view('admin.lc_flagged_mgit.list',compact('data'));
 
   }
-	public function ajaxLCFlaggedMGITList(Request $request){
-		 //dd($request->all());
+	public function ajaxLCFlaggedMGITList(Request $request, $id){
+     //dd($request->all());
+     //dd($id);
 		
 		## Read value
 		$draw = $_POST['draw'];
@@ -161,25 +162,49 @@ class LCFlaggedMGITController extends Controller
 		$totalRecordwithFilter = $sel[0]->count_filtered;
 		//dd('totalRecordwithFilter'.$totalRecordwithFilter);
 		## Fetch records
-		//DB::enableQueryLog();
-				
-		$lcflaggedQry=DB::select("select DISTINCT(t_service_log.id)  AS ID, `m`.`enroll_id`, `m`.`id` as `sample_id`, 
-		`m`.`receive_date` as `receive`, `m`.`test_reason` as `reason`, `is_accepted`, `s`.`result`, 
-		`t_service_log`.`sample_label` as `samples`, `t_service_log`.`enroll_label` as `enroll_label`,
-        `t_service_log`.`service_id`, `t_service_log`.`id` as `log_id`, `t_service_log`.`status`, `m`.`no_of_samples`, 
-        `t`.`status` as `dna_status`, `t`.`created_at` as `date_of_extraction`, `t_service_log`.`mgit`, `t_service_log`.`tube_id_lj`,
-        `t_service_log`.`tube_id_lc`, `ci`.`inoculation_date`, `t_service_log`.`gu`,`lfm`.`flagging_date`, `m`.`fu_month`,
-        `t_service_log`.`tag`, `t_service_log`.`enroll_id` as `enrollID`, `t_service_log`.`sample_id` as `sampleID`, 
-		`t_service_log`.`rec_flag` 
-        from `t_service_log` 
-        left join `sample` as `m` on `m`.`id` = `t_service_log`.`sample_id` 
-        left join `t_dnaextraction` as `t` on `t`.`sample_id` = `t_service_log`.`sample_id` 
-        and `t`.`tag` = `t_service_log`.`tag` and `t`.`status` = 1 
-        left join `t_microscopy` as `s` on `s`.`sample_id` = `t_service_log`.`sample_id` and `s`.`status` = 1 
-        left join `t_culture_inoculation` as `ci` on `ci`.`sample_id` = `t_service_log`.`sample_id` 
-        left join `t_lc_flagged_mgit` as `lfm` on `lfm`.`sample_id` = `t_service_log`.`sample_id` 
-        where `t_service_log`.`service_id` =17 and `t_service_log`.`status` in (1) ".$searchQuery." 
-        order by `t_service_log`.`enroll_id` desc limit ".$row.",".$rowperpage);	    
+    //DB::enableQueryLog();
+    $lcflaggedQry = "";
+
+    if($id == '1')
+    {
+      $lcflaggedQry=DB::select("select DISTINCT(t_service_log.id)  AS ID, `m`.`enroll_id`, `m`.`id` as `sample_id`, 
+      `m`.`receive_date` as `receive`, `m`.`test_reason` as `reason`, `is_accepted`, `s`.`result`, 
+      `t_service_log`.`sample_label` as `samples`, `t_service_log`.`enroll_label` as `enroll_label`,
+          `t_service_log`.`service_id`, `t_service_log`.`id` as `log_id`, `t_service_log`.`status`, `m`.`no_of_samples`, 
+          `t`.`status` as `dna_status`, `t`.`created_at` as `date_of_extraction`, `t_service_log`.`mgit`, `t_service_log`.`tube_id_lj`,
+          `t_service_log`.`tube_id_lc`, `ci`.`inoculation_date`, `t_service_log`.`gu`,`lfm`.`flagging_date`, `m`.`fu_month`,
+          `t_service_log`.`tag`, `t_service_log`.`enroll_id` as `enrollID`, `t_service_log`.`sample_id` as `sampleID`, 
+          `t_service_log`.`rec_flag` 
+          from `t_service_log` 
+          left join `sample` as `m` on `m`.`id` = `t_service_log`.`sample_id` 
+          left join `t_dnaextraction` as `t` on `t`.`sample_id` = `t_service_log`.`sample_id` 
+          and `t`.`tag` = `t_service_log`.`tag` and `t`.`status` = 1 
+          left join `t_microscopy` as `s` on `s`.`sample_id` = `t_service_log`.`sample_id` and `s`.`status` = 1 
+          left join `t_culture_inoculation` as `ci` on `ci`.`sample_id` = `t_service_log`.`sample_id` 
+          left join `t_lc_flagged_mgit` as `lfm` on `lfm`.`sample_id` = `t_service_log`.`sample_id` 
+          where DATEDIFF(CURRENT_DATE, `ci`.`inoculation_date`) >= 42 AND `t_service_log`.`service_id` =17 and `t_service_log`.`status` in (1) ".$searchQuery." 
+          order by `t_service_log`.`enroll_id` desc limit ".$row.",".$rowperpage);
+    }
+    else {
+      $lcflaggedQry=DB::select("select DISTINCT(t_service_log.id)  AS ID, `m`.`enroll_id`, `m`.`id` as `sample_id`, 
+      `m`.`receive_date` as `receive`, `m`.`test_reason` as `reason`, `is_accepted`, `s`.`result`, 
+      `t_service_log`.`sample_label` as `samples`, `t_service_log`.`enroll_label` as `enroll_label`,
+          `t_service_log`.`service_id`, `t_service_log`.`id` as `log_id`, `t_service_log`.`status`, `m`.`no_of_samples`, 
+          `t`.`status` as `dna_status`, `t`.`created_at` as `date_of_extraction`, `t_service_log`.`mgit`, `t_service_log`.`tube_id_lj`,
+          `t_service_log`.`tube_id_lc`, `ci`.`inoculation_date`, `t_service_log`.`gu`,`lfm`.`flagging_date`, `m`.`fu_month`,
+          `t_service_log`.`tag`, `t_service_log`.`enroll_id` as `enrollID`, `t_service_log`.`sample_id` as `sampleID`, 
+      `t_service_log`.`rec_flag` 
+          from `t_service_log` 
+          left join `sample` as `m` on `m`.`id` = `t_service_log`.`sample_id` 
+          left join `t_dnaextraction` as `t` on `t`.`sample_id` = `t_service_log`.`sample_id` 
+          and `t`.`tag` = `t_service_log`.`tag` and `t`.`status` = 1 
+          left join `t_microscopy` as `s` on `s`.`sample_id` = `t_service_log`.`sample_id` and `s`.`status` = 1 
+          left join `t_culture_inoculation` as `ci` on `ci`.`sample_id` = `t_service_log`.`sample_id` 
+          left join `t_lc_flagged_mgit` as `lfm` on `lfm`.`sample_id` = `t_service_log`.`sample_id` 
+          where DATEDIFF(CURRENT_DATE, `ci`.`inoculation_date`) < 42 AND `t_service_log`.`service_id` =17 and `t_service_log`.`status` in (1) ".$searchQuery." 
+          order by `t_service_log`.`enroll_id` desc limit ".$row.",".$rowperpage);
+    }		
+			    
         			
 		//dd($lcflaggedQry);
 		//dd(DB::getQueryLog());
@@ -226,27 +251,50 @@ class LCFlaggedMGITController extends Controller
 				}
         }
 		//dd($test_requested);
-		//dd($reqServ_service_id);
-	 
-      
+		//dd($reqServ_service_id);      
 		
 		$data = array();		
 		$tdStyle="";
-		$submitBtn="";		
+    $submitBtn="";
+    $inputs = "";	
+    $numberDays = 0;	
 		foreach($lcflaggedQry as $key=>$samples){
 			
-				$tdStyle=$services_col_color[$samples->enroll_id]=="Y"?'style="background-color:#ccffcc;width:100%;height:100%;display:block;"':"";
+				$tdStyle=$services_col_color[$samples->enroll_id]=="Y" ? 'style="background-color:#ccffcc;width:100%;height:100%;display:block;"':"";
 				
 				if($samples->status==1){
-				   $submitBtn="<button type='button' onclick=\"openForm( '".$samples->samples."','".$samples->log_id."','".$samples->lpa_type."','".$samples->gu."','".$samples->flagging_date."','".$samples->tag."', '".$samples->enrollID."','".$samples->sampleID."','".$samples->service_id."',".$samples->rec_flag.");\" class='btn btn-info btn-sm resultbtn' >submit</button>";
+          $inputs = '<input class="bulk-selected" type="checkbox" id="sampleID_'.$samples->sampleID.'" value="'.$samples->sampleID.'">';
+          $inputs .= '<input type="hidden" name="samples_'.$samples->sampleID.'" id="samples_'.$samples->sampleID.'" value="'.$samples->samples.'" />';
+          $inputs .= '<input type="hidden" name="log_id_'.$samples->sampleID.'" id="log_id_'.$samples->sampleID.'" value="'.$samples->log_id.'" />';
+          $inputs .= '<input type="hidden" name="lpa_type_'.$samples->sampleID.'" id="lpa_type_'.$samples->sampleID.'" value="'.$samples->lpa_type.'" />';
+          $inputs .= '<input type="hidden" name="gu_'.$samples->sampleID.'" id="gu_'.$samples->sampleID.'" value="'.$samples->gu.'" />';
+          $inputs .= '<input type="hidden" name="flagging_date_'.$samples->sampleID.'" id="flagging_date_'.$samples->sampleID.'" value="'.$samples->flagging_date.'" />';
+          $inputs .= '<input type="hidden" name="tag_'.$samples->sampleID.'" id="tag_'.$samples->sampleID.'" value="'.$samples->tag.'" />';
+          $inputs .= '<input type="hidden" name="enrollID_'.$samples->sampleID.'" id="enrollID_'.$samples->sampleID.'" value="'.$samples->enrollID.'" />';
+          $inputs .= '<input type="hidden" name="service_id_'.$samples->sampleID.'" id="service_id_'.$samples->sampleID.'" value="'.$samples->service_id.'" />';
+          $inputs .= '<input type="hidden" name="rec_flag_'.$samples->rec_flag.'" id="rec_flag_'.$samples->rec_flag.'" value="'.$samples->rec_flag.'" />';        
+
+				   $submitBtn="<button type='button' onclick=\"openForm( '".$samples->sampleID."');\" class='btn btn-info btn-sm resultbtn' >submit</button>";
 				}else{
+          $inputs = '';
 				  $submitBtn="Done";	
-				}
+        }
+        
+        $cur_date = strtotime(date('Y-m-d'));
+        $date_of_inocculation = strtotime($samples->inoculation_date);
+
+        $timeDiff = abs($cur_date - $date_of_inocculation);
+
+        $numberDays = $timeDiff/86400;  // 86400 seconds in one day
+
+        // and you might want to convert to integer
+        $numberDays = intval($numberDays);
+               
 				
-				$data[] = array(
-				     "DT_RowId"=> $key,
-					 "DT_RowClass"=>'sel ',
-				     "ID"=>$samples->ID,
+				/* $data[] = array(
+				    "DT_RowId"=> $key,
+					  "DT_RowClass"=>'sel ',
+				    "ID"=>$samples->ID,
 					 "sample_id"=>$samples->samples,
 					 "mgit_tube_seq_id"=>$samples->mgit,
 					 "date_of_inocculation"=>date('d-m-Y', strtotime($samples->inoculation_date)),
@@ -257,6 +305,24 @@ class LCFlaggedMGITController extends Controller
 					 "gu"=>$samples->gu,
 					 "flagging_date"=>$samples->flagging_date,
 					 "submit_btn"=>$submitBtn,
+           ); */
+           
+
+           $data[] = array(            
+            "DT_RowId"=> $key,
+            "inputs" => $inputs,
+					  "DT_RowClass"=>'sel ',
+				    "ID"=>$samples->ID,
+					 "sample_id"=>$samples->samples,
+					 "mgit_tube_seq_id"=>$samples->mgit,
+           "date_of_inocculation"=>date('d-m-Y', strtotime($samples->inoculation_date)),
+           "submit_btn"=>$submitBtn,
+					 "sample_result"=>$samples->result,					 
+					 "test_requested"=>'<span '.$tdStyle.' >'.$test_requested[$samples->enroll_id].'</span>',					 
+					 "reason_for_test"=>$samples->reason,
+					 "follow_up_month"=>$samples->fu_month,
+					 "no_of_days"=>$numberDays,
+					 "flagging_date"=>$samples->flagging_date,					 
 				   );
 			
 		}	

@@ -12,8 +12,9 @@
         <p></p>
         <form class="form-horizontal form-material" action="{{ url('/lc_flagged_mgit') }}" method="post" id="extractionpopup">
           <input type="hidden" name="_token" value="{{ csrf_token() }}">
-          <input type="hidden" name="log_id" id="log_id" value="">
-		  
+          <div class="col-md-12" id="node"></div>
+          
+          <input type="hidden" name="log_id" id="log_id" value="">		  
 		   <input type="hidden" name="enrollId" id="enrollId" value="">
 		  <input type="hidden" name="tagId" id="tagId" value="">				
 		  <input type="hidden" name="sampleID" id="sampleID" value="">

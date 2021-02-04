@@ -194,8 +194,7 @@
                                               <td>{{$samples->test_reason}}</td>
                                               <td>{{$samples->fu_month}}</td>
                                               <td>{{$samples->result}}</td>
-                                              <td>{{$samples->sent_for_service}}</td>
-                                              
+                                              <td>{{$samples->sent_for_service}}</td>                                           
 
 
                                           </tr>
