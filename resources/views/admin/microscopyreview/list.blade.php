@@ -120,7 +120,6 @@
                                               <th>Lab Enrolment ID</th>
                                               <th>Sample ID</th>
                                               <th>Visual appearance</th>
-                                              <th>Next Step </th>
                                               <th>Microscopy method (ZN OR FM)</th>
                                               <th>Sample Type</th>
 											                        <th>Test Requested</th>
@@ -128,7 +127,7 @@
                                                <th>Follow up month</th>
                                               <th>Date of Receipt</th>
                                               <th>Microscopy result</th>
-                                              
+                                              <th>Next Step </th>
                                             </tr>
                                         </thead>
                                         <tbody>
@@ -144,6 +143,7 @@
                                             <td>{{$samples->label}}</td>
                                             <td>{{$samples->sample_label}}</td>
                                             <td>{{$samples->sample_quality}}</td>
+
                                             <td>
                                               @if($samples->status==2)
                                               <button onclick="openNextForm('{{$samples->sample_label}}', {{$samples->log_id}},'{{$samples->service_id}}',{{$samples->enrollID}},{{$samples->sample_id}},'{{$samples->tag}}',{{$samples->rec_flag}})" type="button" class = "btn btn-info btn-sm  nextbtn">Submit</button>
@@ -178,7 +178,16 @@
                                                <a href="#" onclick="openResultForm('{{$samples->sample_label}}', {{$samples->log_id}}, '{{$samples->result}}','{{$samples->serviceID}}','{{$samples->service_id}}',{{$samples->enrollID}},{{$samples->sample_id}},'{{$samples->tag}}',{{$samples->rec_flag}} )">{{$samples->stage}}</a>
                                                @endif
                                              </td>
-                                            
+                                            <td>
+                                              @if($samples->status==2)
+                                              <button onclick="openNextForm('{{$samples->sample_label}}', {{$samples->log_id}},'{{$samples->service_id}}',{{$samples->enrollID}},{{$samples->sample_id}},'{{$samples->tag}}',{{$samples->rec_flag}})" type="button" class = "btn btn-default btn-sm  nextbtn">Next</button>
+                                              @elseif($samples->status==0)
+                                              Done
+                                              @else
+                                              Storage
+                                              @endif
+
+                                            </td>
                                           </tr>
                                           @endforeach
 
@@ -270,6 +279,8 @@
                               <option value="25" id="Sent_for">Sent for microbiologist</option>
                               <!-- <option value="12" id="Sent_for">Sent for microbiologist</option> -->
                      </select>
+                     <input type="hidden" name="service_name" id="service_name" value="">
+
                        </div>
                     </div>       
                   </div>
@@ -597,11 +608,47 @@ $(document).ready(function() {
                 title: 'LIMS_Review_Microscopy_'+today+''
             },
             {
-                text: 'Submit',            
+                text: 'Send Selected to Review',            
                 action: bulk_action_review
             }
         ],
          //"order": [[ 1, "desc" ]]
+    });
+
+   
+    $('body').on('change', '#service_id1', function(event) { 
+      //alert(this.value);
+      /*if(this.value == 16){
+        $('#service_name').val('LC');
+      }*/
+
+      var id = $(this).children(":selected").attr("id");
+    //console.log(id);
+    if(id=='dna'){
+      $('#service_name').val('DECONTAMINATION');
+    }else if(id=='cbnaat'){
+      $('#service_name').val('CBNAAT');
+    }else if(id=='dna1'){
+      $('#service_name').val('LPA 1st Line');
+    }else if(id=='dna2'){
+      $('#service_name').val('LPA 2nd Line');
+    }else if(id=='dnaboth'){
+      $('#service_name').val('LPA 1st and 2nd Line');
+    }else if(id=='lc'){
+      $('#service_name').val('AFB Culture Liquid');
+    }else if(id=='lj'){
+      $('#service_name').val('AFB Culture Solid');
+    }else if(id=='solid_culture'){
+      $('#service_name').val('LJ');
+    }else if(id=='liquid_culture'){
+      //$('#service_name').val('LC');
+      $('#service_name').val('LC');
+    }else if(id=='both'){
+      $('#service_name').val('LC & LJ Both');
+    }else{
+      $('#service_name').val('');
+    }
+
     });
 	
 });

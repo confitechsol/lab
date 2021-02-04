@@ -93,10 +93,12 @@
               </div>
               @include('admin/lc_flagged_mgit/cipopup')
                 <div class="row">
-                <!----------loader------------>
+                <!--loader-->
 				<div id="pageloader">
 				  <div class="loader"></div>
 				</div>
+				<!--loader-->
+				    <!---<div class="alert alert-danger hide"><h4></h4></div>-->
 				<!----------loader------------>
             <!---<div class="alert alert-danger hide"><h4></h4></div>----->
             

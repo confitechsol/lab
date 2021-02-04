@@ -87,7 +87,32 @@
                  </div>
               </div>
           </div>
+          <div class="row">
+            <div class="col">
+            <label class="col-md-12">Result</label>
+            <div class="col-md-12">     
+              <select name="result" id="allresults" class="form-control form-control-line">       
+                 <option value="">--Select--</option>
+                 <option value="Negative/Not Seen">Negative/Not Seen</option>
+                 <option value="Positive">Positive</option>
+                 <option value="1+positive">1+positive</option>
+                 <option value="2+positive">2+positive</option>
+                 <option value="3+positive">3+positive</option>
+                 <option value="Sc 1">Sc 1</option>
+                 <option value="Sc 2">Sc 2</option>
+                 <option value="Sc 3">Sc 3</option>
+                 <option value="Sc 4">Sc 4</option>
+                 <option value="Sc 5">Sc 5</option>
+                 <option value="Sc 6">Sc 6</option>
+                 <option value="Sc 7">Sc 7</option>
+                 <option value="Sc 8">Sc 8</option>
+                 <option value="Sc 9">Sc 9</option>
+             </select>
+           </div>
+          </div>
 
+          </div>
+          
 
 
           <div class="row">

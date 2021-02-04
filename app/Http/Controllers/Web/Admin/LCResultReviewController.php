@@ -33,7 +33,7 @@ class LCResultReviewController extends Controller
     {
       try{
         // dd("hi");
-        $data = [];
+          $data = [];
           $data['sample'] = ServiceLog::select('m.enroll_id','m.id as sample_id', 'm.receive_date as receive','m.test_reason as reason','is_accepted',
 		  't_service_log.sample_label as samples','t_service_log.enroll_label as enroll_label','t_service_log.service_id','t_service_log.id as log_id',
 		  't_service_log.status','t_service_log.tag as lpa_type','m.no_of_samples','t.status as dna_status','t.created_at as date_of_extraction','ci.mgit_id',
@@ -511,4 +511,245 @@ class LCResultReviewController extends Controller
 			echo json_encode($servicelog[0]->v_count);
 			exit;
 	}
+
+
+	/**
+     *
+     * Bulk send to LC Review Result.
+     *
+     * @param Request $request
+     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
+     */
+    public function bulkStore( Request $request ){      
+
+    	//$service_ids = trim( $request->input('sample_ids') );
+    	//dd($service_ids);
+
+        // Validate User Inputs ===========================================
+        $this->validate( $request, [
+            'sample_ids' => 'required',
+            //'test_date'  => 'required|date_format:Y-m-d',
+        ] );
+
+       DB::beginTransaction();
+        try {        	
+            // User Inputs ====================================================
+            $service_ids = trim( $request->input('sample_ids') );
+            $service_log_ids = explode(',', $service_ids);  
+
+            //$result  = $request->input('result');
+
+            // Get Samples from $sample_ids ===================================
+            // $samples = Sample::query()->findMany( $sample_ids);           
+            $data = array();            
+              if(count($service_log_ids) > 0){                           
+                foreach($service_log_ids as $key => $service_log_id){                 	 
+                $request->service_log_id = $service_log_id;
+               	if($request->service_id == 1 || $request->service_id == 2 || $request->service_id == 3){               		
+					  if($request->service_log_id > 0){
+						$service = ServiceLog::find($request->service_log_id); 
+						$service->released_dt=date('Y-m-d');
+						$service->status = 0;
+						$service->updated_by = $request->user()->id;
+						$service->save();
+
+						if($request->service_id == 1){
+						  $tag = '1st line LPA';
+						}elseif($request->service_id == 2){
+						  $tag = '2nd line LPA';
+						}else{
+						  $tag = '1st line LPA  and for 2nd line LPA';
+						}
+						
+						//DB::enableQueryLog();
+						//Update LPA series if exist
+						ServiceLog::where('enroll_id', $service->enroll_id)->where('sample_id',$service->sample_id)->where('service_id', 8)->where('tag',$tag)->update(['status'=>99]);
+						ServiceLog::where('enroll_id', $service->enroll_id)->where('sample_id',$service->sample_id)->where('service_id', 12)->where('tag',$tag)->update(['status'=>99]);
+						ServiceLog::where('enroll_id', $service->enroll_id)->where('sample_id',$service->sample_id)->where('service_id', 14)->where('tag',$tag)->update(['status'=>99]);
+						ServiceLog::where('enroll_id', $service->enroll_id)->where('sample_id',$service->sample_id)->where('service_id', 15)->where('tag',$tag)->update(['status'=>99]);
+						//dd(DB::getQueryLog());
+						
+						$new_service = [
+						  'enroll_id' => $service->enroll_id,
+						  'sample_id' => $service->sample_id,
+						  'service_id' => 8,
+						  'status' => 1,
+						  'tag' => $tag,
+						  'rec_flag' =>$request->rec_flag+1,
+						  'reported_dt'=>date('Y-m-d'),
+						  'created_by' => $request->user()->id,
+						  'updated_by' => $request->user()->id,
+						  'enroll_label' => $service->enroll_label,
+						  'sample_label' => $service->sample_label,
+						];
+
+						$nwService = ServiceLog::create($new_service);				
+						//Incorporated by Amrito(Insert in to microbiologist)		
+						$microbio = Microbio::create([
+							   'enroll_id' => $service->enroll_id,
+							   'sample_id' => $service->sample_id,
+							   'service_id' => 17,
+							   'next_step' => '',
+							   'detail' => '',
+							   'remark' => '',
+							   'status' => 0,
+							   'report_type'=>'End Of Report',
+							   'result_date' => $request->hid_result_date,
+							   'created_by' => $request->user()->id,
+							   'updated_by' => $request->user()->id
+							 ]);
+							 
+							//Update in sample table 
+							$sample = Sample::find($service->sample_id);				
+							$sample->sample_type ="AFB MTB positive culture (LJ or LC)";
+							$sample->save(); 
+							
+							//Delete from LPA Series if exist
+							DNAextraction::where('enroll_id',$service->enroll_id)->delete();
+							Pcr::where('enroll_id',$service->enroll_id)->where('tag','like',$tag)->delete();
+							Hybridization::where('enroll_id',$service->enroll_id)->where('tag','like',$tag)->delete(); 
+							FinalInterpretation::where('enroll_id',$service->enroll_id)->where('tag','like',$tag)->delete();
+							FirstLineLpa::where('enroll_id',$service->enroll_id)->where('tag','like',$tag)->delete();
+							SecondLineLpa::where('enroll_id',$service->enroll_id)->where('tag','like',$tag)->delete();
+							Microbio::where('enroll_id',$service->enroll_id)->where('tag','like',$tag)->delete();
+							
+					    }
+								
+					}elseif($request->service_id == 4){
+						$service = ServiceLog::find($request->service_log_id);
+						$service->status = 0;
+						$service->updated_by = $request->user()->id;
+						$service->save();
+						$new_service = [
+						  'enroll_id' => $service->enroll_id,
+						  'sample_id' => $service->sample_id,
+						  'service_id' => 21,
+						  'status' => 1,
+						  'tag' => $request->tagId,
+						  'reported_dt'=>date('Y-m-d'),
+						  'created_by' => $request->user()->id,
+						  'updated_by' => $request->user()->id,
+						  'enroll_label' => $service->enroll_label,
+						  'sample_label' => $service->sample_label,
+						];
+						$nwService = ServiceLog::create($new_service);
+						//return $nwService;
+						//Incorporated by Amrito(Insert in to microbiologist)
+
+						$microbio = Microbio::create([
+						   'enroll_id' => $service->enroll_id,
+						   'sample_id' => $service->sample_id,
+						   'service_id' => 17,
+						   'next_step' => '',
+						   'detail' => '',
+						   'remark' => '',
+						   'status' => 0,
+						   'report_type'=>'End Of Report',
+						   'result_date' => $request->hid_result_date,
+						   'created_by' => $request->user()->id,
+						   'updated_by' => $request->user()->id
+						 ]);
+					}elseif($request->service_id == 5 ){
+							$service = ServiceLog::find($request->service_log_id);
+							$service->released_dt=date('Y-m-d');
+							$service->status = 0;
+							$service->updated_by = $request->user()->id;
+							$service->save();
+							$microbio = Microbio::create([
+							  'enroll_id' => $service->enroll_id,
+							  'sample_id' => $service->sample_id,
+							  'service_id' => 17,
+							  'next_step' => '',
+							  'detail' => '',
+							  'remark' => '',
+							  'status' => 0,
+							  'created_by' => $request->user()->id,
+							  'updated_by' => $request->user()->id
+							]);
+									  //return $microbio;
+					}elseif($request->service_id == 7){
+
+						$service = ServiceLog::find($request->service_log_id);
+						$service->released_dt=date('Y-m-d');
+						$service->status = 0;
+						$service->updated_by = $request->user()->id;
+						$service->save();
+					    $microbio = Microbio::create([
+						   'enroll_id' => $service->enroll_id,
+						   'sample_id' => $service->sample_id,
+						   'service_id' => 17,
+						   'next_step' => '',
+						   'detail' => '',
+						   'remark' => '',
+						   'status' => 0,
+						   'report_type'=>'End Of Report',
+						   'result_date' => $request->hid_result_date,
+						   'created_by' => $request->user()->id,
+						   'updated_by' => $request->user()->id
+						 ]);
+					}elseif($request->service_id == 6){
+
+						  $service = ServiceLog::find($request->service_log_id);
+						  $service->status = 0;
+						  $service->updated_by = $request->user()->id;
+						  $service->save();
+						  
+						  $another_sample = ServiceLog::select('sample_id','sample_label')->where('enroll_id',$service->enroll_id)->where('service_id',11)->first();
+						  //dd($another_sample);
+						  
+						  if($another_sample){
+							    $update_sample_obj = ServiceLog::where('enroll_id',$service->enroll_id)->where('service_id',11)->update(['status' => 0]);
+								//$is_decontamin = ServiceLog::where('sample_id',$service->sample_id)->where('service_id',3)->first();
+								//if($is_decontamin){
+								  $new_service = [
+									'enroll_id' => $service->enroll_id,
+									'sample_id' => $another_sample->sample_id,
+									'service_id' => 16,
+									'status' => 1,
+									'tag' => $request->tagId,
+									'reported_dt'=>date('Y-m-d'),
+									'created_by' => $request->user()->id,
+									'updated_by' => $request->user()->id,
+									'enroll_label' => $service->enroll_label,
+									'sample_label' => $another_sample->sample_label,
+								  ];
+								  
+								  //Delete from tables
+									CultureInoculation::where('enroll_id',$request->enrollId)->where('sample_id',$request->sampleID)->delete();
+									LCFlaggedMGIT::where('enroll_id',$request->enrollId)->where('sample_id',$request->sampleID)->delete();
+									LCFlaggedMGITFurther::where('enroll_id',$request->enrollId)->where('sample_id',$request->sampleID)->delete();
+
+								/*}
+								else{
+									$new_service = [
+									'enroll_id' => $service->enroll_id,
+									'sample_id' => $another_sample->sample_id,
+									'service_id' => 3,
+									'status' => 1,
+									'tag' => $request->tagId,
+									'reported_dt'=>date('Y-m-d'),
+									'created_by' => $request->user()->id,
+									'updated_by' => $request->user()->id,
+									'enroll_label' => $service->enroll_label,
+									'sample_label' => $another_sample->sample_label,
+								  ];
+								}*/
+								$nwService = ServiceLog::create($new_service);
+								//$another_sample_obj->service_id = 0;
+								
+						}
+					}
+					                 
+               }             
+            }     
+           DB::commit();
+        }catch(\Exception $e){
+        //dd($e->getMessage()); 
+       DB::rollback();
+        /*return redirect('/dash_decontamination')->withErrors(['Sorry!! Action already taken of the selected Sample']);*/
+        return back(); // Return back from where the request has come.
+    }  
+   return back(); // Return back from where the request has come.
+
+}
 }

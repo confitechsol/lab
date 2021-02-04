@@ -9,6 +9,7 @@ use App\Model\Microscopy;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\Model\Microbio;
+use Illuminate\Support\Facades\Auth;
 
 use App\Http\Controllers\Controller;
 
@@ -233,10 +234,87 @@ class ServiceLogController extends Controller
 			//dd($servicelog);
 		    //dd($servicelog[0]->v_count);	   
 
-			/* $result = array(
-				'result' => $servicelog[0]->v_count,
-				'sample_id' => $sample_id
-			); */
+			echo json_encode($servicelog[0]->v_count);
+			exit;
+	}
+	public function checkForSampleAlreadyInProcessMicroscopyNext($sample_id,$enroll_id,$service_id,$tag=null,$recflag)
+    { 
+	       
+		    
+			$statussql=" AND status=0 ";
+				
+            //DB::enableQueryLog();			
+			$servicelog = DB::select("SELECT IFNULL(count(*),0) AS v_count FROM t_service_log 
+			WHERE sample_id = ".$sample_id."
+			AND enroll_id =".$enroll_id."
+			AND service_id =".$service_id."
+			".$statussql."
+			AND tag = '".$tag."'
+			AND rec_flag = ".$recflag);
+			//dd(DB::getQueryLog());
+			//dd($servicelog);
+		    //dd($servicelog[0]->v_count);	   
+
+			echo json_encode($servicelog[0]->v_count);
+			exit;
+	}
+
+	public function checkForSampleAlreadyInProcess12($sample_id,$enroll_id,$service_id,$tag=null,$recflag,$res=null)
+    { 
+	      // dd('i am here');
+		    //echo $sample_id."=".$enroll_id."==".$service_id."===".$tag."====".$recflag."++".$res; die;
+			$statussql=" AND status = 0 ";
+			if($service_id==1 || $service_id==2)
+			{
+				$statussql=" AND status=2";
+			}
+			if($service_id==21)
+			{
+				$statussql=" AND status=0";
+			}
+            if($service_id==22)
+			{
+				$statussql=" AND status=0 ";
+			}	
+            //DB::enableQueryLog();			
+			$servicelog = DB::select("SELECT IFNULL(count(*),0) AS v_count FROM t_service_log 
+			WHERE sample_id = ".$sample_id."
+			AND enroll_id =".$enroll_id."
+			AND service_id =".$service_id."
+			".$statussql."
+			AND tag = '".$tag."'
+			AND rec_flag = ".$recflag);
+			//dd(DB::getQueryLog());
+			//dd($servicelog);
+		    //dd($servicelog[0]->v_count);	
+
+			if($res == null){
+				
+
+			}else if($res != null){
+			$mrscopy_result = Microscopy::where('sample_id', $sample_id)->where('enroll_id', $enroll_id)->first();
+			if(isset($mrscopy_result)){
+
+			Microscopy::where([
+			    'sample_id' => $sample_id,                   
+			    'enroll_id' => $enroll_id,                   
+			  ])->update([
+			    'result'=> $res,                            
+			  ]);
+			}else{
+
+				Microscopy::create([
+                    'enroll_id' => $enroll_id,
+                    'sample_id' => $sample_id,
+                    'status'    => '1', 
+                    'result' => $res,
+                    'created_by' => Auth::user()->id,
+                    'updated_by' => Auth::user()->id
+                  ]);
+
+			}
+
+			}    
 
 			echo json_encode($servicelog[0]->v_count);
 			exit;
@@ -357,33 +435,6 @@ class ServiceLogController extends Controller
 			exit;
 	}
 	
-
-
-	public function checkForSampleAlreadyInProcessMicroscopyNext($sample_id,$enroll_id,$service_id,$tag=null,$recflag)
-    {   
-		    
-			$statussql=" AND status=0 ";
-				
-            //DB::enableQueryLog();			
-			$servicelog = DB::select("SELECT IFNULL(count(*),0) AS v_count FROM t_service_log 
-			WHERE sample_id = ".$sample_id."
-			AND enroll_id =".$enroll_id."
-			AND service_id =".$service_id."
-			".$statussql."
-			AND tag = '".$tag."'
-			AND rec_flag = ".$recflag);
-			//dd(DB::getQueryLog());
-			//dd($servicelog);
-			//dd($servicelog[0]->v_count);	
-			/* $result = array(
-						'result' => $servicelog[0]->v_count,
-						'sample_id' => $sample_id
-			); */
-
-			echo json_encode($servicelog[0]->v_count);
-			exit;
-	}
-
 	public function checkForSampleAlreadyInProcessMicroscopyNextDeconta($sample_id,$enroll_id,$service_id,$tag=null,$recflag)
     {   
 		    

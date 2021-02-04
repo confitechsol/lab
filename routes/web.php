@@ -97,7 +97,7 @@ Route::group(['middleware' => 'auth:web'], function () {
     Route::get('/check_for_sample_already_process_pcr/{sample_id}/{enroll_id}/{service_id}/{tag?}/{recflag}', 'Web\Admin\ServiceLogController@checkForSampleAlreadyInProcessPcr')->name('check_for_sample_already_process_pcr');
 
     Route::get('/check_for_sample_already_process/{sample_id}/{enroll_id}/{service_id}/{tag?}/{recflag}', 'Web\Admin\ServiceLogController@checkForSampleAlreadyInProcess')->name('check_for_sample_already_process');
-    
+    Route::get('/check_for_sample_already_process1/{sample_id}/{enroll_id}/{service_id}/{tag?}/{recflag}/{res}', 'Web\Admin\ServiceLogController@checkForSampleAlreadyInProcess12')->name('check_for_sample_already_process1');
     Route::get('/check_for_sample_already_process_dnr/{sample_id}/{enroll_id}/{service_id}/{tag?}/{recflag}', 'Web\Admin\ServiceLogController@checkForSampleAlreadyInProcessDnr')->name('check_for_sample_already_process_dnr');
 
     Route::get('/check_for_sample_already_process_migit/{sample_id}/{enroll_id}/{service_id}/{tag?}/{recflag}', 'Web\Admin\ServiceLogController@checkForSampleAlreadyInProcessMigit')->name('check_for_sample_already_process_migit');
@@ -168,6 +168,7 @@ Route::group(['middleware' => 'auth:web'], function () {
 
     Route::group(['middleware' => ['role:lc_result_review,can_view']], function () {
         Route::resource('/lc_result_review', 'Web\Admin\LCResultReviewController');
+        Route::post('/dash_lc_result_review_bulk', 'Web\Admin\LCResultReviewController@bulkStore')->name('lc_result_review.send-review.bulk');
     });
 	
 	Route::get('/check_for_sample_exist_in_storage/{enroll_id}', 'Web\Admin\LCResultReviewController@checkForSampleExistInStorage')->name('check_for_sample_exist_in_storage');

@@ -97,7 +97,7 @@
                                           <th>Date of Inoculation</th>
                                           <th>Initial Smear  result</th>
                                           <th>DX/FU</th>
-                                          <th>GU</th>
+                                          <!-- <th>GU</th> -->
                                           <th>Date of flagging  by MGIT</th>
                                         </tr>
                                       </thead>
@@ -109,7 +109,7 @@
                                           <td><?php echo date('d-m-Y',strtotime($data['sample']->inoculation_date)); ?></td>
                                           <td>{{$data['sample']->result}}</td>
                                           <td>{{$data['sample']->reason}}</td>
-                                          <td>{{$data['sample']->gu}}</td>
+                                          <!-- <td>{{$data['sample']->gu}}</td> -->
                                           <td>{{date('d-m-Y',strtotime($data['sample']->flagging_date)) }}</td>
                                         </tr>
 
