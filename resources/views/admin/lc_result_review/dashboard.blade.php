@@ -77,6 +77,8 @@
                                   <table id="exampl" class="table table-striped table-bordered responsive col-xlg-12" cellspacing="0" width="100%">
                                       <thead>
                                         <tr>
+                                          <th><input type="checkbox" id="bulk-select-all"></th>
+                                          <th class="hide">ID</th>
                                           <th>Lab Enrolment ID</th>
                                           <th>Sample ID</th>
 										  <th>Test Requested</th>
@@ -94,7 +96,11 @@
                                       <tbody>
 
                                         @foreach ($data['sample'] as $key=> $samples)
-                                        <tr>
+                                        <tr>                                         
+                                          <td> 
+                                            <input class="bulk-selected" type="checkbox" value="{{ $samples->log_id }}">
+                                          </td>
+                                          <td class="hide">{{$samples->ID}}</td>
                                           <td>{{$samples->enroll_label}}</td>
                                           <td>{{$samples->samples}}</td>
 										  <td  <?php echo $data['services_col_color['.$samples->enroll_id.']']=='Y'?'bgcolor="#ccffcc"':""; ?>><?php echo $data['test_requested['.$samples->enroll_id.']'];?></td>
@@ -141,6 +147,60 @@
             </div>
             <footer class="footer"> © Copyright Reserved 2017-2018, LIMS </footer>
         </div>
+
+
+        {{-- MODAL FOR BULK REVIEW --}}
+    <div class="modal fade" id="modal-bulk-review" role="dialog">
+        <div class="modal-dialog">
+
+            <!-- Modal content-->
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title">Liquid Culture Result Review</h4>
+                </div>
+
+                @if(count($errors))
+                        @foreach ($errors->all() as $error)
+                            <div class="alert alert-danger"><h4>{{ $error }}</h4></div>
+                        @endforeach
+                    @endif
+         <form class="form-horizontal form-material" action="{{ route('lc_result_review.send-review.bulk') }}" method="post" >
+            <input type="hidden" name="_token" value="{{ csrf_token() }}">             
+            <input type="hidden" name="sample_ids" id="sample_ids" value="">  
+                   
+            <div class="row">
+                <div class="col">
+                    <label class="col-md-12">Sample Sent for :<span class="red">*</span></label>
+                    <div class="col-md-12">
+                       <select name="service_id" id="service_id" class="form-control form-control-line test_reason" required>
+                         <option value="">--Select--</option>
+                         <option value="1">DNA Extraction LPA 1st line</option>
+                         <option value="2">DNA Extraction LPA 2nd line</option>
+                         <!--<option value="3">DNA Extraction LPA 1st line and LPA 2nd line</option>-->
+                         <option value="4">LC- DST- Inoculation</option>
+                        <option value="6">Do LC with standby sample</option>
+                        <option value="7">Result finalization</option>
+                        <!-- <option value="5">MB for further review </option>-->
+
+                       </select>
+                   </div>
+                </div>
+            </div>     
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default btn-md" data-dismiss="modal">Cancel</button>
+        <!-- <button type="button" class="pull-right btn btn-primary btn-md" id="nxtconfirm">Ok</button> -->
+        <!-- <button type="button" class="pull-right btn btn-primary btn-md" id="mysub">Ok</button> -->
+        <input type="submit" class="pull-right btn btn-primary btn-md" value="ok">
+      </div>
+      </form>
+               
+            </div>
+        </div>
+    </div>
+    {{-- MODAL FOR BULK REVIEW - ENDS --}}
+
+
 
 <script>
 $(document).ready(function(){
@@ -199,6 +259,11 @@ $(document).ready(function() {
             {
                 extend: 'excelHtml5',
                 title: 'LIMS_lc_result_review_'+today+''
+            }
+            ,
+            {
+                text: 'Send Selected to Review',            
+                action: bulk_action_review
             }
         ],
         "order": [[ 1, "desc" ]]
@@ -303,6 +368,61 @@ $(document).ready(function() {
 		   $('#nxtconfirm').prop("type", "submit");
 	   }
 	});
+
+
+// ==================================================
+        // =========== SCRIPT FOR BULK REVIEW ===============
+        // ==================================================
+
+        var $bulk_checkboxes = $('.bulk-selected');
+        var $bulk_select_all_checkbox = $('#bulk-select-all');
+
+
+        // Automatically Check or Uncheck "all select" checkbox
+        // based on the state of checkboxes in the list.
+        $bulk_checkboxes.click(function(){
+            if( $bulk_checkboxes.length === $bulk_checkboxes.filter(':checked').length ){
+                $bulk_select_all_checkbox.prop('checked', true);
+            }
+        });
+
+
+        // Check or Uncheck checkboxes based on the state
+        // of "all select" checkbox.
+        $bulk_select_all_checkbox.click(function(){
+            var checked = $(this).prop('checked');
+            $('.bulk-selected').prop('checked', checked);
+        });
+
+
+        // Open bulk editing modal on clicking "Send Selected to Review" button.
+        function bulk_action_review(){
+            var $modal = $('#modal-bulk-review');
+            var selected = [];
+            var $checkboxes = $('.bulk-selected:checked');
+
+            // Display an error message and stop if no checkboxes are selected.
+            if( $checkboxes.length === 0 ){
+                alert("First select one or more items from the list.");
+                return;
+            }
+
+            $modal.modal('show');
+
+            $checkboxes.each(function(i, e){
+                selected.push( $(e).val() );
+
+                // Last iteration of the loop.
+                if( i === $checkboxes.length - 1 ){
+                    $modal.find('input[name="sample_ids"]').val( selected.join(',') );
+                }
+            });
+        }
+
+        // ==================================================
+        // ========= SCRIPT FOR BULK REVIEW - ENDS ==========
+        // ==================================================
+
 });
 </script>
 

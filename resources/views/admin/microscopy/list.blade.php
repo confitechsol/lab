@@ -119,12 +119,11 @@
                                               <th>Lab Enrolment ID</th>
                                               <th>Sample ID</th>
                                               <th>Visual appearance</th>
-                                              <th>Result</th>
                                               <th>Microscopy method (ZN OR FM)</th>
 											   <th>Test Requested</th>
                                               <th>Reason for test DX/FU</th>
                                               <th>Follow up month</th>
-                                              
+                                              <th>Result</th>
                                             </tr>
                                         </thead>
                                         <tbody>
@@ -142,19 +141,18 @@
                                             <td>{{$samples->sample_label}}</td>
                                             <td>{{$samples->sample_quality}}</td>
                                             <td>
-                                              @if($samples->stage!='' && $samples->status!=1)
-                                                {{$samples->stage}}
-                                              @else
-                                              <button onclick="openResultForm('{{$samples->sample_label}}', {{$samples->log_id}}, '{{$samples->result}}','{{$samples->serviceID}}','{{$samples->service_id}}',{{$samples->enrollID}},{{$samples->sample_id}},'{{$samples->tag}}',{{$samples->rec_flag}})",  value="" type="button" class = "btn btn-info btn-sm resultbtn">Submit</button>
-                                              @endif
-                                            </td>
-                                            <td>
                                               {{$samples->service_id == 1? "ZN Microscopy" : "FM Microscopy"}}
                                             </td>
 											<td  <?php echo $data['services_col_color['.$samples->enroll_id.']']=='Y'?'bgcolor="#ccffcc"':""; ?>><?php echo $data['test_requested['.$samples->enroll_id.']'];?></td>
                                             <td>{{$samples->reason}}</td>
                                             <td>{{$samples->fu_month}}</td>
-                                            
+                                            <td>
+                                              @if($samples->stage!='' && $samples->status!=1)
+                                                {{$samples->stage}}
+                                              @else
+                                              <button onclick="openResultForm('{{$samples->sample_label}}', {{$samples->log_id}}, '{{$samples->result}}','{{$samples->serviceID}}','{{$samples->service_id}}',{{$samples->enrollID}},{{$samples->sample_id}},'{{$samples->tag}}',{{$samples->rec_flag}})",  value="" type="button" class = "btn btn-default btn-sm resultbtn">Add Result</button>
+                                              @endif
+                                            </td>
 
                                             <!-- <td>
                                               @if($samples->result)
@@ -233,16 +231,16 @@
 
                         <br>
                         <label class="col-md-12">
-                            <!-- <h5>Microscopy<span class="red">*</span></h5> -->
+                            <h5>Microscopy<span class="red">*</span></h5>
                         </label>
-                        <!-- <div class="col-md-12">
+                        <div class="col-md-12">
                             <input type="date"
                                    name="test_date"
                                    class="form-control form-control-line sampleId"
                                    value="<?php echo date("Y-m-d");?>"
                                    max="<?php echo date("Y-m-d");?>"
                                    required>
-                        </div> -->
+                        </div>
 
                         <div class="row">
                     <div class="col">
@@ -256,22 +254,7 @@
                              <option value="1+positive">1+positive</option>
                              <option value="2+positive">2+positive</option>
                              <option value="3+positive">3+positive</option> -->
-                           <option value="">--Select--</option>
-                           <option value="Negative/Not Seen">Negative/Not Seen</option>
-                           <option value="Positive">Positive</option>
-                           <option value="1+positive">1+positive</option>
-                           <option value="2+positive">2+positive</option>
-                           <option value="3+positive">3+positive</option>
-                           <option value="Sc 1">Sc 1</option>
-                           <option value="Sc 2">Sc 2</option>
-                           <option value="Sc 3">Sc 3</option>
-                           <option value="Sc 4">Sc 4</option>
-                           <option value="Sc 5">Sc 5</option>
-                           <option value="Sc 6">Sc 6</option>
-                           <option value="Sc 7">Sc 7</option>
-                           <option value="Sc 8">Sc 8</option>
-                           <option value="Sc 9">Sc 9</option>
-                           </select>
+                           <option value="">--Select--</option><option value="Negative/Not Seen">Negative/Not Seen</option><option value="Positive">Positive</option><option value="1+positive">1+positive</option><option value="2+positive">2+positive</option><option value="3+positive">3+positive</option><option value="Sc 1">Sc 1</option><option value="Sc 2">Sc 2</option><option value="Sc 3">Sc 3</option><option value="Sc 4">Sc 4</option><option value="Sc 5">Sc 5</option><option value="Sc 6">Sc 6</option><option value="Sc 7">Sc 7</option><option value="Sc 8">Sc 8</option><option value="Sc 9">Sc 9</option></select>
                        </div>
                     </div>       
                   </div>
@@ -576,7 +559,7 @@ $(document).ready(function() {
             },
             ,
             {
-                text: 'Submit',            
+                text: 'Send Selected to Review',            
                 action: bulk_action_review
             }
         ]

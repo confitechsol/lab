@@ -85,12 +85,12 @@
               </div>
               @include('admin/lc_flagged_mgit/cipopup')
                 <div class="row">
-                <!----------loader------------>
+                <!--loader-->
 				<div id="pageloader">
 				  <div class="loader"></div>
 				</div>
-				<!----------loader------------>
-				    <!---<div class="alert alert-danger hide"><h4></h4></div>----->
+				<!--loader-->
+				    <!---<div class="alert alert-danger hide"><h4></h4></div>-->
                     <div class="col-lg-12 col-xlg-12 col-md-12 col-sm-12" style="margin-top: 16px;">
                         <div class="card" style="border: none;">
                             <div class="card-block">

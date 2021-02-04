@@ -364,7 +364,7 @@ class MicroscopyController extends Controller
                     'sample_id' => $value[0]['sample_id'],
                     'status'    => '1',        
                     //'status'    => Microscopy::STATUS_ACTIVE,        
-                    'test_date' => $test_date,
+                    //'test_date' => $test_date,
                     'result' => $result,
                     'created_by' => Auth::user()->id,
                     'updated_by' => Auth::user()->id
@@ -380,14 +380,14 @@ class MicroscopyController extends Controller
                   ])->update([
                     'tag'=> $value[0]['tag'],
                     'stage'=> $result,
-                    'status' => '0',
+                    'status' => '2',
                     //'status' => Microscopy::SERVICE_STATUS_ACTIVE,
                     'created_by' => Auth::user()->id,
                     'updated_by' => Auth::user()->id,
                   ]); 
 
 
-                  ServiceLog::create([
+                  /*ServiceLog::create([
                     'enroll_id' => $value[0]['enroll_id'],
                     'sample_id' => $value[0]['sample_id'],
                     'service_id' => $value[0]['service_id'],                  
@@ -400,7 +400,7 @@ class MicroscopyController extends Controller
                     'stage'=> $result,
                     'created_by' => Auth::user()->id,
                     'updated_by' => Auth::user()->id
-                  ]);
+                  ]);*/
                }             
             }     
            DB::commit();

@@ -69,7 +69,7 @@ class LCFlaggedMGITFurtherController extends Controller
             if($sample)
               $lcobj = LCFlaggedMGITFurther::select('id','result')->where('sample_id',$sample->id)->first();
               if($lcobj){
-				ResultEdit::where('enroll_id', $request->enrollId)->where('service_id', $request->service)->delete();  
+				          ResultEdit::where('enroll_id', $request->enrollId)->where('service_id', $request->service)->delete();  
                 $edit = ResultEdit::create([
                   'enroll_id' => $sample->enroll_id,
                   'sample_id' => $sample->id,
@@ -82,10 +82,10 @@ class LCFlaggedMGITFurtherController extends Controller
                   'created_at' => date('Y-m-d H:i:s'),
                   'updated_at' => ''
                 ]);
-				if(empty($request->result_date)){
-				  $request->result_date=date('Y-m-d');
+          				if(empty($request->result_date)){
+          				  $request->result_date=date('Y-m-d');
 
-				}
+          				}
 				// dd($request->result_date);
                 $lc = LCFlaggedMGITFurther::find($lcobj->id);
                 $lc->ict = $request->ict;
@@ -102,7 +102,7 @@ class LCFlaggedMGITFurtherController extends Controller
                 $lc->save();
 
               }
-			 DB::commit();  
+			       DB::commit();  
             return redirect("/microbiologist");
           }
 
@@ -122,7 +122,8 @@ class LCFlaggedMGITFurtherController extends Controller
              $sample->sample_label = $logdata->sample_label.'R';
              $sample->save();
          }
-
+         //dd($request->all());
+         LCFlaggedMGIT::where(['sample_id'=>$request->sampleID,'enroll_id'=>$request->enrollId])->update(['gu'=> $request->gu]);
         // LCFlaggedMGITFurther::where('sample_id',$logdata->sample_id)->where('enroll_id',$logdata->enroll_id)->delete();
 
        DB::table('t_lc_flagged_mgit_further')
@@ -163,6 +164,8 @@ class LCFlaggedMGITFurtherController extends Controller
            // }
 
         }
+
+        
 		 DB::commit();		
 		}catch(\Exception $e){ 
 		  

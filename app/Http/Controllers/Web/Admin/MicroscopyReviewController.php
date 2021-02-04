@@ -201,11 +201,9 @@ class MicroscopyReviewController extends Controller
             $sample_ids = trim( $request->input('sample_ids') );
             $sample_ids = explode(',', $sample_ids);           
             $comments  = $request->input('comments');
-            $service_id1  = $request->input('service_id1');           
-            $service_data = Service::where('id',$service_id1)->first();  
-            //dd($service_data['name']); 
-
-            
+            $service_id1  = $request->input('service_id1');  
+            $service_name  = $request->input('service_name');           
+            $service_data = Service::where('id',$service_id1)->first();             
 
             // Get Samples from $sample_ids ===================================
             // $samples = Sample::query()->findMany( $sample_ids);           
@@ -224,12 +222,13 @@ class MicroscopyReviewController extends Controller
                       Microbio::create([
                         'enroll_id' => $value->enroll_id,
                         'sample_id' => $value->sample_id,
-                        'service_id' => $value->service_id,
+                        'service_id' => 14,
+                        //'service_id' => $value->service_id,
                         //'service_id' => $service_id1,
                         'status'    => '0',        
                         'report_type'    => 'End Of Report',        
                         'tag' => $value->tag,
-                        'next_step' => null,
+                        'next_step' => '',
                         'created_by' => Auth::user()->id,
                         'updated_by' => Auth::user()->id
                       ]);
@@ -239,6 +238,7 @@ class MicroscopyReviewController extends Controller
                             'id' => $key,                   
                           ])->update([
                             'comments'=> $comments,
+                            'service_id'=> 14,
                             //'stage'=> 0,
                             'status' => 0,                    
                             'created_by' => Auth::user()->id,
@@ -265,7 +265,8 @@ class MicroscopyReviewController extends Controller
                     'status'    => '1', 
                     'enroll_label'    => $value->enroll_label, 
                     'sample_label'    => $value->sample_label, 
-                    'tag'    => $service_data['name'], 
+                    //'tag'    => $service_data['name'], 
+                    'tag'    => $service_name, 
                     //'tag'    => $value->tag, 
                     //'status'    => '0', 
                     'created_by' => Auth::user()->id,
