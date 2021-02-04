@@ -121,7 +121,8 @@
                                               <th>Visual appearance</th>
                                               <th>Result</th>
                                               <th>Microscopy method (ZN OR FM)</th>
-											   <th>Test Requested</th>
+                                              <th>Sample Type</th>
+											                        <th>Test Requested</th>
                                               <th>Reason for test DX/FU</th>
                                               <th>Follow up month</th>
                                               
@@ -150,6 +151,9 @@
                                             </td>
                                             <td>
                                               {{$samples->service_id == 1? "ZN Microscopy" : "FM Microscopy"}}
+                                            </td>
+                                            <td>
+                                              {{ $samples->sample_type == 'Others'? $samples->others_type : $samples->sample_type }}
                                             </td>
 											<td  <?php echo $data['services_col_color['.$samples->enroll_id.']']=='Y'?'bgcolor="#ccffcc"':""; ?>><?php echo $data['test_requested['.$samples->enroll_id.']'];?></td>
                                             <td>{{$samples->reason}}</td>

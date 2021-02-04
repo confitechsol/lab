@@ -126,7 +126,6 @@ class Sample extends Model
 			  }
 			  if($last_index == 'B'){
 				Barcodes::where('codeB',$scan_code)->update(['barcode_status_B'=>'Y','barcode_status_A'=>'Y']);
-
 			  }
 
 			}
@@ -155,7 +154,6 @@ class Sample extends Model
               'service_id' => $request->service_id[$i],
               'others_type' => $request->others_type[$i],
               'created_at' => date('Y-m-d H:i:s'),
-
             ]);
 
 
@@ -185,7 +183,6 @@ class Sample extends Model
             }else if($request->service_id[$i] == 11){
               $type = 'STORAGE';              
             }
-
 
             ServiceLog::create([
               'enroll_id' => $enroll_id,

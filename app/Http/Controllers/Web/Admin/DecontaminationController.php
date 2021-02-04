@@ -44,7 +44,7 @@ class DecontaminationController extends Controller
             't_service_log.sent_to as sent_for_service',
             't_service_log.enroll_id','t_service_log.sample_label as samples',
             't_service_log.sample_id as sample_id','s.test_reason',
-            's.sample_type','m.result as result','t_service_log.tag','s.fu_month',
+            's.sample_type','s.sample_type as sample_type', 's.others_type as others_type', 'm.result as result','t_service_log.tag','s.fu_month',
             's.no_of_samples',
             't_service_log.status','t_service_log.service_id','t_service_log.rec_flag','d.sent_for AS Deconta_sent_for')
              ->leftjoin('t_decontamination as d','d.sample_id','t_service_log.sample_id')

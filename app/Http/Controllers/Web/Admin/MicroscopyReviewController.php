@@ -27,7 +27,7 @@ class MicroscopyReviewController extends Controller
       try{
         $data = [];
         $data['sample'] = ServiceLog::select('t_service_log.updated_at as ID','m.enroll_id', 'e.label','m.sample_quality' ,
-        'm.receive_date as receive','m.test_reason as reason','is_accepted','s.result','t_service_log.sample_label','t_service_log.stage',
+        'm.receive_date as receive','m.test_reason as reason', 'm.sample_type as sample_type', 'm.others_type as others_type', 'is_accepted','s.result','t_service_log.sample_label','t_service_log.stage',
 		't_service_log.service_id','t_service_log.id as log_id', 't_service_log.status','m.fu_month','m.service_id as serviceID',
 		't_service_log.enroll_id AS enrollID','t_service_log.tag','t_service_log.sample_id','t_service_log.rec_flag' )
         ->leftjoin('enrolls as e','e.id','=','t_service_log.enroll_id')
