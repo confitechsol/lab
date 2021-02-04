@@ -830,14 +830,23 @@
 
                  <div class="row">
                   <div class="col">
-                             <label class="col-md-12"><h6>Final Interpretation 1 : <span class="red">*</span></h6></label>
+                             <label class="col-md-12"><h6>Final Interpretation : <span class="red">*</span></h6></label>
                              <div class="col-md-12">
                                 <input class="form-control form-control-line" name="final_interpretation1" value="" id="final_interpretation1" disabled>                                 
                             </div>
                            </div>
                   </div><br/>
+
+                  <div class="row">
+                    <div class="col">
+                               <label class="col-md-12"><h6>Clinical Trial : <span class="red">*</span></h6></label>
+                               <div class="col-md-12">
+                                  <input class="form-control form-control-line" name="clinical_trail" value="" id="clinical_trail" disabled>                                 
+                              </div>
+                             </div>
+                    </div><br/>
                 
-				<div class="row">
+				{{-- <div class="row">
 				 <div class="col">
                     <label class="col-md-12"><h6>Final Interpretation : <span class="red">*</span></h6></label>
                     <div class="col-md-12">
@@ -846,7 +855,7 @@
                        </select>
                    </div>
                   </div>
-				 </div><br/>
+				 </div><br/> --}}
 				  
                  <div class="row">
 
@@ -902,16 +911,19 @@ $(document).ready(function(){
 
   $("#mtb_result").on("change", function() {
     var final_interpretation = "";
+    var clinical_trail = "";
     //$('#final_interpretation1').val("");
     if($(this).val() != "")
     {
       final_interpretation = $("#mtb_result option:selected").text();
       //console.log(final_interpretation);
       $('#final_interpretation1').val(final_interpretation);
+      //$('#clinical_trail').val(final_interpretation);
     }
 
     
     $('#final_interpretation1').val(final_interpretation);
+    $('#clinical_trail').val(final_interpretation);
     
   });
 
@@ -936,6 +948,7 @@ $(document).ready(function(){
     }
     //console.log(final_interpretation);
     $('#final_interpretation1').val(final_interpretation);
+    $('#clinical_trail').val(final_interpretation);
 
   });
 
@@ -961,6 +974,7 @@ $(document).ready(function(){
     }
     //console.log(final_interpretation);
     $('#final_interpretation1').val(final_interpretation);
+    $('#clinical_trail').val(final_interpretation);
 
   });
 

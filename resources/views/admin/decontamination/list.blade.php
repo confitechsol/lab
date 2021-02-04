@@ -139,6 +139,7 @@
                                               <th>Sample ID</th>
                                               <th>Date of Decontamination</th>
                                               <th>Action</th>
+                                              <th>Sample Type</th>
 											                        <th>Test Requested</th>
                                               <th>DX/FU</th>
                                               <th>Follow up month</th>
@@ -185,7 +186,11 @@
 
                                                 @endif
                                               </td>
-											                        <td <?php echo $data['services_col_color['.$samples->enroll_id.']']=='Y'?'bgcolor="#ccffcc"':""; ?>><?php echo $data['test_requested['.$samples->enroll_id.']'];?></td>
+                                              <td>
+                                                {{ $samples->sample_type == 'Others'? $samples->others_type : $samples->sample_type }}
+                                              </td>
+                                              <td <?php echo $data['services_col_color['.$samples->enroll_id.']']=='Y'?'bgcolor="#ccffcc"':""; ?>><?php echo $data['test_requested['.$samples->enroll_id.']'];?></td>
+                                              
                                               <td>{{$samples->test_reason}}</td>
                                               <td>{{$samples->fu_month}}</td>
                                               <td>{{$samples->result}}</td>

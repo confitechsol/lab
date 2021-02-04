@@ -28,7 +28,7 @@ class MicroscopyController extends Controller
 
         $data = [];
         $data['sample'] = ServiceLog::select('s.id as sample_id','t_service_log.updated_at as ID','m.enroll_id', 'e.label', 'm.receive_date as receive',
-        'm.test_reason as reason','m.sample_quality','is_accepted','s.result','t_service_log.sample_label','t_service_log.stage','t_service_log.service_id',
+        'm.test_reason as reason','m.sample_quality','m.sample_type', 'm.others_type', 'is_accepted','s.result','t_service_log.sample_label','t_service_log.stage','t_service_log.service_id',
 		't_service_log.id as log_id', 't_service_log.status','m.fu_month','m.service_id as serviceID','t_service_log.enroll_id AS enrollID','t_service_log.tag',
         't_service_log.status as STATUS','t_service_log.sample_id','t_service_log.rec_flag')
         ->leftjoin('enrolls as e','e.id','=','t_service_log.enroll_id')
@@ -38,7 +38,9 @@ class MicroscopyController extends Controller
         ->whereIn('t_service_log.status',[1]) //->whereIn('t_service_log.status',[0,1,2]) changed
 		->distinct()
         ->orderBy('enroll_id','desc')
-        ->get();         
+        ->get(); 
+        
+        //dd($data);
 		
 		//dd(Config::get('m_services_array.tests'));			
 			 foreach($data['sample'] as $sampledata){

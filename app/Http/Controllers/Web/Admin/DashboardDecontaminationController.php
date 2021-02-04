@@ -32,7 +32,7 @@ class DashboardDecontaminationController extends Controller
            
              $data['sample'] = ServiceLog::select('s.id as sample_id', 't_service_log.updated_at as ID','t_service_log.enroll_label',
 			 't_service_log.enroll_id','t_service_log.sample_label as samples','t_service_log.status',
-			 DB::raw('date_format(d.test_date,"%d-%m-%y") as date'),'s.test_reason','m.result','s.fu_month','t_service_log.tag',
+			 DB::raw('date_format(d.test_date,"%d-%m-%y") as date'), 's.sample_type as sample_type', 's.others_type as others_type', 's.test_reason','m.result','s.fu_month','t_service_log.tag',
                         't_service_log.status as STATUS','t_service_log.sample_id','t_service_log.service_id','t_service_log.rec_flag','d.sent_for AS Deconta_sent_for')
                         ->leftjoin('t_microscopy as m','m.sample_id','=','t_service_log.sample_id')
                         ->leftjoin('t_decontamination as d','d.sample_id','t_service_log.sample_id')

@@ -52,6 +52,7 @@ Route::group(['middleware' => 'auth:web'], function () {
 
     Route::get('/sample/create/{id}', 'Web\Admin\SampleController@create');
     Route::get('/sample/editnew/{id}', 'Web\Admin\SampleController@editNew');
+    Route::post('/sample/sample-update', 'Web\Admin\SampleController@newUpdate');
     Route::get('/check_for_storage/{enroll_id}', 'Web\Admin\SampleController@checkForStorage');
 	Route::get('/check_for_sample_exist/{enroll_id}/{sentStep}/{tag?}/{recflag}', 'Web\Admin\SampleController@checkForSampleExist');	
     Route::get('/check_for_request_service/{enroll_id}', 'Web\Admin\MicroController@checkForRequestSeviceDataExist');	

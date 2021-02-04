@@ -24,7 +24,8 @@ use Illuminate\Support\Facades\DB;
 use App\Model\Microbio;
 use App\Model\Microscopy;
 use App\Model\Hybridization;
-
+use App\Model\Barcodes;
+use DateTime;
 use App\User;
 use \Milon\Barcode\DNS1D;
 use Illuminate\Support\Facades\Auth;
@@ -179,7 +180,142 @@ class SampleController extends Controller
      */
     public function update(Request $request, $id)
     {
-        //
+        dd($request);
+    }
+
+    public function newUpdate(Request $request)
+    {
+        dd($request->all());
+
+        $custom_dt=$request->actualtime;
+		
+		if(!empty($custom_dt)){
+		$time_exploded=explode(" " , $custom_dt);
+		
+		$custom_dt=$time_exploded[0];
+		}else{
+		  $custom_dt='';
+        }
+        
+        $count = count($request->sample_id);
+
+          if($count){           
+
+            for ($i=0; $i < $count; $i++) {               
+
+                if($request->sample_ID[$i] == '0')
+                {
+                    //dd($request->is_accepted[$i]);
+
+                    if( $request->is_accepted[0] === 'Rejected' ){
+                        $request->service_id[$i] = [ ServiceLog::TYPE_BWM ];
+                    }
+
+                    $update_enroll = Enroll::find($request->EnrollID[$i]);
+                    $update_enroll->patient_id = $request->EnrollID[$i];       
+                    $update_enroll->save();
+
+                    if($request->sample_type[$i]=="Other"){
+                        $sample_type = $request->other_sample_type[$i];
+                      }else{
+                        $sample_type = $request->sample_type[$i];
+                      }
+
+                      if($request->rejection=='Other reason'){
+                        $request->rejection = $request->reason_reject;
+                      }
+
+                      $request->name =  ucfirst ($request->name);
+                    //dd($request->receive_date[$i]);
+                    if($request->fu_month[$i]=='Other'){
+                    $month=$request->followup_other[$i];
+                    }
+                    else {
+                    $month=$request->fu_month[$i];
+                    }
+
+                    if($request->service_id[$i] == '8F' || $request->service_id[$i] == '8S' ){
+                        $request->service_id[$i].set('8');
+                      }
+
+                      $scan_code=strtoupper($request->sample_id[$i]);
+                        $last_index=substr($scan_code,-1);
+                        if($last_index == 'A'){
+                            Barcodes::where('codeA',$scan_code)->update(['barcode_status_A'=>'Y','barcode_status_B'=>'Y']);
+
+                        }
+                        if($last_index == 'B'){
+                            Barcodes::where('codeB',$scan_code)->update(['barcode_status_B'=>'Y','barcode_status_A'=>'Y']);
+                        }
+
+                        $data = Sample::insertGetId([
+                            'name' => $request->name,
+                            'nikshay_id' => $request->nikshay_id,
+                            'sample_label' => $request->sample_id[$i],
+                            'receive_date' => $request->receive_date[$i].' '.$custom_dt,
+                            'sample_quality' => $request->sample_quality[$i],
+                            'other_samplequality'=>$request->othersample_quality[$i],
+                            'sample_type' => $sample_type,
+                            'is_accepted' => $request->is_accepted[0],
+                            'rejection'  => $request->rejection[$i],
+                            'test_reason' => $request->test_reason[$i],
+                            'fu_month' => $month,
+                            'enroll_id' => $request->EnrollID[$i],			 
+                            'user_id' => $request->user()->id,
+                            'no_of_samples' => $request->no_of_samples,
+                            'service_id' => $request->service_id[$i],
+                            'others_type' => $request->others_type[$i],
+                            'created_at' => date('Y-m-d H:i:s'),
+                          ]);
+
+                          $status = ServiceLog::STATUS_ACTIVE;
+                        if( $request->service_id[ $i ] == ServiceLog::TYPE_STORAGE ){
+                            $status = ServiceLog::STATUS_STORAGE;
+                        }
+
+                        $type = '';
+                        if($request->service_id[$i] == '8F'){
+                        $type = 'LPA1';
+                        $request->service_id[$i].set('8');
+                        }else if($request->service_id[$i] == '8S'){
+                        $type = 'LPA2';
+                        $request->service_id[$i].set('8');
+                        }else if($request->service_id[$i] == 1){
+                        $type = 'ZN Microscopy';             
+                        }else if($request->service_id[$i] == 2){
+                        $type = 'FM Microscopy';             
+                        }else if($request->service_id[$i] == 3){
+                        $type = 'Decontamination';             
+                        }else if($request->service_id[$i] == 4){
+                        $type = 'CBNAAT';             
+                        }else if($request->service_id[$i] == 16){
+                        $type = 'LC';              
+                        }else if($request->service_id[$i] == 11){
+                        $type = 'STORAGE';              
+                        }
+
+                        ServiceLog::create([
+                            'enroll_id' => $request->EnrollID[$i],
+                            'sample_id' => $data,
+                            'service_id' => $request->service_id[$i],
+                            'enroll_label' => substr_replace($request->sample_id[0] ,"",-1),
+                            'created_by' => $request->user()->id,
+                            'updated_by' => $request->user()->id,
+                            'sample_label' => $request->sample_id[$i],
+                            'reported_dt'=>date('Y-m-d'),
+                            'tag' => $type,
+                            'status' => $status
+                          ]);
+                }
+                else
+                {
+
+                }
+            }
+			   
+          }
+
+          return redirect(route('sample.index'));
     }
 
     /**

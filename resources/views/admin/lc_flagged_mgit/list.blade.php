@@ -91,11 +91,19 @@
 				</div>
 				<!--loader-->
 				    <!---<div class="alert alert-danger hide"><h4></h4></div>-->
+				<!----------loader------------>
+            <!---<div class="alert alert-danger hide"><h4></h4></div>----->
+            
                     <div class="col-lg-12 col-xlg-12 col-md-12 col-sm-12" style="margin-top: 16px;">
                         <div class="card" style="border: none;">
                             <div class="card-block">
+                              
                                 <div class="col-lg-12 col-xlg-12 col-md-12 col-sm-12 col-sm-12" style="width: auto;overflow-y: scroll;">
-
+                                  <div class="col-md-12 my_con">
+                                    <input type="radio" name="sector_radio" class="sector_radio" value="1" checked="" required="">>= 42 days
+                                    <br>
+                                    <input type="radio" name="sector_radio" class="sector_radio" value="2" required="">< 42 days
+                                           </div>
                                     <table id="exampl" class="table table-striped table-bordered responsive col-xlg-12" cellspacing="0" width="100%">
                                       <thead>
                                         <tr>
@@ -239,8 +247,7 @@ $(document).ready(function() {
 		   { data: 'follow_up_month' },		   
 		   { data: 'gu' },
 		   { data: 'flagging_date'},		   
-		   { data: 'submit_btn' },
-		   
+		   { data: 'submit_btn' },		   
 		],
         buttons: [
             {
@@ -250,6 +257,10 @@ $(document).ready(function() {
                     /*columns: [  1, 2, 3,4,5,6,7]*/
 					columns: "thead th:not(.noExport)"
                 }
+            },
+            {
+              text: 'Submit',            
+                action: bulk_action_review
             }
         ],
         order: [[ 1, 'desc' ]],
@@ -300,5 +311,10 @@ $(document).ready(function() {
 		
 	});
 } );
+
+function bulk_action_review()
+{
+  
+}
 </script>
 @endsection
