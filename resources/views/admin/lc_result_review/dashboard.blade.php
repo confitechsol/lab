@@ -81,7 +81,8 @@
                                           <th class="hide">ID</th>
                                           <th>Lab Enrolment ID</th>
                                           <th>Sample ID</th>
-										  <th>Test Requested</th>
+                                          <th>Test Requested</th>
+                                          <th>Next Steps</th>
                                           <th>DX/FU/EQA</th>
                                           <th>Follow up month</th>
                                           <th>Samples submitted</th>
@@ -90,7 +91,7 @@
                                           <th>Culture method S/L/Both</th>
                                           <th>Final result</th>
                                           <th>Date of Result </th>
-                                          <th>Next Steps</th>
+                                          
                                         </tr>
                                       </thead>
                                       <tbody>
@@ -103,7 +104,16 @@
                                           <td class="hide">{{$samples->ID}}</td>
                                           <td>{{$samples->enroll_label}}</td>
                                           <td>{{$samples->samples}}</td>
+                                          
 										  <td  <?php echo $data['services_col_color['.$samples->enroll_id.']']=='Y'?'bgcolor="#ccffcc"':""; ?>><?php echo $data['test_requested['.$samples->enroll_id.']'];?></td>
+                                          <td>
+
+                                            @if($samples->status == 0)
+                                            Done
+                                            @elseif($samples->status == 2)
+                                            <button onclick="openNextForm('{{$samples->samples}}',{{$samples->log_id}},'{{$samples->no_sample}}','{{$samples->lpa_type}}',{{$samples->enrollID}},{{$samples->sampleID}},{{$samples->service_id}},{{$samples->rec_flag}},'{{$samples->result}}')",  value="" type="button" class = "btn btn-info btn-sm resultbtn">Submit</button>
+                                            @endif
+                                          </td>
                                           <td>{{$samples->reason}}</td>
                                           <td>{{$samples->fu_month}}</td>
                                           <td>{{$samples->no_of_samples}}</td>
@@ -123,14 +133,7 @@
 										  </td>
                                           <td>{{$samples->result_date}}</td>
 
-                                          <td>
-
-                                            @if($samples->status == 0)
-                                            Done
-                                            @elseif($samples->status == 2)
-                                            <button onclick="openNextForm('{{$samples->samples}}',{{$samples->log_id}},'{{$samples->no_sample}}','{{$samples->lpa_type}}',{{$samples->enrollID}},{{$samples->sampleID}},{{$samples->service_id}},{{$samples->rec_flag}},'{{$samples->result}}')",  value="" type="button" class = "btn btn-default btn-sm resultbtn">Submit</button>
-                                            @endif
-                                          </td>
+                                          
                                         </tr>
                                         @endforeach
 
@@ -262,7 +265,7 @@ $(document).ready(function() {
             }
             ,
             {
-                text: 'Send Selected to Review',            
+                text: 'Submit',            
                 action: bulk_action_review
             }
         ],

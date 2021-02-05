@@ -119,12 +119,13 @@
                                               <th>Lab Enrolment ID</th>
                                               <th>Sample ID</th>
                                               <th>Visual appearance</th>
+                                              <th>Result</th>
                                               <th>Microscopy method (ZN OR FM)</th>
                                               <th>Sample Type</th>
 											                        <th>Test Requested</th>
                                               <th>Reason for test DX/FU</th>
                                               <th>Follow up month</th>
-                                              <th>Result</th>
+                                              
                                             </tr>
                                         </thead>
                                         <tbody>
@@ -142,6 +143,13 @@
                                             <td>{{$samples->sample_label}}</td>
                                             <td>{{$samples->sample_quality}}</td>
                                             <td>
+                                              @if($samples->stage!='' && $samples->status!=1)
+                                                {{$samples->stage}}
+                                              @else
+                                              <button onclick="openResultForm('{{$samples->sample_label}}', {{$samples->log_id}}, '{{$samples->result}}','{{$samples->serviceID}}','{{$samples->service_id}}',{{$samples->enrollID}},{{$samples->sample_id}},'{{$samples->tag}}',{{$samples->rec_flag}})",  value="" type="button" class = "btn btn-info btn-sm resultbtn">Submit</button>
+                                              @endif
+                                            </td>
+                                            <td>
                                               {{$samples->service_id == 1? "ZN Microscopy" : "FM Microscopy"}}
                                             </td>
                                             <td>
@@ -150,13 +158,7 @@
 											<td  <?php echo $data['services_col_color['.$samples->enroll_id.']']=='Y'?'bgcolor="#ccffcc"':""; ?>><?php echo $data['test_requested['.$samples->enroll_id.']'];?></td>
                                             <td>{{$samples->reason}}</td>
                                             <td>{{$samples->fu_month}}</td>
-                                            <td>
-                                              @if($samples->stage!='' && $samples->status!=1)
-                                                {{$samples->stage}}
-                                              @else
-                                              <button onclick="openResultForm('{{$samples->sample_label}}', {{$samples->log_id}}, '{{$samples->result}}','{{$samples->serviceID}}','{{$samples->service_id}}',{{$samples->enrollID}},{{$samples->sample_id}},'{{$samples->tag}}',{{$samples->rec_flag}})",  value="" type="button" class = "btn btn-default btn-sm resultbtn">Add Result</button>
-                                              @endif
-                                            </td>
+                                            
 
                                             <!-- <td>
                                               @if($samples->result)
@@ -563,7 +565,7 @@ $(document).ready(function() {
             },
             ,
             {
-                text: 'Send Selected to Review',            
+                text: 'Submit',            
                 action: bulk_action_review
             }
         ]
