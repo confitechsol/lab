@@ -12,15 +12,29 @@
         <p></p>
         <form class="form-horizontal form-material" action="{{ url('/lc_flagged_mgit') }}" method="post" id="extractionpopup">
           <input type="hidden" name="_token" value="{{ csrf_token() }}">
+          <div id="mff_result">
+            <label class="col-md-12">Result : </label>
+            <input type="text" name="result" id="result" readonly value="Negative" />
+            <label class="col-md-12">ICT, Culture Microscopy & BHI : </label>
+            <input type="text" name="report_result" readonly id="report_result" value="Not required" />
+          </div>
+          <div class="col-md-12 my_con">
+            <input type="radio" name="test_type" id="test_type_1" class="set_radio" value="1" >&nbsp;LC Reporting
+            <br>
+            <input type="radio" name="test_type" id="test_type_2" class="set_radio" value="2" >&nbsp;Microbiologist
+            </div>
+            
+
+
           <div class="col-md-12" id="node"></div>
-          
-          <input type="hidden" name="log_id" id="log_id" value="">		  
+
+        {{-- <input type="hidden" name="log_id" id="log_id" value="">		  
 		   <input type="hidden" name="enrollId" id="enrollId" value="">
 		  <input type="hidden" name="tagId" id="tagId" value="">				
 		  <input type="hidden" name="sampleID" id="sampleID" value="">
 		  <input type="hidden" name="serviceId" id="serviceId" value="">				
-		  <input type="hidden" name="rec_flag" id="recFlagId" value="">
-          <div class="row">
+		  <input type="hidden" name="rec_flag" id="recFlagId" value=""> --}}
+          {{-- <div class="row">
             <div class="col">
                 <div class="col-md-12">
                    <label class="col-md-12">Sample ID : <span class="red">*</span></label>
@@ -29,8 +43,8 @@
                   </div>
                </div>
             </div>
-          </div>
-          <div class="row">
+          </div> --}}
+          <div class="row hide">
             <div class="col">
                 <div class="col-md-12">
                    <label class="col-md-12">GU : <span class="red">*</span></label>
