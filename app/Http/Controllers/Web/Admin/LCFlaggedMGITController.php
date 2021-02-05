@@ -405,8 +405,8 @@ class LCFlaggedMGITController extends Controller
                 'created_by' => $request->user()->id,
                 'updated_by' => $request->user()->id,
                 'reported_dt'=>date('Y-m-d'),
-            'tag' => $data_arr['tagId'.$sampleID],
-            'rec_flag' => $data_arr['rec_flag'.$sampleID],
+                'tag' => $data_arr['tagId'.$sampleID],
+                'rec_flag' => $data_arr['rec_flag'.$sampleID],
                 'enroll_label' => $logdata->enroll_label,
                 'sample_label' => $logdata->sample_label,
               ];
@@ -462,9 +462,11 @@ class LCFlaggedMGITController extends Controller
                 'sample_id'     => $logdata->sample_id,
                 'enroll_id'     => $logdata->enroll_id,
                 'service_id'    => '17',
-                'status'        => '1',
+                'next_step'     => '',
+                'status'        => '0',
                 'created_by'    => $request->user()->id,
                 'updated_by'    => $request->user()->id,
+                'tag'           => $data_arr['tagId'.$sampleID],
               ];
 
               $nw_rec_microbio = Microbio::create($new_microbio);
@@ -473,7 +475,7 @@ class LCFlaggedMGITController extends Controller
                 'enroll_id' => $logdata->enroll_id,
                 'sample_id' => $logdata->sample_id,
                 'service_id' => 18,
-                'status' => 1,
+                'status' => 0,
                 'created_by' => $request->user()->id,
                 'updated_by' => $request->user()->id,
                 'reported_dt'=>date('Y-m-d'),

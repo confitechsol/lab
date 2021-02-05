@@ -185,7 +185,7 @@ class SampleController extends Controller
 
     public function newUpdate(Request $request)
     {
-        dd($request->all());
+        //dd($request->all());
 
         $custom_dt=$request->actualtime;
 		
@@ -207,9 +207,18 @@ class SampleController extends Controller
                 {
                     //dd($request->is_accepted[$i]);
 
-                    if( $request->is_accepted[0] === 'Rejected' ){
-                        $request->service_id[$i] = [ ServiceLog::TYPE_BWM ];
+                    if ($request->has('is_accepted')) {                        
+                        if( $request->is_accepted[0] === 'Rejected' ){
+                            $request->service_id[$i] = [ ServiceLog::TYPE_BWM ];
+                        }
                     }
+                    else
+                    {
+                        $smpdata = Sample::find($request->sample_ID[0]);
+                        if( $smpdata->is_accepted === 'Rejected' ){
+                            $request->service_id[$i] = [ ServiceLog::TYPE_BWM ];
+                        }
+                    }                    
 
                     $update_enroll = Enroll::find($request->EnrollID[$i]);
                     $update_enroll->patient_id = $request->EnrollID[$i];       
@@ -256,7 +265,7 @@ class SampleController extends Controller
                             'sample_quality' => $request->sample_quality[$i],
                             'other_samplequality'=>$request->othersample_quality[$i],
                             'sample_type' => $sample_type,
-                            'is_accepted' => $request->is_accepted[0],
+                            'is_accepted' => $smpdata->is_accepted,
                             'rejection'  => $request->rejection[$i],
                             'test_reason' => $request->test_reason[$i],
                             'fu_month' => $month,
@@ -309,7 +318,100 @@ class SampleController extends Controller
                 }
                 else
                 {
+                    /* if ($request->has('is_accepted')) {                        
+                        if( $request->is_accepted[0] === 'Rejected' ){
+                            $request->service_id[$i] = [ ServiceLog::TYPE_BWM ];
+                        }
+                    }
+                    else
+                    {
+                        $smpdata = Sample::find($request->sample_ID[0]);
+                        if( $smpdata->is_accepted === 'Rejected' ){
+                            $request->service_id[$i] = [ ServiceLog::TYPE_BWM ];
+                        }
+                    }                    
 
+                    $update_enroll = Enroll::find($request->EnrollID[$i]);
+                    $update_enroll->patient_id = $request->EnrollID[$i];       
+                    $update_enroll->save();
+
+                    if($request->sample_type[$i]=="Other"){
+                        $sample_type = $request->other_sample_type[$i];
+                      }else{
+                        $sample_type = $request->sample_type[$i];
+                      }
+
+                      if($request->rejection=='Other reason'){
+                        $request->rejection = $request->reason_reject;
+                      }
+
+                      $request->name =  ucfirst ($request->name);
+                    //dd($request->receive_date[$i]);
+                    if($request->fu_month[$i]=='Other'){
+                    $month=$request->followup_other[$i];
+                    }
+                    else {
+                    $month=$request->fu_month[$i];
+                    }
+
+                    if($request->service_id[$i] == '8F' || $request->service_id[$i] == '8S' ){
+                        $request->service_id[$i].set('8');
+                      }
+
+                      $scan_code=strtoupper($request->sample_id[$i]);
+                        $last_index=substr($scan_code,-1);
+                        if($last_index == 'A'){
+                            Barcodes::where('codeA',$scan_code)->update(['barcode_status_A'=>'Y','barcode_status_B'=>'Y']);
+
+                        }
+                        if($last_index == 'B'){
+                            Barcodes::where('codeB',$scan_code)->update(['barcode_status_B'=>'Y','barcode_status_A'=>'Y']);
+                        }
+
+                        $sampleData = Sample::find($request->sample_ID[0]);
+
+                        $sampleData->name = $request->name;
+                        $sampleData->nikshay_id = $request->nikshay_id;
+                        $sampleData->sample_label = $request->sample_id[$i];
+                        $sampleData->receive_date = $request->receive_date[$i].' '.$custom_dt;
+                        $sampleData->sample_quality = $request->sample_quality[$i];
+                        $sampleData->other_samplequality=$request->othersample_quality[$i];
+                        $sampleData->sample_type = $sample_type;
+                        $sampleData->is_accepted = $smpdata->is_accepted;
+                        $sampleData->rejection  = $request->rejection[$i];
+                        $sampleData->test_reason = $request->test_reason[$i];
+                        $sampleData->fu_month = $month;
+                        $sampleData->enroll_id = $request->EnrollID[$i];			 
+                        $sampleData->user_id = $request->user()->id;
+                        $sampleData->no_of_sample = $request->no_of_samples;
+                        $sampleData->service_id = $request->service_id[$i];
+                        $sampleData->others_type = $request->others_type[$i];
+                        $sampleData->created_at = date('Y-m-d H:i:s');
+                        $sampleData->save();
+
+
+                        $type = '';
+                        if($request->service_id[$i] == '8F'){
+                        $type = 'LPA1';
+                        $request->service_id[$i].set('8');
+                        }else if($request->service_id[$i] == '8S'){
+                        $type = 'LPA2';
+                        $request->service_id[$i].set('8');
+                        }else if($request->service_id[$i] == 1){
+                        $type = 'ZN Microscopy';             
+                        }else if($request->service_id[$i] == 2){
+                        $type = 'FM Microscopy';             
+                        }else if($request->service_id[$i] == 3){
+                        $type = 'Decontamination';             
+                        }else if($request->service_id[$i] == 4){
+                        $type = 'CBNAAT';             
+                        }else if($request->service_id[$i] == 16){
+                        $type = 'LC';              
+                        }else if($request->service_id[$i] == 11){
+                        $type = 'STORAGE';              
+                        } */
+
+                        
                 }
             }
 			   

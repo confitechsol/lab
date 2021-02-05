@@ -146,7 +146,8 @@ border-color: #5cb85c;
 				  <div class="loader"></div>
 				</div>
 				<!----------loader------------>
-                <form class="form-horizontal form-material" id="addsampleform" action="{{ url('/sample') }}" method="post" enctype='multipart/form-data'>
+                {{-- <form class="form-horizontal form-material" id="addsampleform" action="{{ url('/sample') }}" method="post" enctype='multipart/form-data'> --}}
+                  <form class="form-horizontal form-material" id="addsampleform" action="{{ url('/sample/sample-update') }}" method="post" enctype='multipart/form-data'>
                   @if(count($errors))
                     @foreach ($errors->all() as $error)
                        <div class="alert alert-danger"><h4>{{ $error }}</h4></div>
@@ -234,8 +235,8 @@ border-color: #5cb85c;
                                                       <div class="col-md-12">
                                                         <select name="sample_type[]" class="form-control form-control-line sample_type" id="sample_typeA" required>
                                                           <option value="">--Select--</option>
-                                                          <option value="Sputum" @if($value['sample_quality'] =='Sputum') selected="selected" @endif>Sputum</option>
-                                                          <option value="Other" @if($value['sample_quality'] =='Others') selected="selected" @endif >Other</option>
+                                                          <option value="Sputum" @if($value['sample_type'] =='Sputum') selected="selected" @endif>Sputum</option>
+                                                          <option value="Other" @if($value['sample_type'] =='Others') selected="selected" @endif >Other</option>
                                                         </select>
                                                      </div>
                                                   </div>
@@ -288,6 +289,15 @@ border-color: #5cb85c;
                                                       <label class="col-md-12">Other</label>
                                                       <div class="col-md-12">
                                                            <input type="text" id="others_typeA" name="others_type[]" class="form-control form-control-line others_type" value="{{ $value['others_type'] }}" >
+                                                     </div>
+                                                  </div>
+                                                </div>
+                                                @else
+                                                <div class="col" >
+                                                  <div class="col hide others" id="othersA">
+                                                      <label class="col-md-12">Other</label>
+                                                      <div class="col-md-12">
+                                                           <input type="text" id="others_typeA" name="others_type[]" class="form-control form-control-line others_type" >
                                                      </div>
                                                   </div>
                                                 </div>
@@ -600,6 +610,7 @@ var alpha = ["A","B","C","D","E"];
             }
             var enroll_id = $("#enroll_label").val();
             $(".sampleForm").each(function(i){
+              $(this).find(".sampID").attr('id', 'sampID'+alpha[i]);
               $(this).find(".sampleId").val(enroll_id+alpha[i]);
               $(this).find(".sample_type").attr('id', "sample_type"+alpha[i]);
               $(this).find(".other_sample_type").attr('id', "other_sample_type"+alpha[i]);
@@ -616,7 +627,16 @@ var alpha = ["A","B","C","D","E"];
               $(this).find(".other").attr('id', "other"+alpha[i]);
               $(this).find(".others").attr('id', "others"+alpha[i]);
               $(this).find(".others_type").attr('id', "others_type"+alpha[i]);
-            })
+            });
+
+            if(_noOfSample > 1)
+            {
+              $("#sampIDB").val('0');
+              $('#next_testB > option').removeAttr('selected');
+              document.getElementById('next_testB').selectedIndex = 8;
+              //$( "#next_testB option:selected" ).text('st');
+                
+            }
         });
         $(".sampleId").change(function(){
           var sample = $(this).val().slice(0,-1);
