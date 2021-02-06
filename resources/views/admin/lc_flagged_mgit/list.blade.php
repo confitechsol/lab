@@ -7,6 +7,12 @@
       opacity: 1 !important;
   
   }
+  .set_radio{
+      position: static !important;
+      left: 0 !important;
+      opacity: 1 !important;
+  
+  }
   </style>
 <style>
 #pageloader
@@ -110,7 +116,8 @@
                                     <input type="radio" name="sector_radio" class="setradio" value="1" checked="" required="">&nbsp;>= 42 days
                                     <br>
                                     <input type="radio" name="sector_radio" class="setradio" value="2" required="">&nbsp;< 42 days
-                                    </div>
+                                    <div id="no_sample"></div>  
+                                  </div>                                    
                                     <table id="exampl" class="table table-striped table-bordered responsive col-xlg-12" cellspacing="0" width="100%">
                                       <thead>
                                         <tr>                                         
@@ -225,6 +232,12 @@ function arrangeTable(rd_val)
 					'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
 				}
 		  },
+      drawCallback: function (settings) { 
+        // Here the response
+        var response = settings.json;
+        //console.log(response);
+        $('#no_sample').html('No. of Sample(s): '+response.rc_count);
+    },
 		 columns: [
        { data: 'ID',className: "hide_column"},
        { data: 'inputs'},
@@ -281,8 +294,8 @@ var $bulk_checkboxes = $('.bulk-selected');
             $('.bulk-selected').prop('checked', checked);
         });
 
-function openForm(sample_label, log_id, lpa_type, gu, flagging_date, tag,enroll_id,sample_id,service_id,rec_flag){
-  $('#sample_id').val(sample_label);
+function openForm(sample_id, lpa_type){
+  /* $('#sample_id').val(sample_label);
   $('#log_id').val(log_id);
   $('#gu').val(gu);
   $('#flagging_date').val(flagging_date);
@@ -291,9 +304,9 @@ function openForm(sample_label, log_id, lpa_type, gu, flagging_date, tag,enroll_
   $("#tagId").val(tag);  
   $("#sampleID").val(sample_id);
   $("#serviceId").val(service_id);	
-  $("#recFlagId").val(rec_flag);
+  $("#recFlagId").val(rec_flag); */
   
-  $('#extractionpopupDiv').modal('toggle');
+  //$('#extractionpopupDiv').modal('toggle');
   $(".datep").datepicker({
       dateFormat: "dd/mm/yyyy"
   }).datepicker("setDate", "0");
@@ -303,6 +316,9 @@ function openForm(sample_label, log_id, lpa_type, gu, flagging_date, tag,enroll_
   if(lpa_type == 'LC'){
     $("#tube_id_lj").attr("disabled", true);
   }
+
+  $('#sampleID_'+sample_id).prop('checked', true);
+  showButtonWisePopup(2);
 }
 function openNextForm(sample_label, log_id, enroll_id){
   $('#next_sample_id').val(sample_label);
@@ -323,14 +339,20 @@ $(document).ready(function() {
 	//Confirm ok submit
 	$('.resultbtn, #submit').click( function(e) {
 		//alert("here");
-		var enroll_id=$("#enrollId").val();
+
+    $('.alert-danger').addClass('hide');
+		$('.alert-danger').hide();
+							//$('form#cbnaat_result').submit();	
+		$('#submit').prop("type", "submit");
+
+		/* var enroll_id=$("#enrollId").val();
 		var sample_id=$("#sampleID").val();
 		var service_id=$("#serviceId").val();
 		//var STATUS=$("#statusId").val();
 		var tag=$("#tagId").val();
-		var rec_flag=$("#recFlagId").val();
+		var rec_flag=$("#recFlagId").val(); */
 	
-		$.ajax({
+		/* $.ajax({
 				  url: "{{url('check_for_sample_already_process_migit')}}"+'/'+sample_id+'/'+enroll_id+'/'+service_id+'/'+tag+'/'+rec_flag,
 				  type:"GET",
 				  processData: false,
@@ -358,98 +380,155 @@ $(document).ready(function() {
 				failure: function(response){
 					console.log("err")
 				}
-		});
+		}); */
 		
 	});
 } );
 
 function bulk_action_review()
 {
-  ar $modal = $('#myModal');
+  //ar $modal = $('#myModal');
             //var selected = [];
-            var $checkboxes = $('.bulk-selected:checked');          
-
-            // Display an error message and stop if no checkboxes are selected.
-            if( $checkboxes.length === 0 ){
-                alert("First select one or more items from the list.");
-                return;
-            }
-
-            var err_html = "";
-              var success_html = "";
-              var html = "";
-              var full_html = "";
-              var enroll_id="";
-              var sample_id="";
-              var service_id="";
-              var tag="";
-              var rec_flag="";            
-              var log_id = "";
-              var lpa_type = "";
-              var gu = "";
-              var flagging_date = "";             
-              var samples ="";
-              var err_sample_id = [];
-              var success_sample_id = "";
-              var samples_data = [];
-
-            //
-            $checkboxes.each(function(i, e){
-              //console.log($("#enroll_id_7").val());
-
-              enroll_id=$("#enrollID_"+$(e).val()).val();
-              log_id=$("#log_id_"+$(e).val()).val();
-              lpa_type = $("#lpa_type_"+$(e).val()).val();
-              gu = $("#gu_"+$(e).val()).val();
-              flagging_date = $("#flagging_date_"+$(e).val()).val();
-              tag=$("#tag_"+$(e).val()).val();
-              service_id=$("#service_id_"+$(e).val()).val();
-              sample_id=$(e).val();
-              rec_flag=$("#rec_flag_"+$(e).val()).val();
-              samples = $("#samples_"+$(e).val()).val();             
-
-              samples_data.push({
-                sample_id: sample_id,
-                enroll_id: enroll_id,
-                service_id: service_id,
-                tag: tag,
-                rec_flag: rec_flag,               
-              });
-        
-            });
-
-            for(i=0; i < samples_data.length; i++)
-            {
-              $.ajax({
-                    url: "{{url('check_for_sample_already_process_migit')}}"+'/'+samples_data[i].sample_id+'/'+samples_data[i].enroll_id+'/'+samples_data[i].service_id+'/'+samples_data[i].tag+'/'+samples_data[i].rec_flag,
-                    type:"GET",
-                    processData: false,
-                    contentType: false,
-                    dataType: 'json',
-                    success: function(response){
-                      //console.log(response);
-                      
-                    if(response.result == 1==1){
-                        $('.alert-danger').removeClass('hide');
-                        $('.alert-danger').show();
-                        $('.alert-danger').html("Sorry!! Action already taken of the selected Sample");
-                                      $('#submit').prop("type", "button");
-                                      e. preventDefault(); 							
-                                      
-                      }else{
-                        $('.alert-danger').addClass('hide');
-                        $('.alert-danger').hide();
-                        //$('form#cbnaat_result').submit();	
-                        $('#submit').prop("type", "submit");
-                        //$("#submit").text("OK");
-                        
-                                  }
-                    },
-                  failure: function(response){
-                    console.log("err")
-                  }
-              });
-            }
+            showButtonWisePopup(1);
+            
 }
+
+function showButtonWisePopup(id)
+{
+        var $checkboxes = $('.bulk-selected:checked');          
+
+      // Display an error message and stop if no checkboxes are selected.
+      if( $checkboxes.length === 0 ){
+          alert("First select one or more items from the list.");
+          return;
+      }
+
+      var err_html = "";
+        var success_html = "";
+        var html = "";
+        var full_html = "";
+        var enroll_id="";
+        var sample_id="";
+        var service_id="";
+        var tag="";
+        var rec_flag="";            
+        var log_id = "";
+        var lpa_type = "";
+        var gu = "";
+        var flagging_date = "";             
+        var samples ="";
+        var err_sample_id = [];
+        var success_sample_id = "";
+        var samples_data = [];
+
+      //
+      $checkboxes.each(function(i, e){
+        //console.log($("#enroll_id_7").val());
+
+        enroll_id=$("#enrollID_"+$(e).val()).val();
+        log_id=$("#log_id_"+$(e).val()).val();
+        lpa_type = $("#lpa_type_"+$(e).val()).val();
+        gu = $("#gu_"+$(e).val()).val();
+        flagging_date = $("#flagging_date_"+$(e).val()).val();
+        tag=$("#tag_"+$(e).val()).val();
+        service_id=$("#service_id_"+$(e).val()).val();
+        sample_id=$(e).val();
+        rec_flag=$("#rec_flag_"+$(e).val()).val();
+        samples = $("#samples_"+$(e).val()).val();             
+
+        samples_data.push({
+          sample_id: sample_id,
+          enroll_id: enroll_id,
+          service_id: service_id,
+          tag: tag,
+          rec_flag: rec_flag,               
+        });
+
+      });
+
+      //console.log(samples_data);
+      $("#node").html("");
+
+      for(i=0; i < samples_data.length; i++)
+      {
+        $.ajax({
+              url: "{{url('check_for_sample_already_process_migit')}}"+'/'+samples_data[i].sample_id+'/'+samples_data[i].enroll_id+'/'+samples_data[i].service_id+'/'+samples_data[i].tag+'/'+samples_data[i].rec_flag,
+              type:"GET",
+              processData: false,
+              contentType: false,
+              dataType: 'json',
+              success: function(response){
+                //console.log(response);
+                
+              if(response.result == 1==1){
+                  $('.alert-danger').removeClass('hide');
+                  $('.alert-danger').show();
+                  $('.alert-danger').html("Sorry!! Action already taken of the selected Sample");
+                                $('#submit').prop("type", "button");
+                                e. preventDefault(); 							
+                                
+                }else{                               
+
+                  html+= '<input type="hidden" name="log_id'+response.sample_id+'" value="'+$("#log_id_"+response.sample_id).val()+'">';
+                  html+= '<input type="hidden" name="enrollId'+response.sample_id+'" value="'+$("#enrollID_"+response.sample_id).val()+'">';
+                  html+= '<input type="hidden" name="tagId'+response.sample_id+'" value="'+$("#tag_"+response.sample_id).val()+'">';
+                  html+='<input type="hidden" name="sampleID[]"  value="'+response.sample_id+'">';
+                  html+= '<input type="hidden" name="serviceId'+response.sample_id+'" value="'+$("#service_id_"+response.sample_id).val()+'">';
+                  html+= '<input type="hidden" name="rec_flag'+response.sample_id+'" value="'+$("#rec_flag_"+response.sample_id).val()+'">';
+                  html+='<input type="hidden" name="sample_id'+response.sample_id+'"  value="'+$("#samples_"+response.sample_id).val()+'">';
+                  
+                  $("#node").append(html);
+                    html = "";
+                }
+              },
+            failure: function(response){
+              console.log("err")
+            }
+        });
+      }
+
+
+      if(id == '1' && $('input[name="sector_radio"]:checked').val() == '1')
+      {
+        $('#test_type_2').prop('disabled', false);
+        $('#test_type_2').prop('checked', true);
+        $('#test_type_1').prop('disabled', true);
+        $('#mff_result').show();
+      }
+      else if(id == '2' && $('input[name="sector_radio"]:checked').val() == '1')
+      {
+        $('#test_type_2').prop('disabled', false);
+        $('#test_type_2').prop('checked', true);
+        $('#test_type_1').prop('disabled', false);
+        
+      }
+      else if(id == '1' && $('input[name="sector_radio"]:checked').val() == '2')
+      {
+        $('#test_type_1').prop('disabled', false);
+        $('#test_type_1').prop('checked', true);
+        $('#test_type_2').prop('disabled', true);
+        $('#mff_result').hide();
+      }
+      else if(id == '2' && $('input[name="sector_radio"]:checked').val() == '2')
+      {
+        $('#test_type_2').prop('disabled', false);
+        $('#test_type_2').prop('checked', true);
+        $('#test_type_1').prop('disabled', false);
+      }
+      
+
+      $('#extractionpopupDiv').modal('toggle');
+}
+
+$('.set_radio').on('click', function() {
+  if($(this).val() == '1')
+  {
+    $('#mff_result').hide();
+  }
+  else
+  {
+    $('#mff_result').show();
+  }
+});
 </script>
 @endsection

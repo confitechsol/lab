@@ -7,6 +7,8 @@ use App\Model\Service;
 use App\Model\ServiceLog;
 use App\Model\Microscopy;
 use App\Model\LCFlaggedMGIT;
+use App\Model\LCFlaggedMGITFurther;
+use App\Model\Microbio;
 use App\Model\CultureInoculation;
 use App\Model\RequestServices;
 use Illuminate\Http\Request;
@@ -164,6 +166,7 @@ class LCFlaggedMGITController extends Controller
 		## Fetch records
     //DB::enableQueryLog();
     $lcflaggedQry = "";
+    $count = 0;
 
     if($id == '1')
     {
@@ -203,9 +206,10 @@ class LCFlaggedMGITController extends Controller
           left join `t_lc_flagged_mgit` as `lfm` on `lfm`.`sample_id` = `t_service_log`.`sample_id` 
           where DATEDIFF(CURRENT_DATE, `ci`.`inoculation_date`) < 42 AND `t_service_log`.`service_id` =17 and `t_service_log`.`status` in (1) ".$searchQuery." 
           order by `t_service_log`.`enroll_id` desc limit ".$row.",".$rowperpage);
+          
     }		
 			    
-        			
+     $count = count($lcflaggedQry);
 		//dd($lcflaggedQry);
 		//dd(DB::getQueryLog());
 		foreach ($lcflaggedQry as $key => $value) {
@@ -272,9 +276,9 @@ class LCFlaggedMGITController extends Controller
           $inputs .= '<input type="hidden" name="tag_'.$samples->sampleID.'" id="tag_'.$samples->sampleID.'" value="'.$samples->tag.'" />';
           $inputs .= '<input type="hidden" name="enrollID_'.$samples->sampleID.'" id="enrollID_'.$samples->sampleID.'" value="'.$samples->enrollID.'" />';
           $inputs .= '<input type="hidden" name="service_id_'.$samples->sampleID.'" id="service_id_'.$samples->sampleID.'" value="'.$samples->service_id.'" />';
-          $inputs .= '<input type="hidden" name="rec_flag_'.$samples->rec_flag.'" id="rec_flag_'.$samples->rec_flag.'" value="'.$samples->rec_flag.'" />';        
+          $inputs .= '<input type="hidden" name="rec_flag_'.$samples->sampleID.'" id="rec_flag_'.$samples->sampleID.'" value="'.$samples->rec_flag.'" />';        
 
-				   $submitBtn="<button type='button' onclick=\"openForm( '".$samples->sampleID."');\" class='btn btn-info btn-sm resultbtn' >submit</button>";
+				   $submitBtn="<button type='button' onclick=\"openForm( '".$samples->sampleID."', '".$samples->lpa_type."');\" class='btn btn-info btn-sm resultbtn' >submit</button>";
 				}else{
           $inputs = '';
 				  $submitBtn="Done";	
@@ -333,7 +337,8 @@ class LCFlaggedMGITController extends Controller
 		  "draw" => intval($draw),
 		  "iTotalRecords" => $totalRecords,
 		  "iTotalDisplayRecords" => $totalRecordwithFilter,
-		  "aaData" => $data
+      "aaData" => $data,
+      "rc_count" => $count
 		);
 		echo json_encode($response);
 	}	  
@@ -359,43 +364,132 @@ class LCFlaggedMGITController extends Controller
 	  $success = true;
 	  DB::beginTransaction();
       try {
-		$logdata = ServiceLog::find($request->log_id);
 
-        //LCFlaggedMGIT::where('sample_id',$logdata->sample_id)->delete(); //for repeataton of any sample
-		LCFlaggedMGIT::where('enroll_id',$logdata->enroll_id)->delete(); //for repeataton of any sample
-        $data = LCFlaggedMGIT::create([
-          'sample_id' => $logdata->sample_id,
-          'enroll_id' => $logdata->enroll_id,
-          'gu' => $request->gu,
-          'flagging_date' => $request->flagging_date,
-          'created_by' => $request->user()->id,
-          'updated_by' => $request->user()->id
-        ]);
-		
-        $logdata->comments=$request->comments;
-        $logdata->tested_by=$request->user()->name;
-        $logdata->released_dt=date('Y-m-d');
-        $logdata->status = 0;
-        if(!empty($request->gu)){
-        $logdata->gu = $request->gu;
+        $sample_arr = array();
+        $sample_arr = $request->sampleID;
+        $data_arr = $request->all();
+
+        /* $request->test_type if is 1 then go for LC Reporting if is 2 then go Microbiologist */
+
+        if($request->test_type == '1')
+        {
+          foreach($sample_arr as $sampleID)
+          {
+              $logdata = ServiceLog::find($data_arr['log_id'.$sampleID]);
+
+              //LCFlaggedMGIT::where('sample_id',$logdata->sample_id)->delete(); //for repeataton of any sample
+              LCFlaggedMGIT::where('enroll_id',$logdata->enroll_id)->delete(); //for repeataton of any sample
+              $data = LCFlaggedMGIT::create([
+                'sample_id' => $logdata->sample_id,
+                'enroll_id' => $logdata->enroll_id,
+                'gu' => $request->gu,
+                'flagging_date' => $request->flagging_date,
+                'created_by' => $request->user()->id,
+                'updated_by' => $request->user()->id
+              ]);
+          
+              $logdata->comments=$request->comments;
+              $logdata->tested_by=$request->user()->name;
+              $logdata->released_dt=date('Y-m-d');
+              $logdata->status = 0;
+              if(!empty($request->gu)){
+              $logdata->gu = $request->gu;
+              }
+              $logdata->save();
+          
+              $new_service = [
+                'enroll_id' => $logdata->enroll_id,
+                'sample_id' => $logdata->sample_id,
+                'service_id' => 18,
+                'status' => 1,
+                'created_by' => $request->user()->id,
+                'updated_by' => $request->user()->id,
+                'reported_dt'=>date('Y-m-d'),
+                'tag' => $data_arr['tagId'.$sampleID],
+                'rec_flag' => $data_arr['rec_flag'.$sampleID],
+                'enroll_label' => $logdata->enroll_label,
+                'sample_label' => $logdata->sample_label,
+              ];
+
+              $nwService = ServiceLog::create($new_service);
+          }
         }
-        $logdata->save();
-		
-        $new_service = [
-          'enroll_id' => $logdata->enroll_id,
-          'sample_id' => $logdata->sample_id,
-          'service_id' => 18,
-          'status' => 1,
-          'created_by' => $request->user()->id,
-          'updated_by' => $request->user()->id,
-          'reported_dt'=>date('Y-m-d'),
-		  'tag' => $request->tagId,
-		  'rec_flag' => $request->rec_flag,
-          'enroll_label' => $logdata->enroll_label,
-          'sample_label' => $logdata->sample_label,
-        ];
+        else
+        {
+          foreach($sample_arr as $sampleID)
+          {
+              $logdata = ServiceLog::find($data_arr['log_id'.$sampleID]);
 
-        $nwService = ServiceLog::create($new_service);
+              //LCFlaggedMGIT::where('sample_id',$logdata->sample_id)->delete(); //for repeataton of any sample
+              LCFlaggedMGIT::where('enroll_id',$logdata->enroll_id)->delete(); //for repeataton of any sample
+              $data = LCFlaggedMGIT::create([
+                'sample_id' => $logdata->sample_id,
+                'enroll_id' => $logdata->enroll_id,
+                'gu' => $request->gu,
+                'flagging_date' => $request->flagging_date,
+                'created_by' => $request->user()->id,
+                'updated_by' => $request->user()->id
+              ]);
+          
+              $logdata->comments=$request->comments;
+              $logdata->tested_by=$request->user()->name;
+              $logdata->released_dt=date('Y-m-d');
+              $logdata->status = 0;
+              if(!empty($request->gu)){
+              $logdata->gu = $request->gu;
+              }
+              $logdata->save();
+
+              /*  Adding data in  t_lc_flagged_mgit_further table */
+
+              $flag_migit_further = [
+                'enroll_id'     => $logdata->enroll_id,
+                'sample_id'     => $logdata->sample_id,
+                'ict'           => $request->report_result,
+                'culture_smear' => $request->report_result,
+                'bhi'           => $request->report_result,
+                'result'        => $request->result,
+                'result_date'   => date('Y-m-d'),
+                'created_by'    => $request->user()->id,
+                'updated_by'    => $request->user()->id,
+              ];
+
+              $nwflag_migit_further = LCFlaggedMGITFurther::create($flag_migit_further);
+
+              /* adding data in t_microbiologist */
+
+              $new_microbio = [
+                'sample_id'     => $logdata->sample_id,
+                'enroll_id'     => $logdata->enroll_id,
+                'service_id'    => '17',
+                'next_step'     => '',
+                'status'        => '0',
+                'created_by'    => $request->user()->id,
+                'updated_by'    => $request->user()->id,
+                'tag'           => $data_arr['tagId'.$sampleID],
+              ];
+
+              $nw_rec_microbio = Microbio::create($new_microbio);
+          
+              $new_service = [
+                'enroll_id' => $logdata->enroll_id,
+                'sample_id' => $logdata->sample_id,
+                'service_id' => 18,
+                'status' => 0,
+                'created_by' => $request->user()->id,
+                'updated_by' => $request->user()->id,
+                'reported_dt'=>date('Y-m-d'),
+            'tag' => $data_arr['tagId'.$sampleID],
+            'rec_flag' => $data_arr['rec_flag'.$sampleID],
+                'enroll_label' => $logdata->enroll_label,
+                'sample_label' => $logdata->sample_label,
+              ];
+
+              $nwService = ServiceLog::create($new_service);
+          }
+        }
+
+        
 		DB::commit();		
 		 }catch(\Exception $e){ 
 		  
