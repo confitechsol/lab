@@ -36,7 +36,7 @@ class BioWasteController extends Controller
                    // $data['today'] = date('Y-m-d H:i:s');
             $data['today_date']=DB::select('select date_format(now(),"%d-%m-%y %H:%i:%s") as date');
             $data['today']=$data['today_date'][0]->date;
-             $data['sample'] = BioWaste::orderBy('id','desc')
+            $data['sample'] = BioWaste::orderBy('id','desc')
                         ->distinct()
                         ->get();
             // foreach($data['sample'] as $key=>$value){
@@ -47,7 +47,6 @@ class BioWasteController extends Controller
             //     $value->today_end='';
             //   }
             // }
-
 
             return view('admin.biowaste.list',compact('data'));
     }
@@ -78,14 +77,29 @@ class BioWasteController extends Controller
     public function store(Request $request)
     {
 // dd($request->all());
-        if($request->quantity){
+      if($request->option_value == 'quantity_option'){
+        //if($request->quantity){
           $waste = BioWaste::find($request->waste_id);
           $waste->quantity = $request->quantity;
+          /*set value null ans zero*/
+          $waste->packets = 0;
+          $waste->yellow = 0;
+          $waste->red = 0;
+          $waste->white = 0;
+          $waste->blue = 0;
+
           $waste->save();
         }
-          if(!empty($request->packets)){
+        if($request->option_value == 'packets_option'){
+       // if(!empty($request->option_value == 'packets_option')){
           $waste = BioWaste::find($request->waste_id);
-          $waste->packets = $request->packets;
+          /*set zero in Kgs. value */
+          $waste->quantity = null;
+          $waste->packets = 0;
+          $waste->yellow = $request->yellow;
+          $waste->red = $request->red;
+          $waste->white = $request->white;
+          $waste->blue = $request->blue;
           $waste->save();
         }
 
