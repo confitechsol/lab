@@ -14,10 +14,10 @@
           <input type="hidden" name="_token" value="{{ csrf_token() }}">
           <div id="mff_result">
             <label class="col-md-12">Result : </label>
-            <input type="text" style="margin-left: 15px;   width: 93%;" name="result" class="form-control form-control-line sampleId" value="Negative" id="" readonly>
+            <input type="text" style="margin-left: 15px;   width: 93%;" name="result" id="result" class="form-control form-control-line sampleId" value="Negative" readonly>
             <!-- <input type="text" name="result" id="result" readonly value="Negative" /> -->
             <label class="col-md-12">ICT, Culture Microscopy & BHI : </label>
-            <input type="text" style="margin-left: 15px;    width: 93%;" name="result" class="form-control form-control-line sampleId" value="Not required" id="" readonly>
+            <input type="text" style="margin-left: 15px;    width: 93%;" nname="report_result" id="report_result" class="form-control form-control-line sampleId" value="Not required" readonly>
             <!-- <input type="text" name="report_result" readonly id="report_result" value="Not required" /> -->
           </div>
           <div class="col-md-12 my_con">
