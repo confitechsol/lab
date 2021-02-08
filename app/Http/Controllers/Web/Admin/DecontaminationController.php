@@ -58,9 +58,7 @@ class DecontaminationController extends Controller
              // ->leftjoin('m_services as sr','sr.id','=','d.sent_for')
              ->leftjoin('t_microscopy as m',function($join)
                         {
-
-                              $join->on('m.sample_id','=','t_service_log.sample_id')
-                                    ;
+                              $join->on('m.sample_id','=','t_service_log.sample_id');
                         })
             ->whereIn('t_service_log.status',[2]) //        ->whereIn('t_service_log.status',[0,2])
             ->where('t_service_log.service_id','=',3)
@@ -68,12 +66,12 @@ class DecontaminationController extends Controller
             ->orderBy('t_service_log.enroll_id','desc')
             ->distinct()
             ->get();
+            
             //dd($data['sample']);
             foreach ($data['sample'] as $key => $value) {
               $value->no_sample = ServiceLog::where('enroll_id',$value->enroll_id)->where('service_id',11)->count();
               $date = DB::table('t_decontamination as d')->select(DB::raw('date_format(d.test_date,"%d-%m-%y") as date'))
               ->where('d.sample_id',$value->sample_id)->first();
-
 
               $value->date = $date->date ?? null;
             }
