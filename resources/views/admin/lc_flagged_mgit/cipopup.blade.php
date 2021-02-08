@@ -14,9 +14,11 @@
           <input type="hidden" name="_token" value="{{ csrf_token() }}">
           <div id="mff_result">
             <label class="col-md-12">Result : </label>
-            <input type="text" name="result" id="result" readonly value="Negative" />
+            <input type="text" style="margin-left: 15px;   width: 93%;" name="result" class="form-control form-control-line sampleId" value="Negative" id="" readonly>
+            <!-- <input type="text" name="result" id="result" readonly value="Negative" /> -->
             <label class="col-md-12">ICT, Culture Microscopy & BHI : </label>
-            <input type="text" name="report_result" readonly id="report_result" value="Not required" />
+            <input type="text" style="margin-left: 15px;    width: 93%;" name="result" class="form-control form-control-line sampleId" value="Not required" id="" readonly>
+            <!-- <input type="text" name="report_result" readonly id="report_result" value="Not required" /> -->
           </div>
           <div class="col-md-12 my_con">
             <input type="radio" name="test_type" id="test_type_1" class="set_radio" value="1" >&nbsp;LC Reporting
@@ -55,7 +57,7 @@
             </div>
           </div>
           <div class="row">
-            <div class="col">
+            <div class="col" style="padding: 0px;" >
                 <div class="col-md-12">
                    <label class="col-md-12">Date of flagging  by MGIT : <span class="red">*</span></label>
                    <div class="col-md-12">
@@ -68,7 +70,7 @@
 
 
           <div class="row">
-            <div class="col">
+            <div class="col" style="padding: 0px;">
                 <div class="col-md-12">
                    <label class="col-md-12">Comments:</label>
                    <div class="col-md-12">

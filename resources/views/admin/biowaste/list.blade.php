@@ -37,7 +37,7 @@
 <th class="hide">ID</th>
 <th>Date of waste generated</th>
 <th>Quantity of waste generated(in kg)</th>
-<th>Quantity of waste generated(in Packets)</th>
+<th>Quantity of waste generated(in Packets)<div class="d-flex flex-nowrap text-center"><div class="yellow col-3 p-0">Yellow</div><div class="red1 col-3 p-0">Red</div><div class="white col-3 p-0">White</div><div class="blue col-3 p-0">Blue</div></div></th>
 <th>Date of collection for disposal</th>
 <th>Edit</th>
 <th>Action</th>
@@ -50,7 +50,10 @@
 <td class="hide">{{$samples->id}}</td>
 <td>{{$samples->generated_date}}</td>
 <td>{{$samples->quantity}}</td>
-<td>{{$samples->packets}}</td>
+<td> 
+
+  <div class="d-flex flex-nowrap text-center"><div class="col-3 p-0" style="width: 56px;">{{$samples->yellow}}</div><div class="col-3 p-0" style="width: 56px;">{{$samples->red}}</div><div class="col-3 p-0" style="width: 56px;">{{$samples->white}}</div><div class="col-3 p-0" style="width: 56px;">{{$samples->blue}}</div>
+</td>
 <td>
 @if($samples->collected_date!=null)
 {{$samples->collected_date}}
@@ -59,23 +62,32 @@
 @endif
 </td>
 <td>
+  <?php 
+
+  if(!isset($samples->quantity)){ 
+    $quantity = 0;
+   } else{ 
+   $quantity = $samples->quantity; 
+  }
+ ?>
+
 @if($samples->status==0)
-<button type="button" onclick="openCbnaatForm({{$samples->id}})"  class="btn btn-info btn-sm resultbtn" >Edit</button>
+<button type="button" onclick="openCbnaatForm({{$samples->id}},{{ $quantity }} ,{{$samples->yellow}},{{$samples->red}},{{$samples->white}},{{$samples->blue}})"  class="btn btn-info btn-sm resultbtn" >Edit</button>
 @elseif($samples->status==1)
 submitted
 @endif
 
 </td>
 <td>
-@if(($samples->quantity!=null) ||  ($samples->packets!=null))
-@if($samples->collected_date!=null  && $samples->status==0)
-<a href="{{ url('/bioWaste/'.$samples->id.'/edit') }}">Submit</a>
-@elseif($samples->collected_date!=null && $samples->status==1)
-submitted
-@elseif($samples->collected_date==null  && $samples->status==0)
-@endif
+@if(($samples->quantity!=null) ||  ($samples->packets!=null) )
+  @if($samples->collected_date!=null  && $samples->status==0)
+  <a href="{{ url('/bioWaste/'.$samples->id.'/edit') }}">Submit</a>
+  @elseif($samples->collected_date!=null && $samples->status==1)
+  submitted
+  @elseif($samples->collected_date==null  && $samples->status==0)
+  @endif
 @else
-Enter the quantity in kg
+  Enter the quantity in kg
 @endif
 </td>
 </tr>
@@ -113,22 +125,69 @@ Enter the quantity in kg
 
 <input type="hidden" name="_token" value="{{ csrf_token() }}">
 <input type="hidden" name="waste_id" id="waste_id" value="">
+<div class="d-flex align-items-baseline">
+  <label>Select Mode<span style="color:red;">*</span></label>
+  <div class="d-flex form-options ml-3">
+    <div class="form-check">
+      <input class="form-check-input option_mode" type="radio" name="option_value" id="quantity_mode" value="quantity_option" checked>
+      <label class="form-check-label" for="quantity_mode">
+        in kg
+      </label>
+    </div>
+    <div class="form-check">
+      <input class="form-check-input option_mode" type="radio" name="option_value" id="packets_mode" value="packets_option" >
+      <label class="form-check-label" for="packets_mode">
+        in Packets
+      </label>
+    </div>
+  </div>
+</div>
+
 <div id="qaunt_div">
-<label class="col-md-12">Quantity of waste generated (in kg)</label>
+  <div class="row align-items-center">
+    <label class="col-md-8 my-3"><strong>Quantity of waste generated (in kg)</strong></label>
+    <div class="col-md-4">
+      <input type="number" name="quantity" pattern="[0-9]" class="form-control form-control-line "  id="quantity" >
+    </div>
+  </div>
+</div>
+
+<div id="pckt_div">  
+<label class="d-block my-3"><strong>Quantity of waste generated(in Packets)</strong></label>
 <div class="col-md-12">
-
-<input type="number" name="quantity" pattern="[0-9]" class="form-control form-control-line "  id="quantity" >
+<!-- <input type="number" name="packets" pattern="[0-9]" class="form-control form-control-line "  id="packets" > -->
+  <div class="row text-center">
+    <div class="col-3 yellow py-1">
+      Yellow
+    </div>
+    <div class="col-3 red1 py-1">
+      Red
+    </div>
+    <div class="col-3 white py-1">
+      White
+    </div>
+    <div class="col-3 blue py-1">
+      Blue
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-3">
+      <input type="number"  name="yellow" pattern="[0-9]" class="form-control form-control-line "  id="yellow" >
+    </div>
+    <div class="col-3">
+      <input type="number" name="red" pattern="[0-9]" class="form-control form-control-line "  id="red" >
+    </div>
+    <div class="col-3">
+      <input type="number" name="white" pattern="[0-9]" class="form-control form-control-line "  id="white" >
+    </div>
+    <div class="col-3">
+      <input type="number" name="blue" pattern="[0-9]" class="form-control form-control-line "  id="blue" >
+    </div>
+  </div>
 </div>
 </div>
 
 
-<div id="pckt_div">
-<label class="col-md-12">Quantity of waste generated(in Packets)</label>
-<div class="col-md-12">
-
-<input type="number" name="packets" pattern="[0-9]" class="form-control form-control-line "  id="packets" >
-</div>
-</div>
 
 </div>
 <div class="modal-footer">
@@ -216,12 +275,41 @@ $('#myModal1').modal('toggle');
 }
 
 
-function openCbnaatForm(id) {
+function openCbnaatForm(id,quantity,yellow,red,white,blue) {
 //console.log("sample_ids", sample_ids.split(','));
 $("#waste_id").val(id);
 
 
 $('#myModal').modal('toggle');
+
+if(quantity==0 && yellow==0 && red==0 && white==0 && blue==0){
+  $('#quantity_mode').prop('checked', true);
+  $('#packets_mode').prop('checked', false);
+  $('#pckt_div').hide();
+  $('#qaunt_div').show();
+}else if(quantity==0){
+
+  $('#quantity_mode').prop('checked', false);
+  $('#packets_mode').prop('checked', true);
+  $('#quantity').hide();
+  $('#qaunt_div').hide();
+  $('#pckt_div').show();
+  $('#yellow').val(yellow).show();
+  $('#red').val(red).show();
+  $('#white').val(white).show();
+  $('#blue').val(blue).show();
+  
+
+}else if(quantity >= 1){
+  //alert(quantity);
+  $('#pckt_div').hide();
+  $('#quantity_mode').prop('checked', true);
+  $('#packets_mode').prop('checked', false);
+  $('#quantity').val(quantity).show();
+  $('#qaunt_div').show();
+  
+}
+
 }
 
 </script>
@@ -264,8 +352,46 @@ exportOptions: {
 <script>
 
 $(document).ready(function(){
+  $("#pckt_div").hide();
+ $("#quantity").attr("required", "true");
+  $(document).on('click','.option_mode', function() {
+    
+    if (this.value == 'quantity_option') {
+       // alert("Q");
+        console.log(this.value);
+        $("#pckt_div").hide();
+        $("#qaunt_div").show();
+        $("#quantity").show();
+        $("#quantity").attr("required", "true");
 
-$("#quantity").keyup(function(){
+        $("#yellow").val('');
+        $("#red").val('');
+        $("#white").val('');
+        $("#blue").val('');
+
+        $("#yellow").removeAttr('required');
+        $("#red").removeAttr('required');
+        $("#white").removeAttr('required');
+        $("#blue").removeAttr('required');
+    }
+    if (this.value == 'packets_option') {
+       // alert("P");
+        console.log(this.value);
+        $("#qaunt_div").hide();
+        $("#pckt_div").show();    
+        $("#quantity").val(''); 
+
+        $("#yellow").attr("required", "true");        
+        $("#red").attr("required", "true");
+        $("#white").attr("required", "true");
+        $("#blue").attr("required", "true");
+
+        $("#quantity").removeAttr('required');
+     }
+});
+
+
+/*$("#quantity").keyup(function(){
 var quantity=$("#quantity").val();
 if(quantity == '' || quantity == null){
 $("#pckt_div").show();
@@ -287,7 +413,7 @@ $("#qaunt_div").hide();
 
 }
 });
-
+*/
 
 });
 </script>
@@ -351,4 +477,10 @@ $(function(){
     });
 });
 </script>
+<style type="text/css">
+  .yellow{background-color: #ffff00; color:#000;}
+  .red1{background-color: #fb0001; color:#000;}
+  .white{background-color: #fff; color:#000;}
+  .blue{background-color: #01b0f1; color:#fff;}
+</style>
 @endsection

@@ -292,6 +292,9 @@ class ServiceLogController extends Controller
 				
 
 			}else if($res != null){
+				if($res == 'Negative+Not Seen'){
+					$res = 'Negative/Not Seen';
+				}
 			$mrscopy_result = Microscopy::where('sample_id', $sample_id)->where('enroll_id', $enroll_id)->first();
 			if(isset($mrscopy_result)){
 

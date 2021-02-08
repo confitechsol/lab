@@ -112,10 +112,10 @@
                         <div class="card" style="border: none;">
                             <div class="card-block">                              
                                 <div class="col-lg-12 col-xlg-12 col-md-12 col-sm-12 col-sm-12" style="width: auto;overflow-y: scroll;">
-                                  <div class="col-md-12 my_con">
+                                  <div class="col-md-12 my_con" style="padding: 0px;">
                                     <input type="radio" name="sector_radio" class="setradio" value="1" checked="" required="">&nbsp;>= 42 days
-                                    <br>
-                                    <input type="radio" name="sector_radio" class="setradio" value="2" required="">&nbsp;< 42 days
+                                    <!-- <br> -->
+                                    <input type="radio" name="sector_radio" class="setradio" value="2" required="" style="margin-left: 20px;">&nbsp;< 42 days
                                     <div id="no_sample"></div>  
                                   </div>                                    
                                     <table id="exampl" class="table table-striped table-bordered responsive col-xlg-12" cellspacing="0" width="100%">
