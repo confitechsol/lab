@@ -512,8 +512,9 @@ function showButtonWisePopup(id)
       else if(id == '2' && $('input[name="sector_radio"]:checked').val() == '2')
       {
         $('#test_type_2').prop('disabled', false);
-        $('#test_type_2').prop('checked', true);
+        $('#test_type_1').prop('checked', true);
         $('#test_type_1').prop('disabled', false);
+        $('#mff_result').hide();
       }
       
 

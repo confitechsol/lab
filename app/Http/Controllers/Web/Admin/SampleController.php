@@ -185,7 +185,7 @@ class SampleController extends Controller
 
     public function newUpdate(Request $request)
     {
-        dd($request->all());
+        //dd($request->all());
 
         $custom_dt=$request->actualtime;
 		
