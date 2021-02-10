@@ -119,7 +119,11 @@
                                             @endif
                                           </td>
                                           <td>{{$samples->result}}</td>
-                                          <td>{{$samples->tag}}</td>
+                                          <td>
+                                            @if ($samples->tag != 'NONE')
+                                                {{$samples->tag}}
+                                              @endif
+                                          </td>
                                           @if(empty($samples->mgit))
                                           <td>pending</td>
                                           @else
@@ -236,7 +240,9 @@ function openForm(sample_label, log_id, lpa_type, tag,enroll_id,sample_id,servic
   $("#sampleID").val(sample_id);
   $("#serviceId").val(service_id);	
   $("#recFlagId").val(rec_flag);
-  $("#heading").text(tag);  
+  $("#heading").text(tag);
+  
+  
   var service_html = '<option value="">--Select--</option>';
   if(tag =='LC'){
     service_html +='<option value="1">LC</option><option value="2" disabled>LJ</option><option value="3" disabled>LC & LJ Both</option><option value="Send to BWM">Send to BWM</option>';
@@ -285,6 +291,17 @@ function openForm(sample_label, log_id, lpa_type, tag,enroll_id,sample_id,servic
       dateFormat: "dd/mm/yyyy"
   }).datepicker("setDate", "0");
   //alert(lpa_type);
+
+  if(tag == 'NONE')
+  {
+    $('#p_heading').hide();
+    $('#mgit_id_span').hide();
+    $('#mgit_id').removeAttr('required');
+    $('#tube_id_lj_span').hide();
+    $('#tube_id_lj').removeAttr('required');
+  }
+
+
   if(lpa_type == 'LJ'){
     //$("#mgit_id").attr("disabled", "disabled");
 	$("#mgit_id").attr("readonly", "readonly");
@@ -308,6 +325,8 @@ function openForm(sample_label, log_id, lpa_type, tag,enroll_id,sample_id,servic
   }
   //$("#tube_id_lj").attr("disabled",true);
 }
+
+
 function openNextForm(sample_label, log_id, enroll_id){
   $('#next_sample_id').val(sample_label);
   $('#next_log_id').val(log_id);

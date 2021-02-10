@@ -11,6 +11,7 @@ use App\Model\LJDetail;
 use App\Model\Microscopy;
 use App\Model\LCFlaggedMGIT;
 use App\Model\CultureInoculation;
+use App\Model\Microbio;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -32,7 +33,7 @@ class LJController extends Controller
           $data['sample'] = ServiceLog::select('m.enroll_id','m.id as sample_id', 'm.receive_date as receive','m.test_reason as reason','is_accepted','s.result','t_service_log.sample_label as samples','t_service_log.enroll_label as enroll_label','t_service_log.service_id','t_service_log.id as log_id', 't_service_log.status','m.no_of_samples', 'ci.mgit_id','ci.tube_id_lj','ci.tube_id_lc','ci.inoculation_date')
         ->leftjoin('sample as m','m.id','=','t_service_log.sample_id')
         ->leftjoin('t_culture_inoculation as ci','ci.sample_id','=','t_service_log.sample_id')
-                ->leftjoin('t_lj_detail as tljd','tljd.sample_id','=','t_service_log.sample_id')
+        ->leftjoin('t_lj_detail as tljd','tljd.sample_id','=','t_service_log.sample_id')
         ->leftjoin('t_microscopy as s', function ($join) {
               $join->on('s.sample_id','=','t_service_log.sample_id')
                    ->where('s.status', 1);
@@ -131,6 +132,8 @@ class LJController extends Controller
 
                             $logdata = ServiceLog::find($id);
 
+                            //dd($logdata);
+
                             if ($request->result == 'Ongoing') {
 
                                 $past_data_id = LJWeekLog::select('id')->where('sample_id', $logdata->sample_id)->where('enroll_id', $logdata->enroll_id)->where('status', 1)->first();
@@ -150,7 +153,7 @@ class LJController extends Controller
                                 ]);
                                 $logdata->status = $logdata->status + 1;
                                 $logdata->week_log = $logdata->week_log + 1;
-                
+                                $logdata->save();                
                 
                             } elseif($request->result == 'NEG')
                             {
@@ -170,7 +173,29 @@ class LJController extends Controller
                                 ]);
                                 $logdata->released_dt = date('Y-m-d');
                                 $logdata->status = -1;
+                                $logdata->save();                                
 
+                                $service = ServiceLog::find($id);
+
+                                $service->comments="";
+                                $service->tested_by=$request->user()->name;
+                                $service->released_dt=date('Y-m-d');
+                                $service->status = 0;
+                                $service->updated_by = $request->user()->id;
+                                $service->save();
+                                $microbio = Microbio::create([
+                                    'enroll_id' => $service->enroll_id,
+                                    'sample_id' => $service->sample_id,
+                                    'service_id' => 20,
+                                    'next_step' => '',
+                                    'detail' => '',
+                                    'remark' => '',
+                                    'status' => 0,
+                                    'created_by' => $request->user()->id,
+                                    'updated_by' => $request->user()->id
+                                ]);
+
+                                //dd($newdata);
                             }
                             elseif($request->result == 'CONTA')
                             {
@@ -189,9 +214,28 @@ class LJController extends Controller
                                 ]);
                                 $logdata->released_dt = date('Y-m-d');
                                 $logdata->status = -1;
-                            }
+                                $logdata->save();
 
-                            $logdata->save();
+                                $service = ServiceLog::find($id);
+                                
+                                $service->comments="";
+                                $service->tested_by=$request->user()->name;
+                                $service->released_dt=date('Y-m-d');
+                                $service->status = 0;
+                                $service->updated_by = $request->user()->id;
+                                $service->save();
+                                $microbio = Microbio::create([
+                                    'enroll_id' => $service->enroll_id,
+                                    'sample_id' => $service->sample_id,
+                                    'service_id' => 20,
+                                    'next_step' => '',
+                                    'detail' => '',
+                                    'remark' => '',
+                                    'status' => 0,
+                                    'created_by' => $request->user()->id,
+                                    'updated_by' => $request->user()->id
+                                ]);
+                            }                            
                     }                   
                     
                 }          
@@ -210,14 +254,15 @@ class LJController extends Controller
                         ->where('s.status', 1);
                 })
                 ->leftjoin('t_culture_inoculation as ci', 'ci.sample_id', '=', 't_service_log.sample_id')
+                ->join('t_lj_week_log as tljd','tljd.sample_id','=','t_service_log.sample_id')
                 ->where('t_service_log.service_id', 20)
                 ->whereIn('t_service_log.status', [0, 1, -1, 2, 3, 4, 5, 6, 7, 8])
-                ->where('t_service_log.week_log', $request->week)
+                ->where('t_service_log.week_log', $request->week)                
                 ->orderBy('enroll_id', 'desc')
                 ->get();
 
 
-            // dd($data['sample']);
+            //dd($data['sample']);
 
             $data['week'] = $request->week;
             $data['weeks'] = ["--Select--","Week 1","Week 2","Week 3","Week 4","Week 5","Week 6","Week 7","Week 8"];
@@ -231,6 +276,8 @@ class LJController extends Controller
             return view('admin.layout.error', $error);  
         }
     }
+
+    
 
     /**
      * Display the specified resource.
@@ -317,11 +364,91 @@ class LJController extends Controller
                 ]);
                 $logdata->status = $logdata->status + 1;
                 $logdata->week_log = $logdata->week_log + 1;
+                $logdata->save();
 
+
+            } elseif($request->result == 'NEG') {
+
+            LJDetail::where('sample_id', $logdata->sample_id)->where('enroll_id', $logdata->enroll_id)->delete(); 
+
+                                $newdata = LJDetail::create([
+                                    'sample_id' => $logdata->sample_id,
+                                    'enroll_id' => $logdata->enroll_id,
+                                    'test_id' => 'Not required',
+                                    'culture_smear' => 'Not required',
+                                    'final_result' => 'Negative',                                    
+                                    'lj_result_date' => date('Y-m-d'),
+                                    'result_week' => $request->week,
+                                    'created_by' => $request->user()->id,
+                                    'updated_by' => $request->user()->id,
+                                    'lj_result' => $request->result, // Save result in LJ Result
+                                ]);
+                                $logdata->released_dt = date('Y-m-d');
+                                $logdata->status = -1;
+                                $logdata->save();                                
+
+                                $service = ServiceLog::find($id);
+
+                                $service->comments="";
+                                $service->tested_by=$request->user()->name;
+                                $service->released_dt=date('Y-m-d');
+                                $service->status = 0;
+                                $service->updated_by = $request->user()->id;
+                                $service->save();
+                                $microbio = Microbio::create([
+                                    'enroll_id' => $service->enroll_id,
+                                    'sample_id' => $service->sample_id,
+                                    'service_id' => 20,
+                                    'next_step' => '',
+                                    'detail' => '',
+                                    'remark' => '',
+                                    'status' => 0,
+                                    'created_by' => $request->user()->id,
+                                    'updated_by' => $request->user()->id
+                                ]);
+
+            } elseif($request->result == 'CONTA') {
+
+            LJDetail::where('sample_id', $logdata->sample_id)->where('enroll_id', $logdata->enroll_id)->delete(); 
+                $newdata = LJDetail::create([
+                    'sample_id' => $logdata->sample_id,
+                    'enroll_id' => $logdata->enroll_id,
+                    'test_id' => 'Not required',
+                    'culture_smear' => 'Not required',
+                    'final_result' => 'Contaminated',                                    
+                    'lj_result_date' => date('Y-m-d'),
+                    'result_week' => $request->week,
+                    'created_by' => $request->user()->id,
+                    'updated_by' => $request->user()->id,
+                    'lj_result' => $request->result, // Save result in LJ Result
+                ]);
+                $logdata->released_dt = date('Y-m-d');
+                $logdata->status = -1;
+                $logdata->save();
+
+                $service = ServiceLog::find($id);
+                
+                $service->comments="";
+                $service->tested_by=$request->user()->name;
+                $service->released_dt=date('Y-m-d');
+                $service->status = 0;
+                $service->updated_by = $request->user()->id;
+                $service->save();
+                $microbio = Microbio::create([
+                    'enroll_id' => $service->enroll_id,
+                    'sample_id' => $service->sample_id,
+                    'service_id' => 20,
+                    'next_step' => '',
+                    'detail' => '',
+                    'remark' => '',
+                    'status' => 0,
+                    'created_by' => $request->user()->id,
+                    'updated_by' => $request->user()->id
+                ]);
 
             } else {
 
-                LJDetail::where('sample_id', $logdata->sample_id)->where('enroll_id', $logdata->enroll_id)->delete();
+            LJDetail::where('sample_id', $logdata->sample_id)->where('enroll_id', $logdata->enroll_id)->delete();
 
                 $data = LJDetail::create([
                     'sample_id' => $logdata->sample_id,
@@ -339,13 +466,14 @@ class LJController extends Controller
                 ]);
                 $logdata->released_dt = date('Y-m-d');
                 $logdata->status = -1;
+                $logdata->save();
 
             }
 
 
             // dd($logdata);
 
-            $logdata->save();
+            
             // $week = $request->week+1;
             return redirect("/dashboardlj");
 

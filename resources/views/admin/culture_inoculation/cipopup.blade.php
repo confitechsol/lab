@@ -9,7 +9,7 @@
       </div>
 	  <div class="alert alert-danger hide"><h4></h4></div>
       <div class="modal-body">
-        <p style="text-align:center">Type: <span id="heading"></span> </p>
+        <p style="text-align:center" id="p_heading">Type: <span id="heading"></span> </p>
         <form class="form-horizontal form-material" action="{{ url('/culture_inoculation') }}" method="post" id="extractionpopup">
           <input type="hidden" name="_token" value="{{ csrf_token() }}">
           <input type="hidden" name="log_id" id="log_id" value="">
@@ -33,7 +33,7 @@
           <div class="row">
             <div class="col">
                 <div class="col-md-12">
-                   <label class="col-md-12">MGIT  sequence ID (LC) <span class="red">*</span></label>
+                   <label class="col-md-12">MGIT  sequence ID (LC) <span class="red" id="mgit_id_span">*</span></label>
                    <div class="col-md-12">
                       <input type="text" name="mgit_id" class="form-control form-control-line" value="" id="mgit_id" required>
                   </div>
@@ -53,11 +53,10 @@
           <div class="row">
             <div class="col">
                 <div class="col-md-12">
-                   <label class="col-md-12">TUBE 1 sequence ID (LJ) <span class="red">*</span></label>
-                   <div class="col-md-12">
+                   <label class="col-md-12">TUBE 1 sequence ID (LJ) <span class="red" id="tube_id_lj_span">*</span></label>
+                   <div class="col-md-12">                    
                       <input type="text" id="tube_id_lj" name="tube_id_lj" class="form-control form-control-line" value="" required>  
-					  <p class="scanerr"></p>
-					  
+					  <p class="scanerr"></p>					  
                   </div>
                </div>
             </div>

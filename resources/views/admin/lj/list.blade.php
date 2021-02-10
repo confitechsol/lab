@@ -41,7 +41,7 @@
                               </div>
                               <div class="col-lg-6 col-xlg-6 col-md-6 col-sm-6 col-sm-6">
                                 <label>Result<span style="color:red;">*</span></label>
-                                <select name="result" class="form-control form-control-line" required>
+                                <select name="result" class="form-control form-control-line" >
                                   <option value="">--Select--</option>
                                   @foreach ($data['result_data'] as $key => $result_data)
                                   <option value="{{$key}}"

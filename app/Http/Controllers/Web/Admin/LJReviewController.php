@@ -157,10 +157,11 @@ class LJReviewController extends Controller
      */
     public function store(Request $request)
     {
-        dd($request->all());
+        //dd($request->all());
 		$success = true;
 	  DB::beginTransaction();
       try {
+
         if($request->service_id == 1 || $request->service_id == 2 || $request->service_id == 3){
           if($request->service_log_id > 0){
             $service = ServiceLog::find($request->service_log_id);
@@ -169,8 +170,7 @@ class LJReviewController extends Controller
             $service->released_dt=date('Y-m-d');
             $service->status = 0;
             $service->updated_by = $request->user()->id;
-            $service->save();
-			
+            $service->save();			
 			
             if($request->service_id == 1){
               $tag = '1st line LPA';
@@ -340,9 +340,9 @@ class LJReviewController extends Controller
 			  //dd($e->getMessage());
 			  $error = $e->getMessage();		  
 			  DB::rollback(); 
-			  $success = false;
-			   
+			  $success = false;			   
 		}
+
 		 if($success){
 			// Return data for successful delete
 			 return redirect("/reviewlj");
