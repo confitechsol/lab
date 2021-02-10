@@ -79,9 +79,12 @@
                                   <table id="exampl" class="table table-striped table-bordered responsive col-xlg-12" cellspacing="0" width="100%">
                                       <thead>
                                         <tr>
+                                          <th><input type="checkbox" id="bulk-select-all"></th>
+                                          <th class="hide">ID</th>
                                           <th>Sample ID</th>
                                           <th>Enroll ID</th>
-										  <th>Test Requested</th>
+                    										  <th>Test Requested</th>
+                                          <th>Next steps</th>
                                           <th>DX/FU/EQA</th>
                                           <th>FU month</th>
                                           <th>Week of Result</th>
@@ -93,16 +96,27 @@
                                           <th>Date of Solid Culture Result</th>
                                           <th>If subjected to LC, LC Result</th>
                                           <th>If subjected to LC, date of LC result</th>
-                                          <th>Next steps</th>
+                                          
                                         </tr>
                                       </thead>
                                       <tbody>
 									
                                         @foreach ($data['sample'] as $key=> $samples)
                                         <tr>
+                                          <td>                                            
+                                            <input class="bulk-selected" type="checkbox" value="{{ $samples->log_id }}">
+                                          </td>
+                                          <td class="hide">{{$samples->ID}}</td>
                                           <td>{{$samples->samples}}</td>
                                           <td>{{$samples->enroll_label}}</td>
-										  <td  <?php echo $data['services_col_color['.$samples->enroll_id.']']=='Y'?'bgcolor="#ccffcc"':""; ?>><?php echo $data['test_requested['.$samples->enroll_id.']'];?></td>
+										                      <td <?php echo $data['services_col_color['.$samples->enroll_id.']']=='Y'?'bgcolor="#ccffcc"':""; ?>><?php echo $data['test_requested['.$samples->enroll_id.']'];?></td>
+                                          <td>
+                                            @if($samples->status==0)
+                                            Done
+                                            @else
+                                            <button onclick="openNextForm('{{$samples->samples}}', {{$samples->log_id}},'{{$samples->tag}}',{{$samples->enrollID}},{{$samples->sampleID}},{{$samples->service_id}},{{$samples->rec_flag}},'{{$samples->final_result}}')" type="button" class = "btn btn-info btn-sm  nextbtn">Submit</button>
+                                            @endif
+                                          </td>
                                           <td>{{$samples->reason}}</td>
                                           <td>{{$samples->fu_month}}</td>
                                           <td>
@@ -116,36 +130,30 @@
 										
 											  
                                           <td>
-											 @if($samples->sample_type=="Other" || $samples->sample_type=="Others")
-												{{$samples->sample_type}}({{$samples->others_type}})
-											@else
-												{{$samples->sample_type}}
-											@endif
-											</td>
-                                          <td>{{$samples->lpa_type}}</td>
-                                          <td>{{$samples->culture_method}}</td>
-										  <td>
-											  <?php 
-											  if($samples->final_result=='NTM'){
-												  echo $samples->final_result.' ('.$samples->species.')';
-											  }else if($samples->final_result=='Other Result'){
-												  echo $samples->final_result.' ('.$samples->other_result.')';
-											  }else{
-												  echo $samples->final_result;
-											  }
-											  ?>
-										  </td>
+                        											 @if($samples->sample_type=="Other" || $samples->sample_type=="Others")
+                        												{{$samples->sample_type}}({{$samples->others_type}})
+                        											@else
+                        												{{$samples->sample_type}}
+                        											@endif
+                        											</td>
+                                                                  <td>{{$samples->lpa_type}}</td>
+                                                                  <td>{{$samples->culture_method}}</td>
+                        										  <td>
+                        											  <?php 
+                        											  if($samples->final_result=='NTM'){
+                        												  echo $samples->final_result.' ('.$samples->species.')';
+                        											  }else if($samples->final_result=='Other Result'){
+                        												  echo $samples->final_result.' ('.$samples->other_result.')';
+                        											  }else{
+                        												  echo $samples->final_result;
+                        											  }
+                        											  ?>
+                        								</td>
                                           <!--<td>{{$samples->final_result}}</td>-->
                                           <td>{{$samples->lj_result_date}}</td>
                                           <td>{{$samples->lc_result}}</td>
                                           <td>{{$samples->lc_result_date}}</td>
-                                          <td>
-                                            @if($samples->status==0)
-                                            Done
-                                            @else
-                                            <button onclick="openNextForm('{{$samples->samples}}', {{$samples->log_id}},'{{$samples->tag}}',{{$samples->enrollID}},{{$samples->sampleID}},{{$samples->service_id}},{{$samples->rec_flag}},'{{$samples->final_result}}')" type="button" class = "btn btn-default btn-sm  nextbtn">Next</button>
-                                            @endif
-                                          </td>
+                                          
                                         </tr>
                                         @endforeach
 
@@ -162,6 +170,70 @@
             </div>
             <footer class="footer"> © Copyright Reserved 2017-2018, LIMS </footer>
         </div>
+
+
+        {{-- MODAL FOR BULK REVIEW --}}
+    <div class="modal fade" id="modal-bulk-review" role="dialog">
+        <div class="modal-dialog">
+
+            <!-- Modal content-->
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title">LJ Review</h4>
+                </div>
+
+                <form method="post"
+                      class="form-horizontal form-material"
+                      action="{{ route('reviewlj.send-review.bulk') }}" id="deconbulkform">
+                    
+                    @if(count($errors))
+                        @foreach ($errors->all() as $error)
+                            <div class="alert alert-danger"><h4>{{ $error }}</h4></div>
+                        @endforeach
+                    @endif
+                    <div class="alert alert-danger hide"><h4></h4></div>
+                    <div class="modal-body">
+
+                        <input type="hidden" name="_token" value="{{ csrf_token() }}">
+                        <input type="hidden" name="sample_ids" value="">
+                      <div class="row">
+                        <div class="col">
+                            <label class="col-md-12">Sample Sent for</label>
+                            <div class="col-md-12">
+                               <!-- <textarea rows="5" name="test_reason[]" class="form-control form-control-line" required></textarea> -->
+                               <select name="service_id" id="service_id" class="form-control form-control-line test_reason" required>
+                                 <option value="">--Select--</option>
+                                 <option value="1">DNA Extraction LPA 1st line</option>
+                                 <option value="2">DNA Extraction LPA 2nd line</option>
+                                 <!--<option value="3">DNA Extraction LPA 1st line and LPA 2nd line</option>---->
+                       <option value="4">LJ - DST Inoculation</option>
+                                 <!--<option value="4">LJ - DST 1st Line</option>
+                                 <option value="5">LJ - DST 2nd Line</option>
+                       <option value="7">LJ - DST 1st & 2nd Line</option>-->
+                                 <!--<option value="6">Microbiologist for further review</option>-->
+                                 <option value="19">Result finalization</option>
+                                 <!-- <option value="">MB for further review </option> -->
+                               </select>
+                           </div>
+                        </div>
+                    </div>
+
+                    </div>
+                    <div class="modal-footer">
+                        <!-- <button type="submit" class="btn btn-default" data-dismiss="modal">Save</button> -->
+                        <button class="btn btn-default add-button cancel btn-md"
+                                type="button"
+                                data-dismiss="modal">Cancel</button>
+
+                        <button class="pull-right btn btn-primary btn-md" type="submit">Ok</button>
+                    </div>
+
+                </form>
+            </div>
+        </div>
+    </div>
+    {{-- MODAL FOR BULK REVIEW - ENDS --}}
 
 <script>
 $(document).ready(function(){
@@ -220,6 +292,12 @@ $(document).ready(function() {
                 title: 'LIMS_lj_review_'+today+''
 				
             }
+            ,
+            {
+                text: 'Submit',            
+                action: bulk_action_review
+            }            
+
         ],
         "order": [[ 1, "desc" ]]
     });
@@ -279,6 +357,58 @@ $(document).ready(function() {
 	  }
    });
 });
+
+// ==================================================
+        // =========== SCRIPT FOR BULK REVIEW ===============
+        // ==================================================
+
+        var $bulk_checkboxes = $('.bulk-selected');
+        var $bulk_select_all_checkbox = $('#bulk-select-all');
+
+
+        // Automatically Check or Uncheck "all select" checkbox
+        // based on the state of checkboxes in the list.
+        $bulk_checkboxes.click(function(){
+            if( $bulk_checkboxes.length === $bulk_checkboxes.filter(':checked').length ){
+                $bulk_select_all_checkbox.prop('checked', true);
+            }
+        });
+
+
+        // Check or Uncheck checkboxes based on the state
+        // of "all select" checkbox.
+        $bulk_select_all_checkbox.click(function(){
+            var checked = $(this).prop('checked');
+            $('.bulk-selected').prop('checked', checked);
+        });
+
+        // Open bulk editing modal on clicking "Send Selected to Review" button.
+        function bulk_action_review(){
+            var $modal = $('#modal-bulk-review');
+            var selected = [];
+            var $checkboxes = $('.bulk-selected:checked');
+
+            // Display an error message and stop if no checkboxes are selected.
+            if( $checkboxes.length === 0 ){
+                alert("First select one or more items from the list.");
+                return;
+            }
+
+            $modal.modal('show');
+
+            $checkboxes.each(function(i, e){
+                selected.push( $(e).val() );
+
+                // Last iteration of the loop.
+                if( i === $checkboxes.length - 1 ){
+                    $modal.find('input[name="sample_ids"]').val( selected.join(',') );
+                }
+            });
+        }
+
+        // ==================================================
+        // ========= SCRIPT FOR BULK REVIEW - ENDS ==========
+        // ==================================================
 </script>
 
 

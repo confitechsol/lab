@@ -76,38 +76,24 @@ class BioWasteController extends Controller
      */
     public function store(Request $request)
     {
-// dd($request->all());
+     //dd($request->all());
+      $waste = BioWaste::find($request->waste_id);
       if($request->option_value == 'quantity_option'){
-        //if($request->quantity){
-          $waste = BioWaste::find($request->waste_id);
-          $waste->quantity = $request->quantity;
-          /*set value null ans zero*/
-          $waste->packets = 0;
-          $waste->yellow = 0;
-          $waste->red = 0;
-          $waste->white = 0;
-          $waste->blue = 0;
+        $waste->packets = 1;
+        $waste->quantity = 1;
+      }
+      if($request->option_value == 'packets_option'){
+        $waste->quantity = null;
+        $waste->packets = 2;
+      } 
 
-          $waste->save();
-        }
-        if($request->option_value == 'packets_option'){
-       // if(!empty($request->option_value == 'packets_option')){
-          $waste = BioWaste::find($request->waste_id);
-          /*set zero in Kgs. value */
-          $waste->quantity = null;
-          $waste->packets = 0;
-          $waste->yellow = $request->yellow;
-          $waste->red = $request->red;
-          $waste->white = $request->white;
-          $waste->blue = $request->blue;
-          $waste->save();
-        }
-
-        elseif($request->collected_date) {
-          $waste = BioWaste::find($request->waste_id_col);
-          $waste->collected_date = $request->collected_date;
-          $waste->save();
-        }
+      $waste->yellow = $request->yellow;
+      $waste->red = $request->red;
+      $waste->white = $request->white;
+      $waste->blue = $request->blue;
+      $waste->collected_date = $request->collected_date;
+      $waste->save();
+            
         return redirect('/bioWaste');
     }
 

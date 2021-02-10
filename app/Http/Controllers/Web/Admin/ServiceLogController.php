@@ -259,7 +259,7 @@ class ServiceLogController extends Controller
 			exit;
 	}
 
-	public function checkForSampleAlreadyInProcess12($sample_id,$enroll_id,$service_id,$tag=null,$recflag,$res=null)
+	public function checkForSampleAlreadyInProcess12($sample_id,$enroll_id,$service_id,$tag=null,$recflag,$res)
     { 
 	      // dd('i am here');
 		    //echo $sample_id."=".$enroll_id."==".$service_id."===".$tag."====".$recflag."++".$res; die;
@@ -288,10 +288,10 @@ class ServiceLogController extends Controller
 			//dd($servicelog);
 		    //dd($servicelog[0]->v_count);	
 
-			if($res == null){
+			if($res == 'null'){
 				
 
-			}else if($res != null){
+			}else if($res != 'null'){
 				if($res == 'Negative+Not Seen'){
 					$res = 'Negative/Not Seen';
 				}

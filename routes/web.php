@@ -181,6 +181,7 @@ Route::group(['middleware' => 'auth:web'], function () {
 
     Route::group(['middleware' => ['role:lj_review,can_view']], function () {
         Route::resource('/reviewlj', 'Web\Admin\LJReviewController');
+        Route::post('/dash_reviewlj_bulk', 'Web\Admin\LJReviewController@bulkStore')->name('reviewlj.send-review.bulk');
     });
 
     Route::group(['middleware' => ['role:lc_dst_inoculation,can_view']], function () {

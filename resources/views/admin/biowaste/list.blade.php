@@ -36,9 +36,9 @@
 <tr>
 <th class="hide">ID</th>
 <th>Date of waste generated</th>
-<th>Quantity of waste generated(in kg)</th>
-<th>Quantity of waste generated(in Packets)<div class="d-flex flex-nowrap text-center"><div class="yellow col-3 p-0">Yellow</div><div class="red1 col-3 p-0">Red</div><div class="white col-3 p-0">White</div><div class="blue col-3 p-0">Blue</div></div></th>
-<th>Date of collection for disposal</th>
+<th>Unit of Measurement</th>
+<th>Quantity of Waste Generated<div class="d-flex flex-nowrap text-center"><div class="yellow col-3 p-0">Yellow</div><div class="red1 col-3 p-0" style="margin: 0px 6px;">Red</div><div class="white col-3 p-0">White</div><div class="blue col-3 p-0" style="margin: 0px 6px;">Blue</div></div></th>
+<th>Date of collection of disposal</th>
 <th>Edit</th>
 <th>Action</th>
 
@@ -49,7 +49,13 @@
 <tr>
 <td class="hide">{{$samples->id}}</td>
 <td>{{$samples->generated_date}}</td>
-<td>{{$samples->quantity}}</td>
+@if($samples->quantity!=null)
+<td>KG</td>
+@elseif($samples->packets==2)
+<td>PACKETS</td>
+@else
+<td>None</td>
+@endif
 <td> 
 
   <div class="d-flex flex-nowrap text-center"><div class="col-3 p-0" style="width: 56px;">{{$samples->yellow}}</div><div class="col-3 p-0" style="width: 56px;">{{$samples->red}}</div><div class="col-3 p-0" style="width: 56px;">{{$samples->white}}</div><div class="col-3 p-0" style="width: 56px;">{{$samples->blue}}</div>
@@ -58,7 +64,7 @@
 @if($samples->collected_date!=null)
 {{$samples->collected_date}}
 @else
-<button type="button" onclick="openCbnaatForm1({{$samples->id}})"  class="btn btn-info btn-sm resultbtn" >Add Date</button>
+<button style="display:none;" type="button" onclick="openCbnaatForm1({{$samples->id}})"  class="btn btn-info btn-sm resultbtn" >Add Date</button>
 @endif
 </td>
 <td>
@@ -69,10 +75,13 @@
    } else{ 
    $quantity = $samples->quantity; 
   }
+// $c_date = strtotime($samples->collected_date);
+  $c_date = date('d-m-Y', strtotime($samples->collected_date));
+  $c_date = strtotime($c_date);
  ?>
 
 @if($samples->status==0)
-<button type="button" onclick="openCbnaatForm({{$samples->id}},{{ $quantity }} ,{{$samples->yellow}},{{$samples->red}},{{$samples->white}},{{$samples->blue}})"  class="btn btn-info btn-sm resultbtn" >Edit</button>
+<button type="button" onclick="openCbnaatForm({{$samples->id}},{{ $quantity }} ,{{$samples->yellow}},{{$samples->red}},{{$samples->white}},{{$samples->blue}},{{$c_date}})"  class="btn btn-info btn-sm resultbtn" >Edit</button>
 @elseif($samples->status==1)
 submitted
 @endif
@@ -87,8 +96,8 @@ submitted
   @elseif($samples->collected_date==null  && $samples->status==0)
   @endif
 @else
-  Enter the quantity in kg
-@endif
+  <!-- Enter the quantity in kg -->
+@endif 
 </td>
 </tr>
 @endforeach
@@ -143,17 +152,17 @@ submitted
   </div>
 </div>
 
-<div id="qaunt_div">
+<!-- <div id="qaunt_div">
   <div class="row align-items-center">
     <label class="col-md-8 my-3"><strong>Quantity of waste generated (in kg)</strong></label>
     <div class="col-md-4">
       <input type="number" name="quantity" pattern="[0-9]" class="form-control form-control-line "  id="quantity" >
     </div>
   </div>
-</div>
+</div> -->
 
 <div id="pckt_div">  
-<label class="d-block my-3"><strong>Quantity of waste generated(in Packets)</strong></label>
+<label class="d-block my-3"><strong>Quantity of waste generated</strong></label>
 <div class="col-md-12">
 <!-- <input type="number" name="packets" pattern="[0-9]" class="form-control form-control-line "  id="packets" > -->
   <div class="row text-center">
@@ -182,6 +191,12 @@ submitted
     </div>
     <div class="col-3">
       <input type="number" name="blue" pattern="[0-9]" class="form-control form-control-line "  id="blue" >
+    </div>
+  </div>
+  <div class="row">
+    <label class="d-block my-3"><strong>Date of collection for disposal</strong><span style="color:red;">*</span></label>
+    <div class="col-md-12">
+      <input type="text" id="collected_date" name="collected_date"  placeholder="dd-mm-yy" class="form-control form-control-line datepicker" required>
     </div>
   </div>
 </div>
@@ -274,15 +289,49 @@ $("#waste_id_col").val(id);
 $('#myModal1').modal('toggle');
 }
 
+function formatDate(date) {
+    var d = new Date(date),
+        month = '' + (d.getMonth() + 1),
+        day = '' + d.getDate(),
+        year = d.getFullYear();
 
-function openCbnaatForm(id,quantity,yellow,red,white,blue) {
+    if (month.length < 2) 
+        month = '0' + month;
+    if (day.length < 2) 
+        day = '0' + day;
+
+    return [year, month, day].join('-');
+}
+
+function openCbnaatForm(id,quantity,yellow,red,white,blue,c_date) {
 //console.log("sample_ids", sample_ids.split(','));
 $("#waste_id").val(id);
 
 
-$('#myModal').modal('toggle');
+ $('#myModal').modal('toggle');
+ $('#yellow').val(yellow).show();
+ $('#red').val(red).show();
+ $('#white').val(white).show();
+ $('#blue').val(blue).show();
 
-if(quantity==0 && yellow==0 && red==0 && white==0 && blue==0){
+  var jsDate = new Date(c_date*1000);
+  var c_date = formatDate(jsDate.toDateString());
+
+
+ $("#collected_date").val(c_date);
+ //$("#collected_date").datepicker("setDate", new Date(collected_date)); 
+ if(quantity==0){
+  $('#quantity_mode').prop('checked', false);
+  $('#packets_mode').prop('checked', true);
+
+ }
+ if(quantity==1){
+  $('#quantity_mode').prop('checked', true);
+  $('#packets_mode').prop('checked', false);
+
+ }
+
+/*if(quantity==0 && yellow==0 && red==0 && white==0 && blue==0){
   $('#quantity_mode').prop('checked', true);
   $('#packets_mode').prop('checked', false);
   $('#pckt_div').hide();
@@ -309,7 +358,7 @@ if(quantity==0 && yellow==0 && red==0 && white==0 && blue==0){
   $('#qaunt_div').show();
   
 }
-
+*/
 }
 
 </script>
@@ -352,11 +401,11 @@ exportOptions: {
 <script>
 
 $(document).ready(function(){
-  $("#pckt_div").hide();
- $("#quantity").attr("required", "true");
+  //$("#pckt_div").hide();
+ //$("#quantity").attr("required", "true");
   $(document).on('click','.option_mode', function() {
     
-    if (this.value == 'quantity_option') {
+   /* if (this.value == 'quantity_option') {
        // alert("Q");
         console.log(this.value);
         $("#pckt_div").hide();
@@ -387,7 +436,7 @@ $(document).ready(function(){
         $("#blue").attr("required", "true");
 
         $("#quantity").removeAttr('required');
-     }
+     }*/
 });
 
 

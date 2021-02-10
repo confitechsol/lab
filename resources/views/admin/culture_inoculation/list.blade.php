@@ -385,7 +385,12 @@ $(document).ready(function() {
 		var sample_id=$("#sampleID").val();
     var service_id=$("#serviceId").val();
     //var allresults='3pos';
-		var allresults=$("#allresults").val();
+		var allresults =$("#allresults").val();  
+    if(allresults){
+      allresults =allresults;
+    }else{
+      allresults =null;
+    }
 		//var STATUS=$("#statusId").val();
 		var tag=$("#tagId").val();
 		var rec_flag=$("#recFlagId").val();
