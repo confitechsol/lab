@@ -216,8 +216,8 @@ border-color: #5cb85c;
                                                       <div class="col-md-12">
                                                          <!-- <input type="text" name="sample_id[]" class="form-control form-control-line sampleId" value="<?php //echo str_pad($data['enroll_id'], 10, "0", STR_PAD_LEFT); ?>A" id="sampleId" required> -->
                                                          <input style="width: 88%;" type="text" name="sample_id[]" class="form-control form-control-line sampleId" id="sampleId" readonly required value="{{ $value['sample_label'] }} ">
-                                                         <input type="text" name="sample_ID[]" class="sampID" value="{{ $value['id'] }}" />
-                                                         <input type="text" name="EnrollID[]" value="{{ $value['enroll_id'] }}" />
+                                                         <input type="hidden" name="sample_ID[]" class="sampID" value="{{ $value['id'] }}" />
+                                                         <input type="hidden" name="EnrollID[]" value="{{ $value['enroll_id'] }}" />
                                                      </div>
                                                   </div>
                                                   <div class="col ">

@@ -516,7 +516,6 @@ $(document).ready(function() {
         ],
         "order": [[ 2, "desc" ]]
     });
-	
 
 });
 

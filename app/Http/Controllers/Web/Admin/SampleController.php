@@ -318,7 +318,7 @@ class SampleController extends Controller
                 }
                 else
                 {
-                    /* if ($request->has('is_accepted')) {                        
+                    if ($request->has('is_accepted')) {                        
                         if( $request->is_accepted[0] === 'Rejected' ){
                             $request->service_id[$i] = [ ServiceLog::TYPE_BWM ];
                         }
@@ -383,7 +383,7 @@ class SampleController extends Controller
                         $sampleData->fu_month = $month;
                         $sampleData->enroll_id = $request->EnrollID[$i];			 
                         $sampleData->user_id = $request->user()->id;
-                        $sampleData->no_of_sample = $request->no_of_samples;
+                        $sampleData->no_of_samples = $request->no_of_samples;
                         $sampleData->service_id = $request->service_id[$i];
                         $sampleData->others_type = $request->others_type[$i];
                         $sampleData->created_at = date('Y-m-d H:i:s');
@@ -409,7 +409,7 @@ class SampleController extends Controller
                         $type = 'LC';              
                         }else if($request->service_id[$i] == 11){
                         $type = 'STORAGE';              
-                        } */
+                        } 
 
                         
                 }
