@@ -37,7 +37,11 @@
 <th class="hide">ID</th>
 <th>Date of waste generated</th>
 <th>Unit of Measurement</th>
-<th>Quantity of Waste Generated<div class="d-flex flex-nowrap text-center"><div class="yellow col-3 p-0">Yellow</div><div class="red1 col-3 p-0" style="margin: 0px 6px;">Red</div><div class="white col-3 p-0">White</div><div class="blue col-3 p-0" style="margin: 0px 6px;">Blue</div></div></th>
+<!-- <th>Quantity of Waste Generated<div class="d-flex flex-nowrap text-center"><div class="yellow col-3 p-0">Yellow</div><div class="red1 col-3 p-0">Red</div><div class="white col-3 p-0">White</div><div class="blue col-3 p-0">Blue</div></div></th> -->
+<th class="yellow" style="background-color: #ffff00; color:#000;">Yellow</th>
+<th class="red1" style="background-color: #fb0001; color:#fff;">Red</th>
+<th class="white" style="background-color: #fff; color:#000;">White</th>
+<th class="blue" style="background-color: #01b0f1; color:#fff;">Blue</th>
 <th>Date of collection of disposal</th>
 <th>Edit</th>
 <th>Action</th>
@@ -56,10 +60,14 @@
 @else
 <td>None</td>
 @endif
-<td> 
+<!-- <td> 
 
   <div class="d-flex flex-nowrap text-center"><div class="col-3 p-0" style="width: 56px;">{{$samples->yellow}}</div><div class="col-3 p-0" style="width: 56px;">{{$samples->red}}</div><div class="col-3 p-0" style="width: 56px;">{{$samples->white}}</div><div class="col-3 p-0" style="width: 56px;">{{$samples->blue}}</div>
-</td>
+</td> -->
+<td style="text-align:center;" >{{$samples->yellow}}</td>
+<td style="text-align:center;" >{{$samples->red}}</td>
+<td style="text-align:center;" > {{$samples->white}}</td>
+<td style="text-align:center;">{{$samples->blue}}</td>
 <td>
 @if($samples->collected_date!=null)
 {{$samples->collected_date}}
@@ -69,6 +77,11 @@
 </td>
 <td>
   <?php 
+  if($samples->packets == 0){
+     $packets = 0;
+  }else{
+    $packets = $samples->packets;
+  }
 
   if(!isset($samples->quantity)){ 
     $quantity = 0;
@@ -76,12 +89,17 @@
    $quantity = $samples->quantity; 
   }
 // $c_date = strtotime($samples->collected_date);
-  $c_date = date('d-m-Y', strtotime($samples->collected_date));
-  $c_date = strtotime($c_date);
+  if(isset($samples->collected_date)){
+    $c_date = date('d-m-Y', strtotime($samples->collected_date));
+    $c_date = strtotime($c_date);
+  }else{
+    $c_date = 0;
+  }
+  
  ?>
 
 @if($samples->status==0)
-<button type="button" onclick="openCbnaatForm({{$samples->id}},{{ $quantity }} ,{{$samples->yellow}},{{$samples->red}},{{$samples->white}},{{$samples->blue}},{{$c_date}})"  class="btn btn-info btn-sm resultbtn" >Edit</button>
+<button type="button" onclick="openCbnaatForm({{$samples->id}},{{ $quantity }},{{$packets}} ,{{$samples->yellow}},{{$samples->red}},{{$samples->white}},{{$samples->blue}},{{$c_date}})"  class="btn btn-info btn-sm resultbtn" >Edit</button>
 @elseif($samples->status==1)
 submitted
 @endif
@@ -181,16 +199,16 @@ submitted
   </div>
   <div class="row">
     <div class="col-3">
-      <input type="number"  name="yellow" pattern="[0-9]" class="form-control form-control-line "  id="yellow" >
+      <input type="number"  name="yellow" pattern="[0-9]" class="form-control form-control-line "  id="yellow" min="0" oninput="validity.valid||(value='');">
     </div>
     <div class="col-3">
-      <input type="number" name="red" pattern="[0-9]" class="form-control form-control-line "  id="red" >
+      <input type="number" name="red" pattern="[0-9]" class="form-control form-control-line "  id="red" min="0" oninput="validity.valid||(value='');">
     </div>
     <div class="col-3">
-      <input type="number" name="white" pattern="[0-9]" class="form-control form-control-line "  id="white" >
+      <input type="number" name="white" pattern="[0-9]" class="form-control form-control-line "  id="white" min="0" oninput="validity.valid||(value='');">
     </div>
     <div class="col-3">
-      <input type="number" name="blue" pattern="[0-9]" class="form-control form-control-line "  id="blue" >
+      <input type="number" name="blue" pattern="[0-9]" class="form-control form-control-line "  id="blue" min="0" oninput="validity.valid||(value='');">
     </div>
   </div>
   <div class="row">
@@ -303,7 +321,7 @@ function formatDate(date) {
     return [year, month, day].join('-');
 }
 
-function openCbnaatForm(id,quantity,yellow,red,white,blue,c_date) {
+function openCbnaatForm(id,quantity,packets,yellow,red,white,blue,c_date) {
 //console.log("sample_ids", sample_ids.split(','));
 $("#waste_id").val(id);
 
@@ -314,11 +332,15 @@ $("#waste_id").val(id);
  $('#white').val(white).show();
  $('#blue').val(blue).show();
 
-  var jsDate = new Date(c_date*1000);
-  var c_date = formatDate(jsDate.toDateString());
+ if(c_date > 0 ){
+    var jsDate = new Date(c_date*1000);
+    var c_date = formatDate(jsDate.toDateString());  
+    $("#collected_date").val(c_date);
+  }else{
+    $("#collected_date").val('');
+  }
 
-
- $("#collected_date").val(c_date);
+ 
  //$("#collected_date").datepicker("setDate", new Date(collected_date)); 
  if(quantity==0){
   $('#quantity_mode').prop('checked', false);
@@ -326,6 +348,11 @@ $("#waste_id").val(id);
 
  }
  if(quantity==1){
+  $('#quantity_mode').prop('checked', true);
+  $('#packets_mode').prop('checked', false);
+
+ }
+ if(packets==0){
   $('#quantity_mode').prop('checked', true);
   $('#packets_mode').prop('checked', false);
 
@@ -391,7 +418,7 @@ buttons: [
 extend: 'excelHtml5',
 title: 'LIMS_'+labname+'_'+labcity+'_BWM_'+today+'',
 exportOptions: {
-   columns: [  1, 2, 3,4 ]
+   columns: [  1, 2, 3,4,5,6,7 ]
 }
 }
 ]

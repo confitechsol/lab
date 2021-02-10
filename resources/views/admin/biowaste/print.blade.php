@@ -23,7 +23,11 @@
                                           <tr>
                                             <!-- <th class="hide">ID</th> -->
                                             <th>Date of waste generated</th>
-                                            <th>Quantity of waste generated(in kg)</th>
+                                            <th>Unit of Measurement</th>
+                                            <th>Yellow</th>
+                                            <th>Red</th>
+                                            <th>White</th>
+                                            <th>Blue</th>
                                             <th>Date of collection for disposal</th>
                                             
                                           </tr>
@@ -31,9 +35,19 @@
                                       <tbody>
                                         @foreach ($data['waste'] as $key=> $samples)
                                         <tr>
-                                          <<!-- td class="hide">{{$samples->id}}</td> -->
+                                          <!-- td class="hide">{{$samples->id}}</td> -->
                                           <td>{{$samples->generated_date}}</td>
-                                          <td>{{$samples->quantity}}</td>
+                                          @if($samples->quantity!=null)
+                                            <td>KG</td>
+                                          @elseif($samples->packets==2)
+                                            <td>PACKETS</td>
+                                          @else
+                                            <td>None</td>
+                                          @endif
+                                          <td>{{$samples->yellow}}</td>
+                                          <td>{{$samples->red}}</td>
+                                          <td>{{$samples->white}}</td>
+                                          <td>{{$samples->blue}}</td>
                                           <td>{{$samples->collected_date}}</td>
                                           
                                         </tr>
