@@ -33,7 +33,24 @@
 <table id="exampl" class="table table-striped table-bordered responsive col-xlg-12 " cellspacing="0" >
 
 <thead>
-<tr>
+
+  <tr>
+    <th rowspan="2" class="hide">ID</th>
+    <th rowspan="2">Date of waste generated</th>
+    <th rowspan="2">Unit of Measurement</th>
+    <th colspan="4" style="text-align: center;">Quantity of Waste Generated</th>
+    <th rowspan="2">Date of collection of disposal</th>
+    <th rowspan="2">Edit</th>
+    <th rowspan="2">Action</th>
+  </tr>
+  <tr>
+    <th class="yellow" style="background-color: #ffff00; color:#000;">Yellow</th>
+    <th class="red1" style="background-color: #fb0001; color:#fff;">Red</th>
+    <th class="white" style="background-color: #fff; color:#000;">White</th>
+    <th class="blue" style="background-color: #01b0f1; color:#fff;">Blue</th>
+  </tr>
+
+{{-- <tr>
 <th class="hide">ID</th>
 <th>Date of waste generated</th>
 <th>Unit of Measurement</th>
@@ -46,7 +63,7 @@
 <th>Edit</th>
 <th>Action</th>
 
-</tr>
+</tr> --}}
 </thead>
 <tbody>
 @foreach ($data['sample'] as $key=> $samples)

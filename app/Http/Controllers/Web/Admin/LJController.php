@@ -254,9 +254,9 @@ class LJController extends Controller
                         ->where('s.status', 1);
                 })
                 ->leftjoin('t_culture_inoculation as ci', 'ci.sample_id', '=', 't_service_log.sample_id')
-                ->join('t_lj_week_log as tljd','tljd.sample_id','=','t_service_log.sample_id')
+                /* ->join('t_lj_week_log as tljd','tljd.sample_id','=','t_service_log.sample_id') */
                 ->where('t_service_log.service_id', 20)
-                ->whereIn('t_service_log.status', [0, 1, -1, 2, 3, 4, 5, 6, 7, 8])
+                ->whereIn('t_service_log.status', [1, 2, 3, 4, 5, 6, 7, 8])
                 ->where('t_service_log.week_log', $request->week)                
                 ->orderBy('enroll_id', 'desc')
                 ->get();
