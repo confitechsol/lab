@@ -179,7 +179,7 @@ class Sample extends Model
             }else if($request->service_id[$i] == 4){
               $type = 'CBNAAT';             
             }else if($request->service_id[$i] == 16){
-              $type = 'LC';              
+              $type = '';              
             }else if($request->service_id[$i] == 11){
               $type = 'STORAGE';              
             }
