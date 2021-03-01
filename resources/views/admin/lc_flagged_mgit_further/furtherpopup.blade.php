@@ -33,9 +33,9 @@
           <div class="row">
           <div class="col">
               <div class="col-md-12">
-                 <label class="col-md-12">GU : <span class="red">*</span></label>
+                 <label class="col-md-12">GU : </label>
                  <div class="col-md-12">
-                    <input type="text" name="gu" class="form-control form-control-line" value="" id="gu" required>
+                    <input type="text" name="gu" class="form-control form-control-line" value="" id="gu" >
                 </div>
              </div>
           </div>

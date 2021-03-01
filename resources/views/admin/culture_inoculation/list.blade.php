@@ -260,7 +260,7 @@ function openForm(sample_label, log_id, lpa_type, tag,enroll_id,sample_id,servic
   }
   $("#service_id").html(service_html);
   $.ajax({
-				  url: "{{url('get_mgit_id')}}"+'/'+enroll_id,
+				  url: "{{url('get_mgit_id')}}"+'/'+enroll_id+'/'+rec_flag,
 				  type:"GET",
 				  processData: false,
 				  contentType: false,
@@ -433,6 +433,35 @@ $(document).ready(function() {
 						}else{
 							$('.alert-danger').addClass('hide');
 							$('.alert-danger').hide();
+
+
+              $.ajax({
+                    url:"{{ url('/get_lc_result_data') }}"+'/'+$('#sampleID').val()+'/'+$('#enrollId').val(),
+                    type:"GET",
+                            processData: false,
+                            contentType: false,
+                            dataType: 'json',
+                    success:function(result){
+                      console.log(result);
+                      if(result.result != '0')
+                      {
+                        $('#allresults').find('option:selected').text(result.result);
+                        $('#allresults').attr('disabled', 'disabled');
+                        //$('#allresults').
+                      } else { 
+
+                        $('#allresults').removeAttr('disabled');
+
+                      }             
+
+                  }
+
+                  });
+
+
+
+
+
 							//$('form#cbnaat_result').submit();	
 							$('#submit').prop("type", "submit");
 							//$("#submit").text("OK");

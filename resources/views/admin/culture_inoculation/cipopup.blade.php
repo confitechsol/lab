@@ -145,6 +145,10 @@ $('#extractionpopupDiv').on('show.bs.modal', function (e) {
      // Pass form reference to modal for submission on yes/ok
      var form = $(e.relatedTarget).closest('form');
      $(this).find('.modal-footer #confirm').data('form', form);
+
+     
+
+
  });
 
 </script>
@@ -166,6 +170,9 @@ $('#extractionpopupDiv').on('show.bs.modal', function (e) {
 $(document).ready(function(){
   // $("#sampleId").setAttribute("readonly");
   //   $("#enroll_label").setAttribute("readonly");
+
+  
+
 $("#tube_id_lj").change(function(){
 
   var scanval= $(this).val();

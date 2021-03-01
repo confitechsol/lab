@@ -378,14 +378,17 @@ class LCFlaggedMGITController extends Controller
               $logdata = ServiceLog::find($data_arr['log_id'.$sampleID]);
 
               //LCFlaggedMGIT::where('sample_id',$logdata->sample_id)->delete(); //for repeataton of any sample
-              LCFlaggedMGIT::where('enroll_id',$logdata->enroll_id)->delete(); //for repeataton of any sample
+              /* Updated by Saumen 18-02-2021  */
+                //LCFlaggedMGIT::where('enroll_id',$logdata->enroll_id)->delete(); //for repeataton of any sample
+              /*  End */
               $data = LCFlaggedMGIT::create([
                 'sample_id' => $logdata->sample_id,
                 'enroll_id' => $logdata->enroll_id,
                 'gu' => $request->gu,
                 'flagging_date' => $request->flagging_date,
                 'created_by' => $request->user()->id,
-                'updated_by' => $request->user()->id
+                'updated_by' => $request->user()->id,
+                'rec_flag' => $data_arr['rec_flag'.$sampleID]
               ]);
           
               $logdata->comments=$request->comments;
@@ -412,6 +415,7 @@ class LCFlaggedMGITController extends Controller
               ];
 
               $nwService = ServiceLog::create($new_service);
+              
           }
         }
         else
@@ -428,7 +432,8 @@ class LCFlaggedMGITController extends Controller
                 'gu' => $request->gu,
                 'flagging_date' => $request->flagging_date,
                 'created_by' => $request->user()->id,
-                'updated_by' => $request->user()->id
+                'updated_by' => $request->user()->id,
+                'rec_flag' => $data_arr['rec_flag'.$sampleID]
               ]);
           
               $logdata->comments=$request->comments;
@@ -452,6 +457,8 @@ class LCFlaggedMGITController extends Controller
                 'result_date'   => date('Y-m-d'),
                 'created_by'    => $request->user()->id,
                 'updated_by'    => $request->user()->id,
+                'updated_by'    => $request->user()->id,
+                'rec_flag' => $data_arr['rec_flag'.$sampleID]
               ];
 
               $nwflag_migit_further = LCFlaggedMGITFurther::create($flag_migit_further);

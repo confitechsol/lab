@@ -82,7 +82,7 @@ class CultureInoculationController extends Controller
 					if(count($result)>1)
 					{
 						$data['services_col_color['.$sampledata->enroll_id.']']='Y';
-					}				
+					}		
 					
 				}
 			 }
@@ -100,7 +100,7 @@ class CultureInoculationController extends Controller
         //     $value->lpa_type = "NA";
         //   }
         // }
-        //dd($data['sample']);
+        //dd($data);
         return view('admin.culture_inoculation.list',compact('data','year'));
       }catch(\Exception $e){
           $error = $e->getMessage();
@@ -113,6 +113,34 @@ class CultureInoculationController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
+
+     public function getLCResultData($sample_id, $enroll_id)
+     {
+      $response = array();
+
+        $get_result = DB::table('t_microscopy')
+                      ->select('result')
+                      ->where('sample_id', $sample_id)
+                      ->where('enroll_id', $enroll_id)
+                      ->first();
+
+        if(!empty($get_result))
+        {
+          $response = array(
+              'result' => $get_result->result
+          );
+
+        } else {
+
+          $response = array(
+            'result' => '0'
+        );
+
+        }
+
+        echo json_encode($response);      
+     }
+
     public function create()
     {
         //
@@ -134,7 +162,9 @@ class CultureInoculationController extends Controller
       $logdata = ServiceLog::find($request->log_id);
 
       //CultureInoculation::where('sample_id',$logdata->sample_id)->where('enroll_id',$logdata->enroll_id)->delete();
-      CultureInoculation::where('enroll_id',$logdata->enroll_id)->delete();
+      /* Updated by saumen 18-02-2021  */
+        //CultureInoculation::where('enroll_id',$logdata->enroll_id)->delete();
+        /* End */
        //DB::enableQueryLog();
       $data = CultureInoculation::create([
         'sample_id' => $logdata->sample_id,
@@ -144,7 +174,8 @@ class CultureInoculationController extends Controller
         'tube_id_lc' => $request->tube_id_lc,
         'inoculation_date' => $request->inoculation_date,
         'created_by' => $request->user()->id,
-        'updated_by' => $request->user()->id
+        'updated_by' => $request->user()->id,
+        'rec_flag' => $request->rec_flag
       ]);
 	  //dd(DB::getQueryLog());
 	  //dd($data);
@@ -244,7 +275,7 @@ class CultureInoculationController extends Controller
         DB::commit();		
      }catch(\Exception $e){ 
       
-		  //dd($e->getMessage());
+		  dd($e->getMessage());
           $error = $e->getMessage();		  
 		  DB::rollback(); 
 		  $success = false;
@@ -337,9 +368,12 @@ class CultureInoculationController extends Controller
         return view('admin.culture_inoculation.print',compact('data'));
 
     }
-    public function getMgitId($enroll_id){
+    public function getMgitId($enroll_id, $rec_flag){
         
-        $getmgit=CultureInoculation::select('mgit_id')->where('enroll_id',$enroll_id)->get();
+        $getmgit=CultureInoculation::select('mgit_id')
+                ->where('enroll_id',$enroll_id)
+                ->where('rec_flag', $rec_flag)
+                ->get();
         //dd($getmgit);
 		$json_data['json_data_item']=(array) null;
         if(!empty($getmgit)) {

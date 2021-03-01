@@ -215,43 +215,56 @@ input[type="checkbox"][readonly] {
                     <div class="col-lg-12 col-xlg-12 col-md-12 col-sm-12">
                         <div class="card" >
                             <div class="card-block col-lg-12 col-xlg-12 col-md-12 col-sm-12 col-sm-12">
+                              <button class="btn-sm btn-info" value="CBNAAT">CBNAAT</button>
+                              <button class="btn-sm btn-info" value="LPA 1st Line">LPA 1st Line</button>
+                              <button class="btn-sm btn-info" value="LPA 2nd Line">LPA 2nd Line</button>
+                              <button class="btn-sm btn-info" value="Liquid Culture">Liquid Culture</button>
+                              <button class="btn-sm btn-info" value="LC-DST">LC-DST</button>
+                              <button class="btn-sm btn-info" value="Solid Culture" >Solid Culture</button>
+                              <button class="btn-sm btn-info" value="LJ-DST">LJ-DST</button>
+                              <button class="btn-sm btn-info" value="Microscopy">Microscopy</button>
+                              <button class="btn-sm btn-info" value="BMW" >BMW</button>
+                              <div id="no_sample" style="color: gray;font-weight: bold;"></div>
                                 <div class="scroll-table scroll-table-micro" >
-
                                     <table id="example1" class="table table-striped table-bordered responsive col-xlg-12" cellspacing="0" width="100%">
                                         <thead>
                                             <tr>
                                               <th class="hide">ID</th>
-                                              <th >Enrol. ID /
-                                              Sample ID</th>
+                                              <th><input type="checkbox" id="bulk-select-all"></th>
+                                              <th >Enrol. ID / Sample ID</th>
                                               <th>Patient Name </th>
-											  <th>Test Requested</th>
-											  <th>Reason for Test</th>
-											  <th>Test To Review/ Interim Result</th>
-											  <th class="noExport">View / Edit Result</th>
-											  <th class="noExport">Request for Retest</th>
-											  <th class="noExport">Add Another Test</th>
-											  <th class="noExport">Result to Nikshay</th>
-											  <th>Referal Facility</th>
-											  <th>Sample type / No. of Samples </th>
-											  <th>Date of Receipt</th>
-											  <th class="noExport">Current Status</th>                                            
+                                              <th>Test Requested</th>
+                                              <th>Reason for Test</th>
+                                              <th>Test To Review/ Interim Result</th>
+                                              <th class="noExport">View / Edit Result</th>
+                                              <th class="noExport">Request for Retest</th>
+                                              <th class="noExport">Add Another Test</th>                                           
+                                              <th class="noExport">Result to Nikshay</th>
+                                              <th class="noExport">Send to BMW</th>
+                                              <th class="noExport">Field NAAT Result</th>
+                                              <th>Referal Facility</th>
+                                              <th>Sample type / No. of Samples </th>
+                                              <th>Date of Receipt</th>
+                                              <th class="noExport">Current Status</th>                                            
                                             </tr>
                                         </thead>
-
                                         <tbody>
                                                 <tr class="sel">
                                                     <td class="hide"></td>
                                                     <td></td>
                                                     <td></td>
-													<td></td>
-													<td></td>
-													<td></td>
-													<td></td>
-													<td></td>
-													<td></td>
-													<td></td>
-													<td></td>
-													<td></td>
+                                                    <td></td>
+                                                    <td></td>
+                                                    <td></td>
+                                                    <td></td>
+                                                    <td></td>
+                                                    <td></td>
+                                                    <td></td>
+                                                    <td></td>
+                                                    <td></td>
+                                                    <td></td>
+                                                    <td></td>
+                                                    <td></td>
                                                     <td></td>
                                                     <td></td>
                                                 </tr>
@@ -407,6 +420,86 @@ input[type="checkbox"][readonly] {
       </div>
     </div>
  </div>
+
+
+ <div class="modal fade" id="myModal_naat" role="dialog" >
+  <div class="modal-dialog">
+
+    <!-- Modal content-->
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+        <h4 class="modal-title">Field NAAT Result</h4>
+      </div>
+
+       <form class="form-horizontal form-material" action="" method="post" enctype='multipart/form-data' id="naat_result">
+                @if(count($errors))
+                  @foreach ($errors->all() as $error)
+                     <div class="alert alert-danger"><h4>{{ $error }}</h4></div>
+                 @endforeach
+               @endif
+          <div class="modal-body">
+
+              <input type="hidden" name="_token" value="{{ csrf_token() }}">
+              
+              <label class="col-md-12"><h5>Enrollment Id:</h5></label>
+                  <div class="col-md-12">
+                    <input type="text" name="enrollid" class="form-control form-control-line sampleId"  id="enroll-id">
+                 </div>
+                 <label class="col-md-12"><h5>Field Sample Id:</h5></label>
+                  <div class="col-md-12">
+                    <input type="text" name="sampleid" class="form-control form-control-line sampleId"  id="sample-id">
+                 </div>
+                 <label class="col-md-12"><h5>Patient Name:</h5></label>
+                  <div class="col-md-12">
+                    <input type="text" name="patientname" class="form-control form-control-line sampleId"  id="patientname">
+                 </div>
+                 <label class="col-md-12"><h5>Name of PHI where<br> testing was done:</h5></label>
+                  <div class="col-md-12">
+                    <input type="text" name="phitest" class="form-control form-control-line sampleId"  id="phitest">
+                 </div>
+                 <label class="col-md-12"><h5>Type of Result <br>(CBNAAT/TrueNAT):</h5></label>
+                  <div class="col-md-12">
+                    <input type="text" name="resultcbnnat" class="form-control form-control-line sampleId"  id="resultcbnnat">
+                 </div>
+
+                 <label class="col-md-12"><h5>Vaid/Invalid:</h5></label>
+                  <div class="col-md-12">
+                    <input type="text" name="valid" class="form-control form-control-line sampleId"  id="valid">
+                 </div>
+
+                 <label class="col-md-12"><h5>If Not valid <br>(Invalid/NA/ No result/Error- specifiy):</h5></label>
+                  <div class="col-md-12">
+                    <input type="text" name="invalid" class="form-control form-control-line sampleId"  id="invalid">
+                 </div>
+
+                 <label class="col-md-12"><h5>MTB Result:</h5></label>
+                  <div class="col-md-12">
+                    <input type="text" name="mtb_result" class="form-control form-control-line sampleId"  id="mtb_result">
+                 </div>
+                 <label class="col-md-12"><h5>RIF Result:</h5></label>
+                  <div class="col-md-12">
+                    <input type="text" name="rif_result" class="form-control form-control-line sampleId"  id="rif_result">
+                 </div>
+                 <label class="col-md-12"><h5>Date of Result:</h5></label>
+                  <div class="col-md-12">
+                    <input type="text" name="dor_result" class="form-control form-control-line sampleId"  id="dor_result">
+                 </div>
+             
+              <br>
+          </div>
+          <div class="modal-footer">
+            <!-- <button type="submit" class="btn btn-default" data-dismiss="modal">Save</button> -->
+            <button type="button" class="btn btn-default add-button cancel btn-md" data-dismiss="modal">Cancel</button>
+            <button type="button" class="pull-right btn btn-primary btn-md" id="confirmok2" >Ok</button>
+          </div>
+
+    </form>
+    </div>
+  </div>
+</div>
+
+
 <div class="modal fade micro_log" id="myModal" role="dialog"  id="confirmDelete">
     <div class="modal-dialog">
 
@@ -644,22 +737,35 @@ input[type="checkbox"][readonly] {
 				   <div class="alert alert-danger nikshayDanger hide"><h4></h4></div>
             <div class="modal-body">
 
-                <input type="hidden" name="_token" value="{{ csrf_token() }}">
-                <input type="hidden" name="tsl_id" id="tsl_id" value="">
-                <!--<input type="hidden" name="reqServ_service_id" id="reqServ_service_id" value="">--->
-               
+                <input type="hidden" name="_token" value="{{ csrf_token() }}">         
 
-                <label class="col-md-12"><h5>Sample ID:</h5></label>
-                    <div class="col-md-12">
-                       <input type="text" readonly class="form-control form-control-line" name="sampleid1" id="sampleid_nikshay">
-                   </div>
-                <br/>                       
-                
-				<label class="col-md-12"><h5>Enrolment ID:</h5></label>
-                    <div class="col-md-12">
-                       <input type="text" readonly class="form-control form-control-line" name="enrolid1" id="enrolid_nikshay">
-                   </div>
+                      <input type="hidden" name="tsl_id" id="tsl_id" value="">
+                      <input type="hidden" name="isBMW" id="isBMW_sub" value=""/>
+                      <!--<input type="hidden" name="reqServ_service_id" id="reqServ_service_id" value="">--->
+                    
+
+                      <label class="col-md-12"><h5>Sample ID:</h5></label>
+                          <div class="col-md-12">
+                            <input type="text" readonly class="form-control form-control-line" name="sampleid1" id="sampleid_nikshay">
+                        </div>
+                      <br/>                       
+                      
+                  <label class="col-md-12"><h5>Enrolment ID:</h5></label>
+                          <div class="col-md-12">
+                            <input type="text" readonly class="form-control form-control-line" name="enrolid1" id="enrolid_nikshay">
+                        </div>
+               
                 <br/> 
+
+                <div class="row">
+                  <div class="col">
+                      <label class="col-md-12">Comments: <span class="red">*</span></label>
+                      <div class="col-md-12">
+                            <textarea name="comments" class="form-control form-control-line" id="comments" rows="5" cols="5" required></textarea>
+    
+                     </div>
+                  </div>
+              </div>
 				
             </div>
             <div class="modal-footer">
@@ -672,6 +778,109 @@ input[type="checkbox"][readonly] {
       </div>
     </div>
  </div>
+
+ <div class="modal fade micro_log" id="myModalNikshay_bulk" role="dialog"  id="confirmDelete">
+  <div class="modal-dialog">
+
+    <!-- Modal content-->
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+        <h4 class="modal-title">Microbiologist</h4>
+      </div>
+
+       <form class="form-horizontal form-material" action="{{ url('/microbiologist/sendnikshaybulk') }}" method="post" enctype='multipart/form-data' id="send_to_nikshay_form_bulk">
+                 <div class="alert alert-danger testReqDanger hide"><h4></h4></div>
+         <div class="alert alert-danger nikshayDanger hide"><h4></h4></div>
+          <div class="modal-body">
+
+              <input type="hidden" name="_token" value="{{ csrf_token() }}">
+              <input type="hidden" name="isBMW" id="isBMW" value=""/>
+
+              <div class="col-md-12" id="node"></div>
+
+              <br/> 
+
+              <div class="row">
+                <div class="col">
+                    <label class="col-md-12">Comments: <span class="red">*</span></label>
+                    <div class="col-md-12">
+                          <textarea name="comments" class="form-control form-control-line" id="comments" rows="5" cols="5" required></textarea>
+  
+                   </div>
+                </div>
+            </div>
+      
+          </div>
+          <div class="modal-footer">
+            <!-- <button type="submit" class="btn btn-default" data-dismiss="modal">Save</button> -->
+            <button type="button" class="btn btn-default add-button cancel btn-md" data-dismiss="modal">Cancel</button>
+            <button type="button" class="pull-right btn btn-primary btn-md" id="confirmok_nikshay_bulk" >Ok</button>
+          </div>
+
+    </form>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade micro_log" id="myModalBMW" role="dialog" >
+  <div class="modal-dialog">
+
+    <!-- Modal content-->
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+        <h4 class="modal-title">Microbiologist</h4>
+      </div>
+
+       <form class="form-horizontal form-material" action="{{ url('/microbiologist/send_to_bmw') }}" method="post" enctype='multipart/form-data' id="send_to_nikshay_form_bmw">
+                 <div class="alert alert-danger testReqDanger hide"><h4></h4></div>
+         <div class="alert alert-danger nikshayDanger hide"><h4></h4></div>
+          <div class="modal-body">
+
+              <input type="hidden" name="_token" value="{{ csrf_token() }}">         
+
+                    <input type="hidden" name="log_id" id="log_id" value="">
+                    <input type="hidden" name="enroll_id" id="enroll_id" value="">
+                    <input type="hidden" name="sample_id" id="sample_id" value="">
+                    <input type="hidden" name="service_id" id="service_id" value="">
+                    <!--<input type="hidden" name="reqServ_service_id" id="reqServ_service_id" value="">--->
+                  
+
+                    <label class="col-md-12"><h5>Sample ID:</h5></label>
+                        <div class="col-md-12">
+                          <input type="text" readonly class="form-control form-control-line" name="sampleid1" id="sampleid_nikshay_bmw">
+                      </div>
+                    <br/>                       
+                    
+                <label class="col-md-12"><h5>Enrolment ID:</h5></label>
+                        <div class="col-md-12">
+                          <input type="text" readonly class="form-control form-control-line" name="enrolid1" id="enrolid_nikshay_nmw">
+                      </div>
+             
+              <br/> 
+
+              <div class="row">
+                <div class="col">
+                    <label class="col-md-12">Comments: <span class="red">*</span></label>
+                    <div class="col-md-12">
+                          <textarea name="comments" class="form-control form-control-line" id="comments_bmw" rows="5" cols="5" required></textarea>
+  
+                   </div>
+                </div>
+            </div>
+      
+          </div>
+          <div class="modal-footer">
+            <!-- <button type="submit" class="btn btn-default" data-dismiss="modal">Save</button> -->
+            <button type="button" class="btn btn-default add-button cancel btn-md" data-dismiss="modal">Cancel</button>
+            <button type="button" class="pull-right btn btn-primary btn-md" id="confirmok_nikshay_bmw" >Ok</button>
+          </div>
+
+    </form>
+    </div>
+  </div>
+</div>
  
  
 <div class="modal fade micro_log" id="myModalAddtest" role="dialog"  id="confirmDelete">
@@ -698,7 +907,9 @@ input[type="checkbox"][readonly] {
                 <input type="hidden" name="oldSampleNo" id="oldSampleNo" value="">
 				<input type="hidden" name="oldSampleID" id="oldSampleID" value="">
 				<input type="hidden" name="nextStep" id="nextStepADD" value="Send Sample">
-                 <input type="hidden" name="rec_flag" id="recFlagID" value="">        
+                 <input type="hidden" name="rec_flag" id="recFlagID" value=""> 
+                 <input type="hidden" name="third_onwards_afb_second_onwards_lcdst" id="third_onwards_afb_second_onwards_lcdst" value="0">       
+                 <input type="hidden" name="first_time_another_sample" id="first_time_another_sample" value="0">
                 <label class="col-md-12"><h5>Sample ID:</h5></label>
                     <div class="col-md-12">
                        <input type="text" readonly class="form-control form-control-line sampleId" name="sampleid1" id="sampleid1">
@@ -780,6 +991,7 @@ input[type="checkbox"][readonly] {
                 <input type="hidden" name="bwm_status" id="bwm_status15A" value="0">
                 <input type="hidden" name="no_sample" class="form-control form-control-line" value="0" id="no_sample15A">
                 <input type="hidden" name="nextStep" class="form-control form-control-line" value="Print Form-15A" id="nextStep15A">
+                
 
 
                 
@@ -1589,7 +1801,7 @@ function editResultForm(sample_id, enroll_id, sample_label,service,tag,druglist,
                 }
             });
 
-        } else if (_sample == '2nd line LPA'||_sample == '2nd Line LPA') {
+        } else if (_sample == '2nd line LPA'|| _sample == '2nd Line LPA') {
 
              $("#firstLPA").addClass("hide");
              $(".flpa").removeAttr("required");
@@ -2020,6 +2232,33 @@ var error_print=0;
 								   
 									$("#sampleIDAdd").val(sample_id);
 									$(".sampleId").val(sample_label);
+                  $('#service1Add').val('16');
+                  //$('#recFlagID').val('0');
+
+                  $('#choose_sample > option').removeAttr('selected');
+                  document.getElementById('choose_sample').selectedIndex = 1;
+                  //$('option:selected', $(this)).attr('selected', true);
+
+                  /* If first time 2nd sample has choosen */
+                  $('#first_time_another_sample').val('1');
+                  $('#third_onwards_afb_second_onwards_lcdst').val('1');
+                  /*  end  */
+
+                              $.ajax({
+                                      url: "{{ url('check_for_lcdst_sample_exist') }}"+'/'+enroll_id,
+                                      type:"GET",
+                                      processData: false,
+                                      contentType: false,
+                                      dataType: 'json',
+                                      success: function(result){
+                                        console.log(result.data.service_id);
+                                        if(result.result)
+                                        {                                          
+                                          $('#recFlagID').val(result.data.rec_flag);                                          
+                                        }
+                                      }
+                                  }); 
+
 									if(typeof $("#sentstepadd option:selected").val()==='undefined'){
 										$('#confirmokadd').prop('disabled', true);
 									}else{
@@ -2039,6 +2278,8 @@ var error_print=0;
 					console.log("err")
 				}
 			});
+
+
 		}else{  //alert("with same sample");
 			$(".sampleId").val($("#oldSampleNo").val());//set input type test
 			$("#sampleIDAdd").val($("#oldSampleID").val());//set input type test
@@ -2055,6 +2296,7 @@ var error_print=0;
   $('#sentstepadd').change(function(){ //alert($(this).find(':selected').data('tag'));
 	   var sentStep=$(this).val();
 	   var enroll_id=$("#enrollId1Add").val();
+     var sample_id = $('#sampleIDAdd').val();
 	   var rec_flag=$("#recFlagID").val();
 	   if ($(this).find(':selected').data('tag').length != 0){
 		   var tag=$(this).find(':selected').data('tag'); 
@@ -2072,8 +2314,7 @@ var error_print=0;
 				  contentType: false,
 				  dataType: 'json',
 				  success: function(response){
-					  console.log(response);
-					  
+					  console.log(response);					  
                         if(response==0){
                             $('.alert-danger').hide();							
 							//var sList = "";
@@ -2085,13 +2326,71 @@ var error_print=0;
 								//sList += "(" + $(this).val() + "-" + (this.checked ? "checked" : "not checked") + ")";
 							});
 							//console.log (sList);
+
+             if($('#choose_sample').val() == '2')
+             {
+              $.ajax({
+                            url: "{{url('check_for_storage')}}"+'/'+enroll_id,
+                            type:"GET",
+                            processData: false,
+                            contentType: false,
+                            dataType: 'json',
+                            success: function(response){
+                              console.log(response);
+                              var len = 0;
+                                          if(response['items'] != null){
+                                              len = response['items'].length;
+                                          }
+                                          //alert(len);
+                                          
+                                          if(len > 0){
+                                              // data already exist
+                                              $('#service1Add').val('16');
+                                              $('#confirmokadd').prop('disabled', false);
+                                              
+                              }else{
+                                                      $('.alert-danger').show();
+                                    $('.alert-danger').html("No Sample Found in the Storage");
+                                    //alert($("#sentstepadd option:selected").val());
+                                    $('#confirmokadd').prop('disabled', true);
+                                          }
+                            },
+                          failure: function(response){
+                            console.log("err")
+                          }
+                        });        
+             }
                             
 						}else{
-							$('.alert-danger').show();
-							$('.alert-danger').html("Selected test already considered in the same enrollment");
-							$('#confirmokadd').prop('disabled', true);
+                      //alert(sentStep);
+                      if( sentStep == '21' )
+                      {
+                        $('#confirmokadd').prop('disabled', false);
+                        $.ajax({
+                                      url: "{{ url('check_for_lcdst_sample_exist') }}"+'/'+enroll_id,
+                                      type:"GET",
+                                      processData: false,
+                                      contentType: false,
+                                      dataType: 'json',
+                                      success: function(result){
+                                        console.log(result.data.service_id);
+                                        if(result.result)
+                                        {
+                                          $('#service1Add').val(result.data.service_id);
+                                          $('#recFlagID').val(result.data.rec_flag);
+                                          $('#third_onwards_afb_second_onwards_lcdst').val(result.data.third_onwards_afb_second_onwards_lcdst);
+                                        }
+                                      }
+                                  }); 
+                      } else {                                
+
+                          $('.alert-danger').show();
+                          $('.alert-danger').html("Selected test already considered in the same enrollment");
+                          $('#confirmokadd').prop('disabled', true);
+
+                      }						
 							
-                        }
+                  }
 				  },
 				failure: function(response){
 					console.log("err")
@@ -2182,7 +2481,7 @@ var error_print=0;
           contentType: false,
           dataType : "html",		  
           success: function(data) {
-              //console.log(data);
+              console.log(data);
               $(".ajax_druglist").html(data);
           },
           error: function() {
@@ -2198,7 +2497,7 @@ var error_print=0;
           contentType: false,
           dataType : "html",
           success: function(data){
-             // console.log(data);
+              console.log(data);
               $(".ajax_addtest_list").html(data);
           },
           error: function() {
@@ -2312,11 +2611,203 @@ function openForm15AGenerate(enroll_id, sample_ids, service, sample, bwm_status,
 
   
  }
+
+
+        var $bulk_checkboxes = $('.bulk-selected');
+        var $bulk_select_all_checkbox = $('#bulk-select-all');
+
+
+        // Automatically Check or Uncheck "all select" checkbox
+        // based on the state of checkboxes in the list.
+        $bulk_checkboxes.click(function(){
+            if( $bulk_checkboxes.length === $bulk_checkboxes.filter(':checked').length ){
+                $bulk_select_all_checkbox.prop('checked', true);
+            }
+        });
+
+
+        // Check or Uncheck checkboxes based on the state
+        // of "all select" checkbox.
+        $bulk_select_all_checkbox.click(function(){
+            var checked = $(this).prop('checked');
+            $('.bulk-selected').prop('checked', checked);
+        });
+
+
+    function bulk_action_review()
+    {
+      var $checkboxes = $('.bulk-selected:checked');          
+
+      // Display an error message and stop if no checkboxes are selected.
+      if( $checkboxes.length === 0 ){
+          alert("First select one or more items from the list.");
+          return;
+      }
+
+      var samples_data = [];
+      var micro_data  = [];
+      var nikshayresult;
+      var testreqresult;
+      var html = "";
+      var tag = "";
+      var log_id = "";
+      var samples = "";
+      var enroll = "";
+      var enroll_id = "";
+      var service_id = "";
+      var reqServ_service_id = "";
+      var reponse_log_id = "";
+
+      $checkboxes.each(function(i, e){
+        //console.log($("#enroll_id_7").val());
+        //alert($(e).val());
+
+        /* enroll_id=$("#enroll_"+$(e).val()).val();
+        log_id=$("#log_id_"+$(e).val()).val();
+        lpa_type = $("#lpa_type_"+$(e).val()).val();
+        gu = $("#gu_"+$(e).val()).val();
+        flagging_date = $("#flagging_date_"+$(e).val()).val();
+        tag=$("#tag_"+$(e).val()).val();
+        service_id=$("#service_id_"+$(e).val()).val();
+        sample_id=$(e).val();
+        rec_flag=$("#rec_flag_"+$(e).val()).val();
+        samples = $("#samples_"+$(e).val()).val(); */  
+
+        if( $("#stag_"+$(e).val()).val() == '') 
+        {
+          tag = null;
+        } else {
+          tag = $("#stag_"+$(e).val()).val();
+        } 
+
+          log_id = $(e).val();
+          samples = $("#samples_"+$(e).val()).val();
+          enroll = $("#enroll_"+$(e).val()).val();
+          enroll_id = $('#enroll_1_'+$(e).val()).val();
+          service_id = $("#service_"+$(e).val()).val();
+          reqServ_service_id = $("#request_service_"+$(e).val()).val() != "" ? $("#request_service_"+$(e).val()).val() : '0';                
+
+        samples_data.push({
+          log_id: log_id,
+          samples: samples,
+          enroll: enroll,
+          enroll_id: enroll_id,
+          service_id: service_id,
+          tag: tag,
+          reqServ_service_id: reqServ_service_id,                
+        });       
+
+      });
+
+      //console.log(samples_data.length);
+
+      $("#node").html("");
+
+      for(var i=0; i < samples_data.length; i++)
+      {
+        $.when(
+          //check for nikshay id
+            $.ajax({
+                  url: "{{url('check_for_nikshayid_exist')}}"+'/'+samples_data[i].enroll,
+                  type:"GET",
+                  processData: false,
+                  contentType: false,
+                  async: false,
+                  dataType: 'json',
+                  success: function(response){
+                    console.log(response);
+                    nikshayresult=response;                        
+                  },
+                failure: function(response){
+                  console.log("err")
+                }
+            }),
+            //Check for test request		
+            $.ajax({
+                  url: "{{url('check_for_test_request')}}"+'/'+samples_data[i].enroll+'/'+samples_data[i].service_id+'/'+samples_data[i].tag+'/'+samples_data[i].reqServ_service_id+'/'+samples_data[i].log_id,
+                  type:"GET",
+                  processData: false,
+                  contentType: false,
+                  async: false,
+                  dataType: 'json',
+                  success: function(result){
+                    console.log(result);
+                      testreqresult=result.servicesexist;
+                      reponse_log_id = result.log_id;
+
+                      html+= '<input type="hidden" name="sampleid_nikshay'+reponse_log_id+'" value="'+$("#samples_"+reponse_log_id).val()+'">';
+                      html+= '<input type="hidden" name="enrolid_nikshay'+reponse_log_id+'" value="'+$("#enroll_1_"+reponse_log_id).val()+'">';              
+                      html+='<input type="hidden" name="tsl_id[]"  value="'+result.log_id+'">';                       
+                  },
+                failure: function(result){
+                  console.log("err")
+                }
+            })
+          ).then(function() {
+            //$('#result1').html(testreqresult);
+            //$('#result2').html(nikshayresult);
+            //alert(testreqresult);
+            //alert(nikshayresult);
+            if(nikshayresult==0 && testreqresult==0){
+              $('.testReqDanger').show();
+              $('.testReqDanger').html("Selected Test Result is not available in Test Requests.");
+              $('.nikshayDanger').show();
+              $('.nikshayDanger').html("Nikshay ID is not available of the selected enrolment");
+              $('#confirmok_nikshay_bulk').prop('disabled', true);              										
+              
+            }else if(nikshayresult==1 && testreqresult==0){
+              $('.testReqDanger').show();
+              $('.testReqDanger').html("Selected Test Result is not available in Test Requests.");
+              $('.nikshayDanger').hide();			
+              $('#confirmok_nikshay_bulk').prop('disabled', true);	
+              
+            }else if(nikshayresult==0 && testreqresult==1){
+             $('.testReqDanger').hide();			
+              $('.nikshayDanger').show();
+              $('.nikshayDanger').html("Nikshay ID is not available of the selected enrolment"); 
+              $('#confirmok_nikshay_bulk').prop('disabled', true);               
+            }
+            else if(nikshayresult==1 && testreqresult==1){
+              $('.testReqDanger').hide();			
+              $('.nikshayDanger').hide();
+              $('#confirmok_nikshay_bulk').prop('disabled', true);
+              $("#node").append(html);
+                    html = "";
+            }
+            
+          });
+
+              
+      }
+
+      $('#myModalNikshay_bulk').modal('toggle');
+
+    }
+
+
+    function openBMW(log_id, enroll_id, sample_id, service_id, isBMW)
+    {
+      $.ajax({
+				  url: "{{url('send_to_bmw')}}"+'/'+log_id+'/'+enroll_id+'/'+sample_id+'/'+service_id,
+				  type:"GET",
+				  processData: false,
+				  contentType: false,
+				  dataType: 'json',
+				  success: function(response){
+					  console.log(response);
+					  //nikshayresult=response;                        
+				  },
+				failure: function(response){
+					console.log("err")
+				}
+		  });
+    }
 	
- function openCbnaatFormNikshay(tServiceLogID,enroll_id,sample_id,service_id,sample_no,enroll_no,tag,reqServ_service_id){    
+ function openCbnaatFormNikshay(tServiceLogID,enroll_id,sample_id,service_id,sample_no,enroll_no,tag,reqServ_service_id, isBMW){    
     $("#sampleid_nikshay").val(sample_no);
     $("#enrolid_nikshay").val(enroll_no);
 	$("#tsl_id").val(tServiceLogID);
+  $('#isBMW_sub').val(isBMW);
 	//$("#reqServ_service_id").val(reqServ_service_id);
 	if(tag=='')
 	{
@@ -2326,7 +2817,8 @@ function openForm15AGenerate(enroll_id, sample_ids, service, sample, bwm_status,
 	}
    //alert(tag);
 	var nikshayresult;
-    var testreqresult;
+  var testreqresult;
+
 	$.when(
 	//check for nikshay id
     $.ajax({
@@ -2337,17 +2829,7 @@ function openForm15AGenerate(enroll_id, sample_ids, service, sample, bwm_status,
 				  dataType: 'json',
 				  success: function(response){
 					  console.log(response);
-					  nikshayresult=response;
-                        /*if(response==1){
-                            $('.alert-danger').hide();
-							$('#confirmok_nikshay').prop('disabled', false);	
-                            						
-                            
-						}else{
-							$('.alert-danger').show();
-							$('.alert-danger').html("Nikshay ID is not available of the selected enrolment");
-							$('#confirmok_nikshay').prop('disabled', true);
-                        }*/
+					  nikshayresult=response;                        
 				  },
 				failure: function(response){
 					console.log("err")
@@ -2355,24 +2837,14 @@ function openForm15AGenerate(enroll_id, sample_ids, service, sample, bwm_status,
 		}),
     //Check for test request		
     $.ajax({
-				  url: "{{url('check_for_test_request')}}"+'/'+enroll_id+'/'+service_id+'/'+tag+'/'+reqServ_service_id,
+				  url: "{{url('check_for_test_request')}}"+'/'+enroll_id+'/'+service_id+'/'+tag+'/'+reqServ_service_id+'/'+tServiceLogID,
 				  type:"GET",
 				  processData: false,
 				  contentType: false,
 				  dataType: 'json',
 				  success: function(response){
 					  console.log(response);
-					    testreqresult=response;
-                        /*if(response==1){
-                            $('.alert-danger').hide();
-							$('#confirmok_nikshay').prop('disabled', false);	
-                            						
-                            
-						}else{
-							$('.alert-danger').show();
-							$('.alert-danger').html("Atleast one test reqiuest is required for send the test result to nikshay");
-							$('#confirmok_nikshay').prop('disabled', true);
-                        }*/
+            testreqresult=response.servicesexist;                       
 				  },
 				failure: function(response){
 					console.log("err")
@@ -2410,9 +2882,13 @@ function openForm15AGenerate(enroll_id, sample_ids, service, sample, bwm_status,
 		
 	});
 
-
     $('#myModalNikshay').modal('toggle');
  }
+
+ $('#confirmok_nikshay_bulk').click(function(){ //alert("button click");
+	      var form = $(document).find('form#send_to_nikshay_form_bulk');
+          form.submit();
+   });
 
 $('#confirmok_nikshay').click(function(){ //alert("button click");
 	      var form = $(document).find('form#send_to_nikshay_form');
@@ -2571,73 +3047,16 @@ var error_print=0;
 
 <script>
 $(document).ready(function() {
-  var today = new Date();
-  var dd = today.getDate();
-  var mm = today.getMonth()+1; //January is 0!
-  var yyyy = today.getFullYear();
 
-  if(dd<10) {
-      dd = '0'+dd
-  }
-
-  if(mm<10) {
-      mm = '0'+mm
-  }
-
-  today = dd + '-' + mm + '-' + yyyy;
-    
-	$('#example1').DataTable({
-        dom: 'Bfrtip',
-		pageLength:25,
-        processing: true,
-        language: {
-            loadingRecords: '&nbsp;',
-            //processing: 'Loading...'
-            processing: '<div class="spinner"></div>'
-        } , 		
-        serverSide: true,
-        serverMethod: 'post',
-       //searching: false, // Remove default Search Control
-		ajax: {
-			    url: "{{url('ajax_microbiologist_list')}}",			  
-				headers: 
-				{
-					'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-				}
-		  },
-		 columns: [
-		   { data: 'ID',className: "hide_column"},
-		   { data: 'enroll_id'},
-		   { data: 'patient_name' },
-		   { data: 'test_requested' },
-		   { data: 'reason_for_test' },
-		   { data: 'test_review' },
-		   { data: 'view_result' },
-		   { data: 'req_retest' },
-		   { data: 'add_test' },
-		   { data: 'result_to_nikshay' },
-		   { data: 'referal_facility' },
-		   { data: 'sample_type' },
-		   { data: 'date_of_receipt' },
-		   { data: 'current_status' },
-		],
-        buttons: [
-            {
-                extend: 'excelHtml5',
-                title: 'LIMS_microbilogist_current_'+today+'',
-                 exportOptions: {
-                    /*columns: [  1, 2, 3,4,5,6,7]*/
-					columns: "thead th:not(.noExport)"
-                }
-            }
-        ],
-        order: [[ 1, 'desc' ]],
-		columnDefs: [
-			  { targets: [1,2,3,4,5,6,7,8,9,10,11,12,13], orderable: false }
-		  ]
-    });	
+  /* var service_id=0;
+  var tag=0;
+  arrangeTable(tag); */
 	
 });
+
+
+
+
 </script>
 
 
@@ -2878,7 +3297,7 @@ $(".sel2").click(function(){
 									console.log("err")
 								}
 							});
-                          }else{
+                    }else{
 							 //alert($("#sampleIDrt").val()); 
 							 ///$('#sampleidrt option').remove(); 
 							 //$('#sampleidrt').append($('<option>', {text : $("#sampleIDrt").val()})); 
@@ -2951,6 +3370,10 @@ $(document).on('change', '.addtest_array', function() {
         {
 			  $(".dst_drugs_lj_section").show();
 		}
+    if(this.value == 16)
+    {
+      $('.dst_drugs_lc_z_section').show();
+    }
 		
 		 //on unchecked
         var ischecked= $(this).is(':checked');
@@ -2963,8 +3386,135 @@ $(document).on('change', '.addtest_array', function() {
 		   if($(this).val()==22){ //alert("here");
 			$(".dst_drugs_lj_section").hide();   
 		   }
+       if($(this).val()==16){ //alert("here");
+			$(".dst_drugs_lc_z_section").hide();   
+		   }
 		}		
     });
+
+    $('document').ready(function() {
+
+      $('.btn-sm').on('click', function() {
+        
+        var tag = $(this).attr('value'); 
+
+        if(tag == 'BMW' || tag == 'Microscopy')
+        {
+          $('#isBMW').val('1');
+        } else {
+          $('#isBMW').val('0');
+        }
+
+         arrangeTable(tag);
+
+                             
+          
+
+        
+                      
+      });
+
+  });
+
+  function showNaatResult()
+  {
+      $('#myModal_naat').modal('toggle');
+  }
+
+
+    function arrangeTable(tag)
+    {
+        var today = new Date();
+        var dd = today.getDate();
+        var mm = today.getMonth()+1; //January is 0!
+        var yyyy = today.getFullYear();
+
+                        if(dd<10) {
+                            dd = '0'+dd
+                        }
+
+                        if(mm<10) {
+                            mm = '0'+mm
+                        }
+
+                        today = dd + '-' + mm + '-' + yyyy;
+
+                        var url = '{{ route("ajax_microbiologist_list") }}';
+                        
+
+                        $('#example1').DataTable({
+                          dom: 'Bfrtip',
+                      pageLength:25,
+                      bDestroy: true,
+                          processing: true,
+                          language: {
+                              loadingRecords: '&nbsp;',
+                              //processing: 'Loading...'
+                              processing: '<div class="spinner"></div>'
+                          } , 		
+                          serverSide: true,
+                          serverMethod: 'post',
+                        //searching: false, // Remove default Search Control
+                      ajax: {
+                          url: url,	
+                          data: {tag: tag},	  
+                          headers: 
+                          {
+                            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                          }
+                        },
+                        drawCallback: function (settings) { 
+                            // Here the response
+                            var response = settings.json;
+                            //console.log(response);
+                            $('#no_sample').html('No. of Sample(s): '+response.rc_count);
+                        },
+                      columns: [
+                        { data: 'ID',className: "hide_column"},
+                        { data: 'inputs'},
+                        { data: 'enroll_id'},
+                        { data: 'patient_name' },
+                        { data: 'test_requested' },
+                        { data: 'reason_for_test' },
+                        { data: 'test_review' },
+                        { data: 'view_result' },
+                        { data: 'req_retest' },
+                        { data: 'add_test' },                       
+                        { data: 'result_to_nikshay' },
+                        { data: 'bmwButton' },
+                        { data: 'naatresult' },
+                        { data: 'referal_facility' },
+                        { data: 'sample_type' },
+                        { data: 'date_of_receipt' },
+                        { data: 'current_status' },
+                      ],
+                          buttons: [
+                              {
+                                  extend: 'excelHtml5',
+                                  title: 'LIMS_microbilogist_current_'+today+'',
+                                  exportOptions: {
+                                      /*columns: [  1, 2, 3,4,5,6,7]*/
+                            columns: "thead th:not(.noExport)"
+                                  }
+                              },
+                              {
+                                text: 'Submit',            
+                                  action: bulk_action_review
+                              }
+                          ],
+                          order: [[ 1, 'desc' ]],
+                      columnDefs: [
+                          { targets: [1,2,3,4,5,6,7,8,9,10,11,12,13], orderable: false }
+                        ]
+                      });
+    }
+
+    
+
+    
+
+
+    
 
 
   </script>

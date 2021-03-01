@@ -460,7 +460,7 @@ function showButtonWisePopup(id)
               success: function(response){
                 //console.log(response);
                 
-              if(response.result == 1==1){
+              if(response.result == 1){
                   $('.alert-danger').removeClass('hide');
                   $('.alert-danger').show();
                   $('.alert-danger').html("Sorry!! Action already taken of the selected Sample");

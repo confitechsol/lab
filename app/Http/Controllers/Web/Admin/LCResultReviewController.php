@@ -51,9 +51,21 @@ class LCResultReviewController extends Controller
               $join->on('s.sample_id','=','t_service_log.sample_id')
                    ->where('s.status', 1);
           })
-        ->leftjoin('t_culture_inoculation as ci','ci.sample_id','=','t_service_log.sample_id')
-        ->leftjoin('t_lc_flagged_mgit as lfm','lfm.sample_id','=','t_service_log.sample_id')
-        ->leftjoin('t_lc_flagged_mgit_further as lfmf','lfmf.sample_id','=','t_service_log.sample_id')
+
+		  ->leftjoin('t_culture_inoculation as ci', function ($join) {
+			$join->on('ci.rec_flag','=','t_service_log.rec_flag')
+				->on('ci.enroll_id','=','t_service_log.enroll_id');				 
+		})
+
+		->leftjoin('t_lc_flagged_mgit as lfm', function ($join) {
+			$join->on('lfm.rec_flag','=','t_service_log.rec_flag')
+			->on('lfm.enroll_id','=','t_service_log.enroll_id');				 
+		})       
+
+		->leftjoin('t_lc_flagged_mgit_further as lfmf', function ($join) {
+			$join->on('lfmf.rec_flag','=','t_service_log.rec_flag')
+			->on('lfmf.enroll_id','=','t_service_log.enroll_id');				 
+		})        
         ->where('t_service_log.service_id',18)
         //->where('s.status',1)
         ->whereIn('t_service_log.status',[2]) //    ->whereIn('t_service_log.status',[0,2])
@@ -153,6 +165,8 @@ class LCResultReviewController extends Controller
 					
 				}
 			 }
+
+			 //dd($data['sample']);
         return view('admin.lc_result_review.dashboard',compact('data'));
       }catch(\Exception $e){
 
@@ -242,7 +256,8 @@ class LCResultReviewController extends Controller
 					   'report_type'=>'End Of Report',
 					   'result_date' => $request->hid_result_date,
 					   'created_by' => $request->user()->id,
-					   'updated_by' => $request->user()->id
+					   'updated_by' => $request->user()->id,
+					   'tag' => $tag
 					 ]);
 					 
 					//Update in sample table 
@@ -262,10 +277,15 @@ class LCResultReviewController extends Controller
 			 }
 			
 		  }elseif($request->service_id == 4){
+
+			
 			$service = ServiceLog::find($request->service_log_id);
 			$service->status = 0;
 			$service->updated_by = $request->user()->id;
 			$service->save();
+
+			//dd($service);
+
 			$new_service = [
 			  'enroll_id' => $service->enroll_id,
 			  'sample_id' => $service->sample_id,
@@ -277,7 +297,9 @@ class LCResultReviewController extends Controller
 			  'updated_by' => $request->user()->id,
 			  'enroll_label' => $service->enroll_label,
 			  'sample_label' => $service->sample_label,
+			  'rec_flag' => $service->rec_flag
 			];
+
 			$nwService = ServiceLog::create($new_service);
 			//return $nwService;
 			//Incorporated by Amrito(Insert in to microbiologist)
@@ -293,7 +315,9 @@ class LCResultReviewController extends Controller
 			   'report_type'=>'End Of Report',
 			   'result_date' => $request->hid_result_date,
 			   'created_by' => $request->user()->id,
-			   'updated_by' => $request->user()->id
+			   'updated_by' => $request->user()->id,
+			   'tag' => $request->tagId,
+			   'rec_flag' => $service->rec_flag
 			 ]);
 		  }elseif($request->service_id == 5 ){
 				   $service = ServiceLog::find($request->service_log_id);
@@ -310,7 +334,8 @@ class LCResultReviewController extends Controller
 					  'remark' => '',
 					  'status' => 0,
 					  'created_by' => $request->user()->id,
-					  'updated_by' => $request->user()->id
+					  'updated_by' => $request->user()->id,
+					  'tag' => $service->tag
 					]);
 				  //return $microbio;
 		  }elseif($request->service_id == 7){
@@ -331,7 +356,8 @@ class LCResultReviewController extends Controller
 			   'report_type'=>'End Of Report',
 			   'result_date' => $request->hid_result_date,
 			   'created_by' => $request->user()->id,
-			   'updated_by' => $request->user()->id
+			   'updated_by' => $request->user()->id,
+			   'tag' => $service->tag
 			 ]);
 		  }elseif($request->service_id == 6){
 
@@ -596,7 +622,8 @@ class LCResultReviewController extends Controller
 							   'report_type'=>'End Of Report',
 							   'result_date' => $request->hid_result_date,
 							   'created_by' => $request->user()->id,
-							   'updated_by' => $request->user()->id
+							   'updated_by' => $request->user()->id,
+							   'tag'		=> $service->tag
 							 ]);
 							 
 							//Update in sample table 
@@ -647,7 +674,8 @@ class LCResultReviewController extends Controller
 						   'report_type'=>'End Of Report',
 						   'result_date' => $request->hid_result_date,
 						   'created_by' => $request->user()->id,
-						   'updated_by' => $request->user()->id
+						   'updated_by' => $request->user()->id,
+						   'tag'		=> $service->tag
 						 ]);
 					}elseif($request->service_id == 5 ){
 							$service = ServiceLog::find($request->service_log_id);
@@ -664,7 +692,8 @@ class LCResultReviewController extends Controller
 							  'remark' => '',
 							  'status' => 0,
 							  'created_by' => $request->user()->id,
-							  'updated_by' => $request->user()->id
+							  'updated_by' => $request->user()->id,
+							  'tag'		=> $service->tag
 							]);
 									  //return $microbio;
 					}elseif($request->service_id == 7){
@@ -685,7 +714,8 @@ class LCResultReviewController extends Controller
 						   'report_type'=>'End Of Report',
 						   'result_date' => $request->hid_result_date,
 						   'created_by' => $request->user()->id,
-						   'updated_by' => $request->user()->id
+						   'updated_by' => $request->user()->id,
+						   'tag'		=> $service->tag
 						 ]);
 					}elseif($request->service_id == 6){
 

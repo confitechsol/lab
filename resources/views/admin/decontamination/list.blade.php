@@ -503,7 +503,8 @@ $(document).ready(function() {
   today = dd + '-' + mm + '-' + yyyy;
     $('#table_decontamin').DataTable({
         dom: 'Bfrtip',
-		pageLength:25,
+        stateSave: true,
+		pageLength:5,
         buttons: [
             {
                 extend: 'excelHtml5',

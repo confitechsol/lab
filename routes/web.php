@@ -26,7 +26,7 @@ Route::group(['middleware' => 'auth:web'], function () {
     Route::get('/dashboard', 'Web\Admin\DashboardController@index');
 
     Route::resource('/microbiologist', 'Web\Admin\MicroController');
-	Route::post('/ajax_microbiologist_list','Web\Admin\MicroController@ajaxMicrobiologistList'); 
+	Route::post('/ajax_microbiologist_list','Web\Admin\MicroController@ajaxMicrobiologistList')->name('ajax_microbiologist_list'); 
 	Route::get('/get_drugs','Web\Admin\MicroController@get_drugs');
 	Route::get('/annexure15a', 'Web\Admin\MicroController@annexure15A');
 	Route::post('/ajax_annexure15A_list', 'Web\Admin\MicroController@ajaxAnnexure15AList');
@@ -54,7 +54,10 @@ Route::group(['middleware' => 'auth:web'], function () {
     Route::get('/sample/editnew/{id}', 'Web\Admin\SampleController@editNew');
     Route::post('/sample/sample-update', 'Web\Admin\SampleController@newUpdate');
     Route::get('/check_for_storage/{enroll_id}', 'Web\Admin\SampleController@checkForStorage');
-	Route::get('/check_for_sample_exist/{enroll_id}/{sentStep}/{tag?}/{recflag}', 'Web\Admin\SampleController@checkForSampleExist');	
+	Route::get('/check_for_sample_exist/{enroll_id}/{sentStep}/{tag?}/{recflag}', 'Web\Admin\SampleController@checkForSampleExist');
+    
+    Route::get('/check_for_lcdst_sample_exist/{enroll_id}', 'Web\Admin\MicroController@checkForRequestLCDstDataExist');
+
     Route::get('/check_for_request_service/{enroll_id}', 'Web\Admin\MicroController@checkForRequestSeviceDataExist');	
     //Route::get('/check_for_sample_exist/{enroll_id}/{sentStep}', 'Web\Admin\SampleController@checkForSampleExist');	
     Route::get('/get_dst_drugs', 'Web\Admin\MicroController@getDstDrugs');
@@ -62,8 +65,10 @@ Route::group(['middleware' => 'auth:web'], function () {
 	Route::get('/get_add_test_list/{enroll_id}', 'Web\Admin\MicroController@getAddTestList');
 	Route::get('/get_existing_service_ids/{enroll_id}', 'Web\Admin\MicroController@getExistingServiceIds');
     Route::get('/check_for_nikshayid_exist/{enroll_id}', 'Web\Admin\PatientController@checkForNikshayIdExist');
-    Route::get('/check_for_test_request/{enroll_id}/{service_id}/{tag?}/{reqServ_service_id}', 'Web\Admin\MicroController@checkForTestRequest');		
-    Route::post('/microbiologist/sendnikshay', 'Web\Admin\MicroController@sendToNikshay');	
+    Route::get('/check_for_test_request/{enroll_id}/{service_id}/{tag?}/{reqServ_service_id}/{log_id}', 'Web\Admin\MicroController@checkForTestRequest');		
+    Route::post('/microbiologist/sendnikshay', 'Web\Admin\MicroController@sendToNikshay');
+    Route::post('/microbiologist/sendnikshaybulk', 'Web\Admin\MicroController@sendToNikshayBulk');
+    Route::get('/send_to_bmw/{log_id}/{enroll_id}/{sample_id}/{service_id}', 'Web\Admin\MicroController@sendToBMW');	
 	Route::get('test_request/create/{id}', [
         'as' => 'test_request.create',
         'uses' => 'Web\Admin\TestRequestController@create'
@@ -156,7 +161,10 @@ Route::group(['middleware' => 'auth:web'], function () {
     Route::group(['middleware' => ['role:culture_inoculation,can_view']], function () {
         Route::resource('/culture_inoculation', 'Web\Admin\CultureInoculationController');
     });
-    Route::get('/get_mgit_id/{enroll_id}', 'Web\Admin\CultureInoculationController@getMgitId');
+    Route::get('/get_mgit_id/{enroll_id}/{rec_flag}', 'Web\Admin\CultureInoculationController@getMgitId');
+
+    Route::get('/get_lc_result_data/{sample_id}/{enroll_id}', 'Web\Admin\CultureInoculationController@getLCResultData');
+
     Route::group(['middleware' => ['role:lc_flagged_mgit,can_view']], function () {
         Route::resource('/lc_flagged_mgit', 'Web\Admin\LCFlaggedMGITController');
     });
@@ -291,7 +299,7 @@ Route::group(['middleware' => 'auth:web'], function () {
 
     Route::post('/lcdstinoculation/print', 'Web\Admin\LCDSTInoculationController@lcdstinoculationprint');
 	
-	Route::get('/check_for_lcdst_inaucolation_already_process/{enroll_id}', 'Web\Admin\LCDSTInoculationController@checkForLCDSTInaucolationAlreadyInProcess')->name('check_for_lcdst_inaucolation_already_process');
+	Route::get('/check_for_lcdst_inaucolation_already_process/{enroll_id}/{recflag}', 'Web\Admin\LCDSTInoculationController@checkForLCDSTInaucolationAlreadyInProcess')->name('check_for_lcdst_inaucolation_already_process');
    
 
     Route::post('/ljdstfirst/print', 'Web\Admin\LJDST1Controller@ljdstfirstprint');
@@ -349,6 +357,10 @@ Route::group(['middleware' => 'auth:web'], function () {
     Route::resource('/bioWaste/print', 'Web\Admin\BioWasteController@biowasteprint');
 
     Route::resource('/calendar', 'Web\Admin\CalenderController');
+
+    Route::get('/get-districts', 'Web\Admin\SampleController@getDistricts')->name('get-districts');
+    Route::get('/get-tu', 'Web\Admin\SampleController@getTU')->name('get-tu');
+    Route::get('/get-phi', 'Web\Admin\SampleController@getPHI')->name('get-phi');
 
     Route::get('/edit_result_micro/{sample}', 'Web\Admin\EditResultController@edit_result_micro');
     Route::get('/editResultCbnaat/{sample}', 'Web\Admin\EditResultController@edit_result_cbnaat');

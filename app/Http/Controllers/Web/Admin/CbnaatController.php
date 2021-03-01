@@ -168,7 +168,8 @@ $data['equipments_list']=Equipment::select('serial_no as eqipments')->where('nam
               DB::commit();
 			  return redirect('/microbiologist');
 			}
-			// dd($request->all());
+
+			//dd($request->all());
 			
             Cbnaat::where('enroll_id', $request->enrollId)->where('sample_id', $sample_id)->delete();
 			$cbnaat = Cbnaat::create([
@@ -203,8 +204,6 @@ $data['equipments_list']=Equipment::select('serial_no as eqipments')->where('nam
 			  $cbnaat_update->updated_by = $request->user()->id;
 			  $cbnaat_update->save();
 
-
-
 			  if($request->next_step=='Submit result for finalization'){
 
 				  $microbio = Microbio::create([
@@ -218,7 +217,9 @@ $data['equipments_list']=Equipment::select('serial_no as eqipments')->where('nam
 					'sample_label' => $cbnaat_update->sample_label,
 					'status' => 0,
 					'created_by' => Auth::user()->id,
-					 'updated_by' => Auth::user()->id
+					 'updated_by' => Auth::user()->id,
+					 'tag'		=> $request->tag,
+					  
 				  ]);
 			  }
 			  elseif($request->next_step=='Send to BWM'){

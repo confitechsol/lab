@@ -192,7 +192,8 @@ class LJController extends Controller
                                     'remark' => '',
                                     'status' => 0,
                                     'created_by' => $request->user()->id,
-                                    'updated_by' => $request->user()->id
+                                    'updated_by' => $request->user()->id,
+                                    'tag'       => $service->tag
                                 ]);
 
                                 //dd($newdata);
@@ -233,7 +234,8 @@ class LJController extends Controller
                                     'remark' => '',
                                     'status' => 0,
                                     'created_by' => $request->user()->id,
-                                    'updated_by' => $request->user()->id
+                                    'updated_by' => $request->user()->id,
+                                    'tag'       => $service->tag
                                 ]);
                             }                            
                     }                   

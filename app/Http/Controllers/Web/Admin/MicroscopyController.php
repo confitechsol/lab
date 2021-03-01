@@ -108,8 +108,8 @@ class MicroscopyController extends Controller
      */
     public function store(Request $request)
     {
+      //dd('1');
 
-        //dd($request->all());
 		DB::beginTransaction();
         try {
 
@@ -317,7 +317,7 @@ class MicroscopyController extends Controller
      */
     public function bulkStore( Request $request ){      
 
-
+      //dd('3');
         // Validate User Inputs ===========================================
         $this->validate( $request, [
             'sample_ids' => 'required',

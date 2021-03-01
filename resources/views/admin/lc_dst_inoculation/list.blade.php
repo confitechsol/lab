@@ -55,7 +55,7 @@
                                           <td>{{$samples->dst_c_id2}}</td>
                                           <td>{{$samples->dst_c_id3}}</td>
                                           <td>{{$samples->druglist}}</td>
-                                          <td>{{ date('d-m-Y',strtotime($samples->inoculation_date)) }}</td>
+                                          <td>{{ !empty($samples->inoculation_date) ? date('d-m-Y',strtotime($samples->inoculation_date)) :  date('d-m-Y',strtotime($samples->inc_date)) }}</td>
                                           <td>
                                             @if($samples->status==1)
                                             <button onclick="openForm('{{$samples->samples}}', {{$samples->log_id}}, '{{$samples->lpa_type}}','{{$samples->mgit_id}}',{{$samples->enrollID}},{{$samples->sampleID}},{{$samples->service_id}},'{{$samples->tag}}',{{$samples->rec_flag}})",  value="" type="button" class = "btn btn-default btn-sm resultbtn">Submit</button>

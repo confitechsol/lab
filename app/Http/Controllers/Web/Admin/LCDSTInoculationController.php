@@ -41,20 +41,26 @@ class LCDSTInoculationController extends Controller
            'ci.mgit_id','ci.tube_id_lj','ci.tube_id_lc','ci.inoculation_date', 'ddt.id as lc_dst_tr_id','ddt.drug_ids as drug_ids',
             'ldi.mgit_seq_id', 'ldi.dst_c_id1', 'ldi.dst_c_id2','ldi.dst_c_id3','t_service_log.enroll_id AS enrollID','t_service_log.sample_id AS sampleID','t_service_log.tag',
 		  't_service_log.rec_flag',
-            DB::raw('date_format(ldi.inoculation_date,"%d-%m-%y")'))
+            DB::raw('date_format(ldi.inoculation_date,"%d-%m-%y") AS inc_date'))
         ->leftjoin('sample as m','m.id','=','t_service_log.sample_id')
         //->leftjoin('t_microscopy as s','s.sample_id','=','t_service_log.sample_id')
          ->leftjoin('t_microscopy as s', function ($join) {
               $join->on('s.sample_id','=','t_service_log.sample_id')
                    ->where('s.status', 1);
           })
-        ->leftjoin('t_culture_inoculation as ci','ci.sample_id','=','t_service_log.sample_id')
+        ->leftjoin('t_culture_inoculation as ci','ci.rec_flag','=','t_service_log.rec_flag')
        // ->leftjoin('t_dst_drugs_tr as ddt','ddt.enroll_id','=','t_service_log.enroll_id')
 	   ->leftjoin('t_dst_drugs_tr as ddt', function ($join) {
             $join->on('ddt.enroll_id', '=', 't_service_log.enroll_id')
+            ->on('ddt.rec_flag', '=', 't_service_log.rec_flag')
                  ->where('ddt.service_id', 21);
         })
-        ->leftjoin('t_lc_dst_inoculation as ldi','ldi.sample_id','=','t_service_log.sample_id')
+
+        ->leftjoin('t_lc_dst_inoculation as ldi', function ($join) {
+          $join->on('ldi.enroll_id', '=', 't_service_log.enroll_id')
+          ->on('ldi.rec_flag', '=', 't_service_log.rec_flag');           
+      })       
+       
         ->where('t_service_log.service_id',21)
         //->where('s.status',1)
         ->where('ddt.status',1)
@@ -62,15 +68,6 @@ class LCDSTInoculationController extends Controller
         ->orderBy('enroll_id','desc')
         ->get();
  //dd($data['sample']);
-
-
-
-
-
-
-
-
-
         $data['drugs'] = [];
         foreach ($data['sample'] as $key => $value) {
         if($value->drug_ids != ''){
@@ -152,7 +149,7 @@ class LCDSTInoculationController extends Controller
 				return redirect("/microbiologist");
 			  }
 			$logdata = ServiceLog::find($request->log_id);
-			LCDSTInoculation::where('sample_id',$logdata->sample_id)->delete();
+			//LCDSTInoculation::where('sample_id',$logdata->sample_id)->delete();
 			$data = LCDSTInoculation::create([
 			  'sample_id' => $logdata->sample_id,
 			  'enroll_id' => $logdata->enroll_id,
@@ -160,9 +157,10 @@ class LCDSTInoculationController extends Controller
 			  'dst_c_id1' => $request->dst_c_id1,
 			  'dst_c_id2' => $request->dst_c_id2,
 			  'dst_c_id3' => $request->dst_c_id3,
-			  'inoculation_date' => $request->inoculation_date,
+			  'inoculation_date' => date('Y-m-d', strtotime($request->inoculation_date)),
 			  'created_by' => $request->user()->id,
-			  'updated_by' => $request->user()->id
+			  'updated_by' => $request->user()->id,
+        'rec_flag'  => $logdata->rec_flag
 			]);
 			$logdata->status = 2;
 			$logdata->save();
@@ -287,6 +285,8 @@ class LCDSTInoculationController extends Controller
                 'report_type'=>'End Of Report',
                 'created_by' => $request->user()->id,
                 'updated_by' => $request->user()->id,
+                'tag'        => $logdata->tag,
+                'rec_flag' => $logdata->rec_flag,
               ]);
       }elseif($next_step==2){
         $logdata->comments=$request->comments;
@@ -304,6 +304,8 @@ class LCDSTInoculationController extends Controller
               'report_type'=>'Interim Report',
               'created_by' => $request->user()->id,
                'updated_by' => $request->user()->id,
+               'tag'        => $logdata->tag,
+               'rec_flag' => $logdata->rec_flag,
             ]);
       }else{
         $logdata->comments=$request->comments;
@@ -320,6 +322,8 @@ class LCDSTInoculationController extends Controller
                 'status' => 0,
                 'created_by' => $request->user()->id,
                  'updated_by' => $request->user()->id,
+                 'tag'        => $logdata->tag,
+                 'rec_flag' => $logdata->rec_flag,
               ]);
       }
       $logdata->save();
@@ -385,12 +389,12 @@ class LCDSTInoculationController extends Controller
         return view('admin.lc_dst_inoculation.print',compact('data'));
 
     }
-	public function checkForLCDSTInaucolationAlreadyInProcess($enroll_id)
+	public function checkForLCDSTInaucolationAlreadyInProcess($enroll_id, $rec_flag)
     { 
 	       
 		    //echo $sample_id."=".$enroll_id."==".$service_id."===".$tag."====".$recflag; die;
 			$ljdstinaucolationlog = DB::select("SELECT IFNULL(count(*),0) AS v_count FROM t_lc_dst_inoculation 
-			WHERE  enroll_id = ".$enroll_id);
+			WHERE  enroll_id = ".$enroll_id." AND rec_flag = ".$rec_flag);
 			//dd($ljdstinaucolationlog);
 		    //dd($ljdstinaucolationlog[0]->v_count);	   
 

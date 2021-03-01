@@ -5,6 +5,7 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Responce;
 use Illuminate\Database\Eloquent\Model;
 use App\Model\Barcodes;
+use App\Model\TSampleRejected;
 use DateTime;
 use Illuminate\Support\Collection;
 
@@ -156,6 +157,22 @@ class Sample extends Model
               'created_at' => date('Y-m-d H:i:s'),
             ]);
 
+            $sample_rejected = TSampleRejected::create([
+
+              'sample_id' => $data,
+              'state_code' => $request->state_id,
+              'state_name' => $request->state_name,
+              'district_code' => $request->district_id,
+              'district_name' => $request->district_name,
+              'tbu_code'=>$request->tu_id,
+              'tbu_name' => $request->tu_name,
+              'phi_id' => $request->phi_id,
+              'phi_name'  => $request->phi_name,              
+              'created_by' => $request->user()->id,             
+
+            ]);
+
+            //dd($data);
 
             $status = ServiceLog::STATUS_ACTIVE;
             if( $request->service_id[ $i ] == ServiceLog::TYPE_STORAGE ){

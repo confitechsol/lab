@@ -299,7 +299,7 @@ $(document).ready(function(){
     $("#pageloader").fadeIn();
   });//submit
   //Confirm ok submit
-	$('#lj_result').change( function(e) {
+	$('#lj_result').change( function() {
 		//alert("here");
 		var enroll_id=$("#enrollId").val();
 		var sample_id=$("#sampleID").val();
@@ -307,6 +307,10 @@ $(document).ready(function(){
 		//var STATUS=$("#statusId").val();
 		var tag=$("#tagId").val();
 		var rec_flag=$("#recFlagId").val();
+
+   
+
+    
 	
 		$.ajax({
 				  url: "{{url('check_for_sample_already_process')}}"+'/'+sample_id+'/'+enroll_id+'/'+service_id+'/'+tag+'/'+rec_flag,
@@ -329,6 +333,33 @@ $(document).ready(function(){
 							$('.alert-danger').hide();
 							//$('form#cbnaat_result').submit();	
 							$('#lj_butt').prop("type", "submit");
+
+              if($('#lj_result').val() == 'NEG' )
+              {
+                
+                $("#test_id option[value='Not required']").attr("selected","selected");
+                $("#culture_smear option[value='Not required']").attr("selected","selected");                
+                $("#idsubmit").prop("type","submit");
+                $('#idsubmit').click();
+                $("#smearsubmit").prop("type","submit");
+                $('#smearsubmit').click();
+               
+                
+              }
+
+              if( $('#lj_result') == 'CONTA' )
+              {
+                $("#test_id option[value='Not required']").attr("selected","selected");
+                $("#culture_smear option[value='Not required']").attr("selected","selected");
+                
+                $("#idsubmit").prop("type","submit");
+                $('#idsubmit').click();
+                $("#smearsubmit").prop("type","submit");
+                $('#smearsubmit').click();
+                
+
+                
+              }
 							//$("#nxtconfirm").text("OK");
 							
                         }
@@ -390,6 +421,9 @@ $(function(){
   $(".datep").datepicker({
       dateFormat: "dd/mm/yyyy"
   }).datepicker("setDate", "0");
+
+  
+
 });
 </script>
 
@@ -409,7 +443,10 @@ $(function(){
 
 		if(err == 0){
 
+      
+
 		  $("#idsubmit").prop("type","submit");
+      
 		}else{
 		   $("#idsubmit").prop("type","button");
 		}
@@ -435,6 +472,8 @@ $(function(){
 		}
 
     });
+
+      
 
 
   });
@@ -500,6 +539,9 @@ $("#lj_result_date").change(function(){ //alert($("#lj_result_date").val());
 });
 
 });
+
+
+
 
 </script>
 

@@ -73,7 +73,7 @@ class TestRequestController extends Controller
                           ->orderBy('enroll_id','desc')
                           ->get();*/
 		 //dd(DB::getQueryLog());				  
-        //dd($data['sample']);
+        //dd($data);
         return view('admin.test_request.list',compact('data'));
 
     }
@@ -164,7 +164,10 @@ class TestRequestController extends Controller
 			
 			$data = array();
 			$actionBtn="";
-            foreach($empQuery as $key=>$samples){				
+            foreach($empQuery as $key=>$samples){	
+              
+          $naatresult="<a class='detail_modal bmwoff' style='color:#1E88E5; cursor:pointer; font-size:12px;' onclick=\"showNaatResult()\">View Naat Result</a>";
+
 				$actionBtn="<button class='btn btn-default btn-sm' onclick=\"window.open('".( $samples->tr_id > 0 ? url('/test_request/'.$samples->tr_id.'/edit') : url('/test_request/create/'.$samples->enroll_id))."');"
       ." $('#exampl tr.bg-selected').removeClass('bg-selected');$(this).parents('tr').addClass('bg-selected') \"> "
       . ($samples->tr_id > 0 ? 'Request' : 'Create' )
@@ -178,6 +181,7 @@ class TestRequestController extends Controller
 				 "receive_date"=>date('d-m-Y h:i:s',strtotime($samples->receive)),
 				 "reason"=>str_replace(',','<br/>', $samples->reason),
 				 "fu_month"=>str_replace(',','<br/>', $samples->fu_month),
+         'naatresult' => $naatresult,
 				 "action"=>$actionBtn,
 			   );
 			}	

@@ -206,15 +206,16 @@ class MicroController extends Controller
 
               /*foreach ($data['sample'] as $key => $value) {
                 $value->no_sample = ServiceLog::where('enroll_id',$value->enroll)->where('service_id',11)->count();
-              }*/
-
-           
+              }*/          
 
             $services = DB::table('m_test_request')->select('id','name')->whereIn('name',['LCDST','LJ DST','LJ DST 2st line'])->where('status',1)->get();
             $services = json_decode($services, true);
             $data['services'] = $services;
 			//druglist
-            $dstdrugs = LCDSTDrugs::select('id','name')->where('status',1)->get();
+            $dstdrugs = LCDSTDrugs::select('id','name')            
+            ->where('status',1)           
+            ->get();
+            //dd($dstdrugs);
             $data['dstdrugs'] = $dstdrugs;
 			$data['sendtolist'] = Master_addtest::select('*')->get();
 			$data['addtestlist'] = DB::table('m_test_request')->select('id','name')->where('status',1)->get();
@@ -223,7 +224,9 @@ class MicroController extends Controller
             return view('admin.microbiologist.list',compact('data'));
     }
 	public function ajaxMicrobiologistList(Request $request){
-		 //dd($request->all());
+		 
+        //dd($request->all());
+         
 		## Read value
 		$draw = $_POST['draw'];
 		$row = $_POST['start'];
@@ -234,114 +237,186 @@ class MicroController extends Controller
 		$searchValue = $_POST['search']['value']; // Search value  
         //dd($request->all());
 		## Search 
-		$searchQuery = "";
-        if($searchValue != ''){
-			   $searchQuery .= " and (t_service_log.enroll_label like '%".$searchValue."%' OR sample.name like '%".$searchValue."%') ";
-			  
-		}
+       
+        $req_tag = $request->tag;
+       
+        $count = 0;
+
+        if($req_tag == '0')
+        {
+
+            $searchQuery = "";
+            if($searchValue != ''){
+                $searchQuery .= " and (t_service_log.enroll_label like '%".$searchValue."%' OR sample.name like '%".$searchValue."%') ";  
+            }
+            
+            ## Total number of records without filtering
+            //DB::enableQueryLog();	
+            $sel=DB::select("SELECT IFNULL(COUNT(A.id),0) AS count FROM t_service_log A, t_microbiologist B
+            WHERE B.service_id = A.service_id
+            AND   B.sample_id = A.sample_id
+            AND   B.enroll_id = A.enroll_id
+            AND   B.tag = A.tag
+            AND  B.rec_flag = A.rec_flag
+            AND   A.status = 0 AND IFNULL(A.print_15a,1) = 1 
+            AND   IFNULL(A.sent_to_nikshay,0) = 0 AND A.sent_to_nikshay_date IS NULL
+            AND  A.service_id in (1,2,4,15, 17, 20, 21, 22)");
+            //dd(DB::getQueryLog());
+            //echo "<pre>"; print_r($sel);	echo "</pre>";	die();
+            $totalRecords =$sel[0]->count;
+            //dd('totalRecords'.$totalRecords);	
+            
+            ## Total number of records with filtering
+            //DB::enableQueryLog();			
+            $sel=DB::select("SELECT IFNULL(COUNT(t_service_log.id),0) AS count_filtered FROM t_service_log, t_microbiologist B,sample
+            WHERE B.service_id = t_service_log.service_id
+            AND   B.sample_id = t_service_log.sample_id
+            AND   B.enroll_id = t_service_log.enroll_id
+            AND   B.tag = t_service_log.tag
+            AND   B.rec_flag = t_service_log.rec_flag
+            AND   `t_service_log`.`sample_id` = `sample`.`id`
+            AND   t_service_log.status = 0 AND IFNULL(t_service_log.print_15a,1) = 1 
+            AND   IFNULL(t_service_log.sent_to_nikshay,0) = 0 AND t_service_log.sent_to_nikshay_date IS NULL
+            AND   t_service_log.service_id in (1,2,4,15, 17, 20, 21, 22)".$searchQuery);
+                //dd($sel);	
+            //dd(DB::getQueryLog());			  
+            $totalRecordwithFilter = $sel[0]->count_filtered;
+            //dd('totalRecordwithFilter'.$totalRecordwithFilter);
+            ## Fetch records
+            //DB::enableQueryLog();
+            
+                /* updated sql 12-02-2021 */
+                $microQry=DB::select("select `s`.`id` as `ID`, `s`.`tag` as `tag`, `t_service_log`.`id` as `tslID`, `t_service_log`.`tag` as `stag`,         `t_service_log`.`print_15a` as `print_15a`, `t_service_log`.`sent_to_nikshay` as `sent_to_nikshay`,        `f`.`DMC_PHI_Name` as `facility_id`, `sample`.`id` as `sampleID`,        `s`.`enroll_id` as `enroll`, `enrolls`.`label` as `enroll_l`,         `sample`.`sample_label` as `samples`, `s`.`sample_id` as `sample`,         `sample`.`name` as `p_name`, `s`.`created_at` as `date`,        `sample`.`sample_type`, `sample`.`test_reason`,         `s`.`service_id` as `service`, `s`.`next_step` as `next`,         `s`.`detail` as `m_detail`, `s`.`remark` as `m_remark`,         `m`.`name` as `service_name`, `m`.`url`,         `s`.`bwm` as `bwm_status`,`ddt`.`drug_ids` as `drug_ids`,         `patient`.`reg_by`, `sample`.`no_of_samples` as `no_of_samples`, `t_service_log`.`rec_flag` , date_format(ldi.inoculation_date,'%d-%m-%y')         from `t_service_log` left join `t_microbiologist` as `s` on `s`.`sample_id` = `t_service_log`.`sample_id` and `s`.`service_id` = `t_service_log`.`service_id` and ((`s`.`tag` is null) or (`s`.`tag` = `t_service_log`.`tag`))                    and s.rec_flag = t_service_log.rec_flag         and `s`.`enroll_id` = `t_service_log`.`enroll_id`          
+                left join `sample` as `sample` on `t_service_log`.`sample_id` = `sample`.`id`         
+                left join `enrolls` as `enrolls` on `enrolls`.`id` = `t_service_log`.`enroll_id`          
+                left join `req_test` as `rq` on `rq`.`enroll_id` = `t_service_log`.`enroll_id`         
+                left join `m_dmcs_phi_relation` as `f` on `rq`.`facility_id` = `f`.`id`      
+                left join `m_services` as `m` on `m`.`id` = `t_service_log`.`service_id`         
+                left join `patient` as `patient` on `patient`.`id` = `enrolls`.`patient_id`                    
+                left join `t_cbnaat` as `cbnaat` on `s`.`sample_id` = `cbnaat`.`sample_id` and `s`.`enroll_id` = `cbnaat`.`enroll_id`        
+                left join `t_microscopy` as `microscopy` on `s`.`sample_id` = `microscopy`.`sample_id` and `s`.`enroll_id` = `microscopy`.`enroll_id`        
+                left join `t_decontamination` as `d` on `s`.`sample_id` = `d`.`sample_id` and `s`.`enroll_id` = `d`.`enroll_id`        
+                left join `t_culture_inoculation` as `ci` on `s`.`sample_id` = `ci`.`sample_id`  and `s`.`enroll_id` = `ci`.`enroll_id`        
+                left join `t_lc_dst_inoculation` as `ldi` on `s`.`sample_id` = `ldi`.`sample_id` and `s`.`enroll_id` = `ldi`.`enroll_id`        
+                left join `t_dst_drugs_tr` as `ddt` on `s`.`enroll_id` = `ddt`.`enroll_id` and `s`.`service_id` = `ddt`.`service_id` where `t_service_log`.`sent_to_nikshay` = 0 and `t_service_log`.`sent_to_nikshay_date` is null and `t_service_log`.`status` = 0     ".$searchQuery."     and `t_service_log`.`service_id` in (1,2,4,15, 17, 20, 21, 22) and  t_service_log.print_15a=1          and (CONCAT(CONVERT(s.service_id,CHAR(2)),s.next_step) NOT IN ('14Send Sample'))        group by s.enroll_id, s.service_id, s.tag, s.rec_flag  order by `enrolls`.`label`  desc, `t_service_log`.`rec_flag` desc limit ".$row.",".$rowperpage);
+
+        }
+        else {
+
+            $searchQuery = "";
+            if($searchValue != ''){
+                $searchQuery .= " and (t_service_log.enroll_label like '%".$searchValue."%' OR sample.name like '%".$searchValue."%') ";  
+            }
+
+            $service_sql_without_and_with_filter = "";           
+            $service_sql = "";
+
+            if($req_tag == 'CBNAAT')
+            {
+                $service_sql_without_and_with_filter = "B.service_id=4 AND B.tag='CBNAAT'";                
+                $service_sql = "s.service_id=4 AND s.tag='CBNAAT'";
+
+            } elseif( $req_tag == 'LPA 1st Line' ) {
+
+                $service_sql_without_and_with_filter = "B.service_id=15 AND B.tag='1st line LPA'";                
+                $service_sql = "s.service_id=15 AND s.tag='1st line LPA'";                
+
+            } elseif( $req_tag == 'LPA 2nd Line' ) {
+
+                $service_sql_without_and_with_filter = "B.service_id=15 AND B.tag='2nd line LPA'";                
+                $service_sql = "s.service_id=15 AND s.tag='2nd line LPA'";
+
+            } elseif( $req_tag == 'Liquid Culture' ) {
+
+                $service_sql_without_and_with_filter = "B.service_id=17 AND B.tag='LC' AND B.rec_flag<55";                
+                $service_sql = "s.service_id=17 AND s.tag='LC' AND s.rec_flag<55";
+
+            } elseif( $req_tag == 'LC-DST' ) {
+
+                $service_sql_without_and_with_filter = "B.service_id=21 AND B.tag='LC'";                
+                $service_sql = "s.service_id=21 AND s.tag='LC'";
+
+            } elseif( $req_tag == 'Solid Culture' ) {
+
+                $service_sql_without_and_with_filter = "B.service_id=20 AND B.tag='LJ'";                
+                $service_sql = "s.service_id=20 AND s.tag='LJ'";
+                
+            } elseif( $req_tag == 'LJ-DST' ) {
+
+                $service_sql_without_and_with_filter = "B.service_id=22 AND B.tag='LJ'";                
+                $service_sql = "s.service_id=22 AND s.tag='LJ'";
+                
+            } elseif( $req_tag == 'Microscopy' ) {
+
+                $service_sql_without_and_with_filter = "B.service_id IN (1,2) AND B.tag IN ('ZN Microscopy', 'FM Microscopy') ";                
+                $service_sql = "s.service_id IN (1,2) AND s.tag IN ('ZN Microscopy', 'FM Microscopy')";
+
+            } elseif( $req_tag == 'BMW' ) {
+
+                $service_sql_without_and_with_filter = "B.service_id=17 AND B.rec_flag>=55";                
+                $service_sql = "s.service_id=17 AND s.rec_flag>=55";
+
+            }
 		
-        ## Total number of records without filtering
-		//DB::enableQueryLog();	
-        $sel=DB::select("SELECT IFNULL(COUNT(distinct A.enroll_id),0) AS count FROM t_service_log A, t_microbiologist B
-			WHERE B.service_id = A.service_id
-			AND   B.sample_id = A.sample_id
-			AND   B.enroll_id = A.enroll_id
-			AND   A.status = 0 AND IFNULL(A.print_15a,1) = 1 
-			AND   IFNULL(A.sent_to_nikshay,0) = 0 AND A.sent_to_nikshay_date IS NULL
-			AND  A.service_id in (1,2,4,14,15, 17, 20, 21, 22)");
-        //dd(DB::getQueryLog());
-        //echo "<pre>"; print_r($sel);	echo "</pre>";	die();
-	    $totalRecords =$sel[0]->count;
-		//dd('totalRecords'.$totalRecords);	
+            ## Total number of records without filtering
+            //DB::enableQueryLog();	
+            $sel=DB::select("SELECT IFNULL(COUNT(A.id),0) AS count FROM t_service_log A, t_microbiologist B
+            WHERE ".$service_sql_without_and_with_filter."
+            AND B.service_id = A.service_id
+            AND   B.sample_id = A.sample_id
+            AND   B.enroll_id = A.enroll_id
+            AND   B.tag = A.tag
+            AND  B.rec_flag = A.rec_flag
+            AND   A.status = 0 AND IFNULL(A.print_15a,1) = 1 
+            AND   IFNULL(A.sent_to_nikshay,0) = 0 AND A.sent_to_nikshay_date IS NULL
+            AND  A.service_id in (1,2,4,15, 17, 20, 21, 22)");
+            //dd(DB::getQueryLog());
+            //echo "<pre>"; print_r($sel);	echo "</pre>";	die();
+            $totalRecords =$sel[0]->count;
+            //dd('totalRecords'.$totalRecords);	
+            
+            ## Total number of records with filtering
+            //DB::enableQueryLog();			
+            $sel=DB::select("SELECT IFNULL(COUNT(t_service_log.id),0) AS count_filtered FROM t_service_log, t_microbiologist B,sample
+            WHERE ".$service_sql_without_and_with_filter."
+            AND B.service_id = t_service_log.service_id
+            AND   B.sample_id = t_service_log.sample_id
+            AND   B.enroll_id = t_service_log.enroll_id
+            AND   B.tag = t_service_log.tag
+            AND   B.rec_flag = t_service_log.rec_flag
+            AND   `t_service_log`.`sample_id` = `sample`.`id`
+            AND   t_service_log.status = 0 AND IFNULL(t_service_log.print_15a,1) = 1 
+            AND   IFNULL(t_service_log.sent_to_nikshay,0) = 0 AND t_service_log.sent_to_nikshay_date IS NULL
+            AND   t_service_log.service_id in (1,2,4,15, 17, 20, 21, 22)".$searchQuery);
+                //dd($sel);	
+            //dd(DB::getQueryLog());			  
+            $totalRecordwithFilter = $sel[0]->count_filtered;
+            //dd('totalRecordwithFilter'.$totalRecordwithFilter);
+            ## Fetch records
+            //DB::enableQueryLog();
+            
+                /* updated sql 12-02-2021 */
+                $microQry=DB::select("select `s`.`id` as `ID`, `s`.`tag` as `tag`, `t_service_log`.`id` as `tslID`, `t_service_log`.`tag` as `stag`,  `t_service_log`.`print_15a` as `print_15a`, `t_service_log`.`sent_to_nikshay` as `sent_to_nikshay`,        `f`.`DMC_PHI_Name` as `facility_id`, `sample`.`id` as `sampleID`,        `s`.`enroll_id` as `enroll`, `enrolls`.`label` as `enroll_l`,         `sample`.`sample_label` as `samples`, `s`.`sample_id` as `sample`,         `sample`.`name` as `p_name`, `s`.`created_at` as `date`,        `sample`.`sample_type`, `sample`.`test_reason`,         `s`.`service_id` as `service`, `s`.`next_step` as `next`,         `s`.`detail` as `m_detail`, `s`.`remark` as `m_remark`,         `m`.`name` as `service_name`, `m`.`url`,         `s`.`bwm` as `bwm_status`,`ddt`.`drug_ids` as `drug_ids`,         `patient`.`reg_by`, `sample`.`no_of_samples` as `no_of_samples`, `t_service_log`.`rec_flag` , date_format(ldi.inoculation_date,'%d-%m-%y')         from `t_service_log` left join `t_microbiologist` as `s` on `s`.`sample_id` = `t_service_log`.`sample_id` and `s`.`service_id` = `t_service_log`.`service_id` and ((`s`.`tag` is null) or (`s`.`tag` = `t_service_log`.`tag`)) and s.rec_flag = t_service_log.rec_flag         and `s`.`enroll_id` = `t_service_log`.`enroll_id` 
+                left join `sample` as `sample` on `t_service_log`.`sample_id` = `sample`.`id`         
+                left join `enrolls` as `enrolls` on `enrolls`.`id` = `t_service_log`.`enroll_id`          
+                left join `req_test` as `rq` on `rq`.`enroll_id` = `t_service_log`.`enroll_id`         
+                left join `m_dmcs_phi_relation` as `f` on `rq`.`facility_id` = `f`.`id`      
+                left join `m_services` as `m` on `m`.`id` = `t_service_log`.`service_id`         
+                left join `patient` as `patient` on `patient`.`id` = `enrolls`.`patient_id`                    
+                left join `t_cbnaat` as `cbnaat` on `s`.`sample_id` = `cbnaat`.`sample_id` and `s`.`enroll_id` = `cbnaat`.`enroll_id`        
+                left join `t_microscopy` as `microscopy` on `s`.`sample_id` = `microscopy`.`sample_id` and `s`.`enroll_id` = `microscopy`.`enroll_id`        
+                left join `t_decontamination` as `d` on `s`.`sample_id` = `d`.`sample_id` and `s`.`enroll_id` = `d`.`enroll_id`        
+                left join `t_culture_inoculation` as `ci` on `s`.`sample_id` = `ci`.`sample_id`  and `s`.`enroll_id` = `ci`.`enroll_id`        
+                left join `t_lc_dst_inoculation` as `ldi` on `s`.`sample_id` = `ldi`.`sample_id` and `s`.`enroll_id` = `ldi`.`enroll_id`        
+                left join `t_dst_drugs_tr` as `ddt` on `s`.`enroll_id` = `ddt`.`enroll_id` and `s`.`service_id` = `ddt`.`service_id` where ".$service_sql." AND `t_service_log`.`sent_to_nikshay` = 0 and `t_service_log`.`sent_to_nikshay_date` is null and `t_service_log`.`status` = 0     ".$searchQuery."     and `t_service_log`.`service_id` in (1,2,4,15, 17, 20, 21, 22) and  t_service_log.print_15a=1          and (CONCAT(CONVERT(s.service_id,CHAR(2)),s.next_step) NOT IN ('14Send Sample'))        group by s.enroll_id, s.service_id, s.tag, s.rec_flag  order by `enrolls`.`label`  desc, `t_service_log`.`rec_flag` desc limit ".$row.",".$rowperpage);
+        }
 		
-        ## Total number of records with filtering
-        //DB::enableQueryLog();			
-		$sel=DB::select("SELECT IFNULL(COUNT(distinct t_service_log.enroll_id),0) AS count_filtered FROM t_service_log, t_microbiologist B,sample
-			WHERE B.service_id = t_service_log.service_id
-			AND   B.sample_id = t_service_log.sample_id
-			AND   B.enroll_id = t_service_log.enroll_id
-			AND   `t_service_log`.`sample_id` = `sample`.`id`
-			AND   t_service_log.status = 0 AND IFNULL(t_service_log.print_15a,1) = 1 
-			AND   IFNULL(t_service_log.sent_to_nikshay,0) = 0 AND t_service_log.sent_to_nikshay_date IS NULL
-			AND   t_service_log.service_id in (1,2,4,14,15, 17, 20, 21, 22)".$searchQuery);
-			//dd($sel);	
-		//dd(DB::getQueryLog());			  
-		$totalRecordwithFilter = $sel[0]->count_filtered;
-		//dd('totalRecordwithFilter'.$totalRecordwithFilter);
-		## Fetch records
-		//DB::enableQueryLog();
-		/*$empQuery=ServiceLog::select(
-                 's.id as ID','s.tag as tag','t_service_log.id as tslID','t_service_log.tag as stag','t_service_log.print_15a as print_15a','t_service_log.sent_to_nikshay as sent_to_nikshay','f.DMC_PHI_Name as facility_id',
-                 'sample.id as sampleID','s.enroll_id as enroll','enrolls.label as enroll_l',
-                 'sample.sample_label as samples','s.sample_id as sample','sample.name as p_name',
-                 's.created_at as date','sample.sample_type', 'sample.test_reason',
-                 's.service_id as service','s.next_step as next','s.detail as m_detail',
-                 's.remark as m_remark','m.name as service_name','m.url','s.bwm as bwm_status',
-                 'ci.mgit_id','ci.tube_id_lj','ci.tube_id_lc','ci.inoculation_date','ddt.id as lc_dst_tr_id','ddt.drug_ids as drug_ids',
-                 'ldi.mgit_seq_id', 'ldi.dst_c_id1', 'ldi.dst_c_id2','ldi.dst_c_id3',
-                 'patient.reg_by', 'sample.no_of_samples as no_of_samples','t_service_log.rec_flag',
-                  DB::raw('date_format(ldi.inoculation_date,"%d-%m-%y")') )
-                 ->leftJoin('t_microbiologist as s', function($join){
-                    $join->on('s.sample_id', '=','t_service_log.sample_id');
-                    $join->on('s.service_id', '=','t_service_log.service_id')
-					->whereRaw(DB::raw("( CONCAT(CONVERT(s.service_id,CHAR(2)),s.next_step) NOT IN ('14Send Sample') )" ));
-                })
-                ->leftjoin('sample as sample','s.sample_id','=','sample.id')
-                ->leftjoin('enrolls as enrolls','enrolls.id','=','sample.enroll_id')
-                ->leftjoin('t_cbnaat as cbnaat','s.sample_id','=','cbnaat.sample_id')
-                ->leftjoin('t_decontamination as d','s.sample_id','=','d.sample_id')
-                ->leftjoin('req_test as rq','rq.enroll_id','=','s.enroll_id')
-                ->leftjoin('m_dmcs_phi_relation as f','rq.facility_id','=','f.id')
-                ->leftjoin('m_services as m','m.id','=','s.service_id')
-                ->leftjoin('t_culture_inoculation as ci','ci.sample_id','=','s.sample_id')               
-                ->leftjoin('t_lc_dst_inoculation as ldi','ldi.sample_id','=','s.sample_id')               
-                ->leftjoin('t_dst_drugs_tr as ddt', function ($join) {
-                     $join->on('ddt.enroll_id','=','s.enroll_id');
-					 $join->on('ddt.service_id', '=','t_service_log.service_id');                        
-                 })
-                ->leftjoin('patient as patient','patient.id','=','enrolls.patient_id')               
-				->where('t_service_log.sent_to_nikshay',0)
-                ->where('t_service_log.sent_to_nikshay_date',null)
-                ->where('t_service_log.status',0)
-                //->where('t_service_log.print_15a',1)
-				->whereIn('t_service_log.service_id',array(4,14,22,15,17,20,21))               
-				->whereRaw(" t_service_log.print_15a=1 ".$searchQuery." group by sample.id,s.service_id,t_service_log.service_id,t_service_log.tag  limit ".$row.",".$rowperpage)
-                ->get();*/
-	   // DB::enableQueryLog();			
-		 $microQry=DB::select("select `s`.`id` as `ID`, `s`.`tag` as `tag`, `t_service_log`.`id` as `tslID`, `t_service_log`.`tag` as `stag`, 
-			`t_service_log`.`print_15a` as `print_15a`, `t_service_log`.`sent_to_nikshay` as `sent_to_nikshay`,
-			`f`.`DMC_PHI_Name` as `facility_id`, `sample`.`id` as `sampleID`,
-			`s`.`enroll_id` as `enroll`, `enrolls`.`label` as `enroll_l`, 
-			`sample`.`sample_label` as `samples`, `s`.`sample_id` as `sample`, 
-			`sample`.`name` as `p_name`, `s`.`created_at` as `date`,
-			`sample`.`sample_type`, `sample`.`test_reason`, 
-			`s`.`service_id` as `service`, `s`.`next_step` as `next`, 
-			`s`.`detail` as `m_detail`, `s`.`remark` as `m_remark`, 
-			`m`.`name` as `service_name`, `m`.`url`, 
-			`s`.`bwm` as `bwm_status`,`ddt`.`drug_ids` as `drug_ids`, 
-			`patient`.`reg_by`, `sample`.`no_of_samples` as `no_of_samples`, `t_service_log`.`rec_flag` , date_format(ldi.inoculation_date,'%d-%m-%y') 
-			from `t_service_log` left join `t_microbiologist` as `s` on `s`.`sample_id` = `t_service_log`.`sample_id` and `s`.`service_id` = `t_service_log`.`service_id` and ((`s`.`tag` is null) or (`s`.`tag` = `t_service_log`.`tag`))  
-			and `s`.`enroll_id` = `t_service_log`.`enroll_id`  
-			left join `sample` as `sample` on `t_service_log`.`sample_id` = `sample`.`id` 
-			left join `enrolls` as `enrolls` on `enrolls`.`id` = `t_service_log`.`enroll_id`  
-			left join `req_test` as `rq` on `rq`.`enroll_id` = `t_service_log`.`enroll_id` 
-			left join `m_dmcs_phi_relation` as `f` on `rq`.`facility_id` = `f`.`id` 
-			left join `m_services` as `m` on `m`.`id` = `t_service_log`.`service_id` 
-			left join `patient` as `patient` on `patient`.`id` = `enrolls`.`patient_id`
-            left join `t_cbnaat` as `cbnaat` on `s`.`sample_id` = `cbnaat`.`sample_id` and `s`.`enroll_id` = `cbnaat`.`enroll_id`
-			left join `t_microscopy` as `microscopy` on `s`.`sample_id` = `microscopy`.`sample_id` and `s`.`enroll_id` = `microscopy`.`enroll_id`
-			left join `t_decontamination` as `d` on `s`.`sample_id` = `d`.`sample_id` and `s`.`enroll_id` = `d`.`enroll_id`
-			left join `t_culture_inoculation` as `ci` on `s`.`sample_id` = `ci`.`sample_id`  and `s`.`enroll_id` = `ci`.`enroll_id`
-			left join `t_lc_dst_inoculation` as `ldi` on `s`.`sample_id` = `ldi`.`sample_id` and `s`.`enroll_id` = `ldi`.`enroll_id`
-			left join `t_dst_drugs_tr` as `ddt` on `s`.`enroll_id` = `ddt`.`enroll_id` and `s`.`service_id` = `ddt`.`service_id` 
-			where `t_service_log`.`sent_to_nikshay` = 0 and `t_service_log`.`sent_to_nikshay_date` is null and `t_service_log`.`status` = 0 ".$searchQuery." 
-			and `t_service_log`.`service_id` in (1,2,4,14,15, 17, 20, 21, 22) and  t_service_log.print_15a=1  
-			and (CONCAT(CONVERT(s.service_id,CHAR(2)),s.next_step) NOT IN ('14Send Sample'))
-			group by s.enroll_id, s.service_id, s.tag  order by `enrolls`.`label` desc limit ".$row.",".$rowperpage);
+
 			//".$columnSortOrder."
          //dd(DB::getQueryLog());			
 		//dd($microQry);
 		//dd(DB::getQueryLog());
+        $count = count($microQry);
 		$test_requested = array();
 		$services_col_color=array();
 		$reqServ_service_id=array();
@@ -389,6 +464,7 @@ class MicroController extends Controller
         }
 		//dd($test_requested);
 		//dd($reqServ_service_id);
+        
 	  $drugs = array();
 	  $existing_drugs = array();
 	  foreach ($microQry as $key => $value) {
@@ -417,28 +493,78 @@ class MicroController extends Controller
 		$addTestBtn="";
 		$sendToNikshayBtn="";
 		$currentStatusLink="";
+        $naatresult="";
+        $inputs = "";        
+
 		foreach($microQry as $key=>$samples){
 			if(($samples->print_15a==1)&&($samples->sent_to_nikshay==0)){
-				$draftRsltBtn="<a target='_blank' href=".url('interimview/'.$samples->sampleID)." class='btn btn-info btn-sm'>Draft Result</a>";
-				$tdStyle=$services_col_color[$samples->enroll]=="Y"?'style="background-color:#ccffcc;width:100%;height:100%;display:block;"':"";
-				$editBtn="<button type='button' onclick=\"openCbnaatForm1('".$samples->enroll."','".$samples->sample."','".$samples->service."','".$samples->samples."','".($samples->service==15?$samples->stag:'NULL')."');\" class='btn btn-info btn-sm resultbtn'>View</button>";
-				
-				if($samples->service_name!='BWM'){
-					if($samples->service_name=='LJ - DST Inoculation' || $samples->service_name=='LJ - DST 2nd Line')
-					{
-					  $editLink="<a href=\"javascript:void(0)\" onclick=\"editResultForm('".$samples->sampleID."','".$samples->enroll."','".$samples->samples."','".$samples->service."','','".$samples->druglist."','".$samples->drug_ids."')\">Edit</a>";
-					}else{						
-					  $editLink="<a href=\"javascript:void(0)\" onclick=\"editResultForm('".$samples->sampleID."','".$samples->enroll."','".$samples->samples."','".$samples->service."','".$samples->stag."','".(!empty($samples->druglist)?$samples->druglist:'')."','".(!empty($samples->drug_ids)?$samples->drug_ids:'')."')\">Edit</a>";
-					}
-				}
-				$tag= (!empty($samples->stag))? $samples->stag : '';
-				$retestBtn="<button type='button' onclick=\"openCbnaatFormRetest( '".$samples->enroll."','".$samples->samples."','".$samples->service."','".$samples->sampleID."','".$samples->bwm_status."','".$samples->no_sample."', '".$samples->reg_by."','".(($samples->service==14||$samples->service==15)?$samples->stag:'NULL')."',".$samples->rec_flag.");\" class='btn btn-info btn-sm resultbtn' >Retest</button>";
-				$addTestBtn="<button type='button' onclick=\"openCbnaatFormAddtest('".$samples->enroll."','".$samples->sample."','".$samples->service."','".$samples->samples."',".$samples->rec_flag.")\" class='btn btn-info btn-sm resultbtn addTestBtn' >Add Test</button>";
-				$sendToNikshayBtn="<button type='button' onclick=\"openCbnaatFormNikshay('".$samples->tslID."','".$samples->enroll."','".$samples->sample."','".$samples->service."','".$samples->samples."','".$samples->enroll_l."','".($samples->service==15?$samples->stag:'')."',".$reqServ_service_id[$samples->enroll].")\" class='btn btn-info btn-sm resultbtn' >Submit</button>";
-				$currentStatusLink="<a class='detail_modal' style='color:#1E88E5; cursor:pointer; font-size:12px;' onclick=\"getdetailsform(".$id=$samples->sampleID.",'".$enrolls_id=$samples->enroll."','".$sample_label=$samples->samples."')\">Show Status</a>";
+                
+                $inputs = '<input class="bulk-selected" type="checkbox" id="service_log_'.$samples->tslID.'" value="'.$samples->tslID.'">';
+                $inputs .= '<input type="hidden" name="enroll_'.$samples->tslID.'" id="enroll_'.$samples->tslID.'" value="'.$samples->enroll.'" >';
+                $inputs .= '<input type="hidden" name="sample_'.$samples->tslID.'" id="sample_'.$samples->tslID.'" value="'.$samples->sample.'" >';
+                $inputs .= '<input type="hidden" name="service_'.$samples->tslID.'" id="service_'.$samples->tslID.'" value="'.$samples->service.'" >';
+                $inputs .= '<input type="hidden" name="samples_'.$samples->tslID.'" id="samples_'.$samples->tslID.'" value="'.$samples->samples.'" >';
+                $inputs .= '<input type="hidden" name="enroll_1_'.$samples->tslID.'" id="enroll_1_'.$samples->tslID.'" value="'.$samples->enroll_l.'" >';
+                $inputs .= '<input type="hidden" name="stag_'.$samples->tslID.'" id="stag_'.$samples->tslID.'" value="'.($samples->service==15?$samples->stag:'').'" >';
+                $inputs .= '<input type="hidden" name="request_service_'.$samples->tslID.'" id="request_service_'.$samples->tslID.'" value="'.$reqServ_service_id[$samples->enroll].'" >';
+
+                if($req_tag == 'BMW' || $req_tag=='Microscopy')
+                {
+                    //echo $tag;
+
+                    $draftRsltBtn="<a target='_blank' disabled='disabled' class='btn btn-info btn-sm bmwoff'>Draft Result</a>";
+                    $tdStyle=$services_col_color[$samples->enroll]=="Y"?'style="background-color:#ccffcc;width:100%;height:100%;display:block;"':"";
+                    $editBtn="<button type='button' onclick=\"openCbnaatForm1('".$samples->enroll."','".$samples->sample."','".$samples->service."','".$samples->samples."','".($samples->service==15?$samples->stag:'NULL')."');\" disabled='disabled' class='btn btn-info btn-sm resultbtn bmwoff'>View</button>";
+                    
+                    if($samples->service_name!='BWM'){
+                        if($samples->service_name=='LJ - DST Inoculation' || $samples->service_name=='LJ - DST 2nd Line')
+                        {
+                        $editLink="<a>Edit</a>";
+                        }else{						
+                        $editLink="<a >Edit</a>";
+                        }
+                    }
+                    $tag= (!empty($samples->stag))? $samples->stag : '';
+                    $retestBtn="<button type='button' disabled='disabled' onclick=\"openCbnaatFormRetest( '".$samples->enroll."','".$samples->samples."','".$samples->service."','".$samples->sampleID."','".$samples->bwm_status."','".$samples->no_sample."', '".$samples->reg_by."','".(($samples->service==14||$samples->service==15)?$samples->stag:'NULL')."',".$samples->rec_flag.");\" class='btn btn-info btn-sm resultbtn bmwoff' >Retest</button>";
+                    $addTestBtn="<button type='button' disabled='disabled' onclick=\"openCbnaatFormAddtest('".$samples->enroll."','".$samples->sample."','".$samples->service."','".$samples->samples."',".$samples->rec_flag.")\" class='btn btn-info btn-sm resultbtn addTestBtn bmwoff' >Add Test</button>";             
+
+                    $sendToNikshayBtn="<button type='button' disabled='disabled' onclick=\"openCbnaatFormNikshay('".$samples->tslID."','".$samples->enroll."','".$samples->sample."','".$samples->service."','".$samples->samples."','".$samples->enroll_l."','".($samples->service==15?$samples->stag:'')."','".$reqServ_service_id[$samples->enroll]."', '1')\" class='btn btn-info btn-sm resultbtn bmwoff'>Submit</button>";
+
+                    $bmwButton = "<button type='button' onclick=\"openCbnaatFormNikshay('".$samples->tslID."','".$samples->enroll."','".$samples->sample."','".$samples->service."','".$samples->samples."','".$samples->enroll_l."','".($samples->service==15?$samples->stag:'')."','".$reqServ_service_id[$samples->enroll]."', '1')\" class='btn btn-info btn-sm resultbtn bmwButton'>BMW</button>";
+
+                } else {
+
+                    //dd($microQry);
+
+                    $draftRsltBtn="<a target='_blank' href=".url('interimview/'.$samples->sampleID)." class='btn btn-info btn-sm bmwoff'>Draft Result</a>";
+                    $tdStyle=$services_col_color[$samples->enroll]=="Y"?'style="background-color:#ccffcc;width:100%;height:100%;display:block;"':"";
+                    $editBtn="<button type='button' onclick=\"openCbnaatForm1('".$samples->enroll."','".$samples->sample."','".$samples->service."','".$samples->samples."','".($samples->service==15?$samples->stag:'NULL')."');\" class='btn btn-info btn-sm resultbtn bmwoff'>View</button>";
+                    
+                    if($samples->service_name!='BWM'){
+                        if($samples->service_name=='LJ - DST Inoculation' || $samples->service_name=='LJ - DST 2nd Line')
+                        {
+                        $editLink="<a href=\"javascript:void(0)\" class='bmwoff' onclick=\"editResultForm('".$samples->sampleID."','".$samples->enroll."','".$samples->samples."','".$samples->service."','','".$samples->druglist."','".$samples->drug_ids."')\">Edit</a>";
+                        }else{						
+                        $editLink="<a href=\"javascript:void(0)\" class='bmwoff' onclick=\"editResultForm('".$samples->sampleID."','".$samples->enroll."','".$samples->samples."','".$samples->service."','".$samples->stag."','".(!empty($samples->druglist)?$samples->druglist:'')."','".(!empty($samples->drug_ids)?$samples->drug_ids:'')."')\">Edit</a>";
+                        }
+                    }
+                    $tag= (!empty($samples->stag))? $samples->stag : '';
+                    $retestBtn="<button type='button' onclick=\"openCbnaatFormRetest( '".$samples->enroll."','".$samples->samples."','".$samples->service."','".$samples->sampleID."','".$samples->bwm_status."','".$samples->no_sample."', '".$samples->reg_by."','".(($samples->service==14||$samples->service==15)?$samples->stag:'NULL')."',".$samples->rec_flag.");\" class='btn btn-info btn-sm resultbtn bmwoff' >Retest</button>";
+                    $addTestBtn="<button type='button' onclick=\"openCbnaatFormAddtest('".$samples->enroll."','".$samples->sample."','".$samples->service."','".$samples->samples."',".$samples->rec_flag.")\" class='btn btn-info btn-sm resultbtn addTestBtn bmwoff' >Add Test</button>";             
+
+                    $sendToNikshayBtn="<button type='button' onclick=\"openCbnaatFormNikshay('".$samples->tslID."','".$samples->enroll."','".$samples->sample."','".$samples->service."','".$samples->samples."','".$samples->enroll_l."','".($samples->service==15?$samples->stag:'')."','".$reqServ_service_id[$samples->enroll]."', '0')\" class='btn btn-info btn-sm resultbtn bmwoff'>Submit</button>";
+
+                    $bmwButton = "<button type='button'  onclick=\"openCbnaatFormNikshay('".$samples->tslID."','".$samples->enroll."','".$samples->sample."','".$samples->service."','".$samples->samples."','".$samples->enroll_l."','".($samples->service==15?$samples->stag:'')."','".$reqServ_service_id[$samples->enroll]."', '0')\" disabled='disabled' class='btn btn-info btn-sm resultbtn bmwButton'>BMW</button>";
+
+                } 
+                
+                $naatresult="<a class='detail_modal bmwoff' style='color:#1E88E5; cursor:pointer; font-size:12px;' onclick=\"showNaatResult()\">View Naat Result</a>";
+                
+				$currentStatusLink="<a class='detail_modal bmwoff' style='color:#1E88E5; cursor:pointer; font-size:12px;' onclick=\"getdetailsform(".$id=$samples->sampleID.",'".$enrolls_id=$samples->enroll."','".$sample_label=$samples->samples."')\">Show Status</a>";
 				$data[] = array(
 				     "DT_RowId"=> $key,
-					 "DT_RowClass"=>'sel ',
+                     "inputs" => $inputs,
+					 "DT_RowClass"=>'sel',
 				     "ID"=>$samples->ID,
 					 "enroll_id"=>$samples->enroll_l.'<br/>'.$samples->samples,
 					 "patient_name"=>$samples->p_name,
@@ -447,8 +573,10 @@ class MicroController extends Controller
 					 "test_review"=>($samples->service==15?$samples->stag:$samples->service_name).'<br/>'.$draftRsltBtn,
 					 "view_result"=>$editBtn."<br/>".$editLink,
 					 "req_retest"=>$retestBtn,
-					 "add_test"=>$addTestBtn,
+					 "add_test"=>$addTestBtn,                     
 					 "result_to_nikshay"=>$sendToNikshayBtn,
+                     "bmwButton"=>$bmwButton,
+                     "naatresult"=>$naatresult,
 					 "referal_facility"=>$samples->facility_id,
 					 "sample_type"=>$samples->sample_type,
 					 "date_of_receipt"=>date('d/m/Y', strtotime($samples->date)),
@@ -457,13 +585,14 @@ class MicroController extends Controller
 			}
 		}	
 			
-
+        //dd($data);
 		## Response
 		$response = array(
 		  "draw" => intval($draw),
 		  "iTotalRecords" => $totalRecords,
 		  "iTotalDisplayRecords" => $totalRecordwithFilter,
-		  "aaData" => $data
+		  "aaData" => $data,
+          "rc_count" => $count
 		);
 		echo json_encode($response);
 		
@@ -485,6 +614,71 @@ class MicroController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
+
+     public function checkForRequestLCDstDataExist($enroll_id)
+     {
+         $result = false;
+         $data = array();
+        $total_rec = LCDSTInoculation::select(DB::raw('COUNT(*) AS total_rec'))
+                    ->where('enroll_id', $enroll_id)                    
+                    ->get();
+
+                    if($total_rec[0]->total_rec >= 1)
+                    {
+                        $result = true;
+                        /* This below variable is for checking that lcdst will start from 2nd time or afb culture from 3rd time */
+                            $third_onwards_afb_second_onwards_lcdst = 1;
+                        /* end */
+                        $get_max_date = CultureInoculation::select(DB::raw("MAX(STR_TO_DATE(inoculation_date, '%Y-%m-%d')) AS max_date"))
+                        ->where('enroll_id', $enroll_id)                        
+                        ->get();
+
+                        $date1 = strtotime($get_max_date[0]->max_date);
+                        $date2 = strtotime(date('Y-m-d'));
+                        $datediff = $date2 - $date1;
+                        $days = $datediff / (60 * 60 * 24); 
+                        if($days <= 5)
+                        {
+                            $service_id = 21;
+
+                            $max_rec_flag = ServiceLog::select(DB::raw('MAX(rec_flag) AS max_rec_flag'))
+                                        ->where('enroll_id', $enroll_id)                                        
+                                        ->where('service_id', '21')
+                                        ->get();                                        
+                            $rec_flag = $max_rec_flag[0]->max_rec_flag + 1;
+
+
+                        } else {
+
+                            $service_id = 16;
+                            $max_rec_flag = ServiceLog::select(DB::raw('MAX(rec_flag) AS max_rec_flag'))
+                                        ->where('enroll_id', $enroll_id)                                        
+                                        ->where('service_id', '21')
+                                        ->get();                                        
+                            $rec_flag = $max_rec_flag[0]->max_rec_flag + 1;
+
+                        }
+
+                        $data = array(
+                                        "service_id" => $service_id,
+                                        "rec_flag"   => $rec_flag,
+                                        'third_onwards_afb_second_onwards_lcdst' => $third_onwards_afb_second_onwards_lcdst
+                        );                        
+
+                    }
+                    else
+                    {
+                        $result = false;
+                        $data = array();
+                    }
+
+                    $response = array(
+                                        "data" => $data,
+                                        "result" => $result
+                    );
+                    echo json_encode($response);
+     }
+
     public function store(Request $request)
     {
         //dd($request->all());	   
@@ -509,6 +703,7 @@ class MicroController extends Controller
                 ->update(['status' => 0]);
 
             $rec_flag=0;//For Add Test
+            $max_rec_flag_drug = 0; // For drug rec_flag
             // If process comes from Cancel Process Page(Current Status Page), then remove
             // set the invalidate the status of old service log item.
             /*if($request->action === 'cancel-process'){
@@ -637,13 +832,149 @@ class MicroController extends Controller
 										DB::table('t_lj_dst_reading')->where('enroll_id',$request->enrollId1)->delete();
 										DB::table('t_lj_dst_inoculation')->where('enroll_id',$request->enrollId1)->delete();
 									}
-								 break;
-                           
-     
+								 break;    
                     }
 				
 				$rec_flag=$request->rec_flag+1;
                }
+
+               //dd($request->all());
+
+               if( isset($request->drugs) )
+               {
+                   /* This below variable will check that is afb culture will start from 3rd time and onwards and lcdst 2nd time and onwards */
+                    if( $request->third_onwards_afb_second_onwards_lcdst != '1')
+                    {
+                        
+                                    $is_exists =  ServiceLog::select(DB::raw('COUNT(*) AS total_rec'))
+                                    ->where('enroll_id', $request->enrollId1)
+                                    ->where('status', '0')
+                                    ->where('service_id', '16')
+                                    ->get();
+
+                                    //dd($is_exists[0]->total_rec);
+
+                            if($is_exists[0]->total_rec >= 1)
+                            {
+                                $max_rec_flag = ServiceLog::select(DB::raw('MAX(rec_flag) AS max_rec_flag'))
+                                                ->where('enroll_id', $request->enrollId1)
+                                                ->where('status', '0')
+                                                ->where('service_id', '16')
+                                                ->get();
+
+                                
+                                if($max_rec_flag[0]->max_rec_flag == '0')
+                                {
+                                    /* if(in_array('6', $request->drugs['lcdst']))
+                                    {
+                                        $rec_flag = 59;
+                                    }
+                                    else
+                                    {
+                                        $rec_flag = 55;
+                                    } */
+
+                                    $rec_flag = 55;
+                                    $max_rec_flag_drug = 55;
+
+                                    ServiceLog::create([
+                                        'enroll_id' => $request->enrollId1,
+                                        'sample_id' => $sample_id,
+                                        'enroll_label' => $enroll_label,
+                                        'sample_label' => $request->sampleid1,
+                                        'service_id' => 16,
+                                        'reported_dt' => date('Y-m-d'),
+                                        'status' => $status,
+                                        'tag' => 'LC',
+                                        'rec_flag'=> $rec_flag,
+                                        'test_date' => date('Y-m-d H:i:s'),
+                                        'created_by' => Auth::user()->id,
+                                        'updated_by' => Auth::user()->id
+                                    ]);
+
+
+
+                                } else {
+
+                                    $rec_flag = $max_rec_flag[0]->max_rec_flag + 1;
+                                    $max_rec_flag_drug = $rec_flag;
+
+                                    ServiceLog::create([
+                                        'enroll_id' => $request->enrollId1,
+                                        'sample_id' => $sample_id,
+                                        'enroll_label' => $enroll_label,
+                                        'sample_label' => $request->sampleid1,
+                                        'service_id' => 16,
+                                        'reported_dt' => date('Y-m-d'),
+                                        'status' => $status,
+                                        'tag' => 'LC',
+                                        'rec_flag'=> $rec_flag,
+                                        'test_date' => date('Y-m-d H:i:s'),
+                                        'created_by' => Auth::user()->id,
+                                        'updated_by' => Auth::user()->id
+                                    ]);
+
+                                }
+                                
+                            }
+                            else
+                            {
+                                ServiceLog::create([
+                                    'enroll_id' => $request->enrollId1,
+                                    'sample_id' => $sample_id,
+                                    'enroll_label' => $enroll_label,
+                                    'sample_label' => $request->sampleid1,
+                                    'service_id' => 16,
+                                    'reported_dt' => date('Y-m-d'),
+                                    'status' => $status,
+                                    'tag' => 'LC',
+                                    'rec_flag'=> 0,
+                                    'test_date' => date('Y-m-d H:i:s'),
+                                    'created_by' => Auth::user()->id,
+                                    'updated_by' => Auth::user()->id
+                                ]);
+                            } 
+
+                    } elseif( $request->choose_sample == '2')
+                    {
+                        $max_rec_flag_drug = $request->rec_flag;
+                        ServiceLog::create([
+                            'enroll_id' => $request->enrollId1,
+                            'sample_id' => $sample_id,
+                            'enroll_label' => $enroll_label,
+                            'sample_label' => $request->sampleid1,
+                            'service_id' => $request->service1,
+                            'reported_dt' => date('Y-m-d'),
+                            'status' => 1,
+                            'tag' => 'LC',
+                            'rec_flag'=> $request->rec_flag,
+                            'test_date' => date('Y-m-d H:i:s'),
+                            'created_by' => Auth::user()->id,
+                            'updated_by' => Auth::user()->id
+                        ]);
+
+                    } else
+                    {
+                        $max_rec_flag_drug = $request->rec_flag;
+
+                        ServiceLog::create([
+                            'enroll_id' => $request->enrollId1,
+                            'sample_id' => $sample_id,
+                            'enroll_label' => $enroll_label,
+                            'sample_label' => $request->sampleid1,
+                            'service_id' => $request->service1,
+                            'reported_dt' => date('Y-m-d'),
+                            'status' => 1,
+                            'tag' => 'LC',
+                            'rec_flag'=> $request->rec_flag,
+                            'test_date' => date('Y-m-d H:i:s'),
+                            'created_by' => Auth::user()->id,
+                            'updated_by' => Auth::user()->id
+                        ]);
+                    }               
+                
+                } else {
+
                 ServiceLog::create([
                     'enroll_id' => $request->enrollId1,
                     'sample_id' => $sample_id,
@@ -659,18 +990,76 @@ class MicroController extends Controller
                     'updated_by' => Auth::user()->id
                 ]);
 
+               }               
+
             }
 			//if drugs exist
             if(isset($request->drugs)){
-               if(!empty($request->drugs['lcdst'])){//For LCDST
-					$count_drug_exists=DSTDrugTR::where('enroll_id', $request->enrollId1)->where('service_id', 21)->where('status', 1)->count();
-					$drug_str = implode(',',$request->drugs['lcdst']);
+               if(!empty($request->drugs['lcdst'])){ //For LCDST
+                    $drug_arr = array();
+                    $old_drugs = array();
+                    $expl_old_drugs = array();
+                    $z_drug = "";
+                    $drug_str = "";
+					$count_drug_exists=DSTDrugTR::select('drug_ids')
+                    ->where('enroll_id', $request->enrollId1)->where('service_id', 21)->where('status', 1)->get();
+                    if(!empty($count_drug_exists))
+                    {
+                        foreach($count_drug_exists as $oldDrug)
+                        {
+                            if( strpos($oldDrug->drug_ids, ',') !== false ) 
+                            {
+                                $expl_old_drugs = explode(',', $oldDrug->drug_ids);
+
+                                foreach($expl_old_drugs as $explolddrugs)
+                                {
+                                    array_push($old_drugs, $explolddrugs);
+                                }
+                            }
+                            else {
+                                array_push($old_drugs, $oldDrug->drug_ids);
+                            }
+                        }
+                    }
+
+					foreach($request->drugs['lcdst'] as $val)
+                    {
+                        if(!empty($old_drugs))
+                        {
+                            if(!in_array($val, $old_drugs))
+                            {                                
+                                    $drug_arr[] = $val;                               
+                            }
+                        }
+                        else
+                        {                                
+                                    $drug_arr[] = $val;                               
+                        }                                               
+                    }                   
+
+                    if(!empty($drug_arr))
+                    {
+                        $drug_str = implode(',', $drug_arr);
+
+                        DSTDrugTR::create([
+                            'enroll_id' => $request->enrollId1,
+                            'sample_id' => $sample_id,
+                            'service_id'=>21,
+                            'drug_ids' => $drug_str,
+                            'status' => 1,
+                            'flag' => 1,
+                            'created_by'=>$request->user()->id,
+                            'updated_by'=>$request->user()->id,
+                            'rec_flag'  => $max_rec_flag_drug
+                          ]);    
+                    }                     
+                    
 					 // dd($count_drug_exists);
-					if($count_drug_exists < 1){
+					/* if($count_drug_exists < 1){
 
 					  DSTDrugTR::create([
 						'enroll_id' => $request->enrollId1,
-						'sample_id' => '0',
+						'sample_id' => $sample_id,
 						'service_id'=>21,
 						'drug_ids' => $drug_str,
 						'status' => 1,
@@ -681,8 +1070,9 @@ class MicroController extends Controller
 					}else{
 					  DSTDrugTR::where('enroll_id',$request->enrollId1)->where('service_id', 21)->update(['drug_ids'=>$drug_str]);
 
-					}
+					} */
 			   }
+
 			   if(!empty($request->drugs['ljdst'])){//For LJDST
 					$count_drug_exists=DSTDrugTR::where('enroll_id', $request->enrollId1)->where('service_id', 22)->where('status', 1)->count();
 					$drug_str = implode(',',$request->drugs['ljdst']);
@@ -766,7 +1156,7 @@ class MicroController extends Controller
 
 
         }
-// dd($request->all());
+//dd($request->all());
 
 
         // dd($get);
@@ -2287,11 +2677,33 @@ value='".$drugs['id']."' name='drugs[]' type='checkbox'>".$drugs['name']."</div>
     }
     public function getAddTestDstDrugs($enroll_id){
 		$html ='';
+        $drugids = array();
+        $expl_drugs = array();
         $existing_drugs_lc=[];
         $drugs=DB::table('t_dst_drugs_tr')->where('enroll_id',$enroll_id)->where('service_id',21)->pluck('drug_ids');
         //dd($drugs);
         if(count($drugs)>0){
-			$drugids = explode(',',$drugs[0]);               
+            foreach($drugs as $drug)
+            {
+                
+                if( strpos($drug, ',') !== false ) {
+                    $expl_drugs = explode(',',$drug); 
+                    foreach($expl_drugs as $expldrug)
+                    {
+                        array_push($drugids, $expldrug);
+                    }
+               }
+               else{
+                   if($drug != "")
+                   {
+                    
+                    array_push($drugids, $drug);
+
+                    //print_r($drugids);
+                   }
+               }
+            }
+			    //dd($drugids);
 			$data['drugs'] = LCDSTDrugs::whereIn('id',$drugids)->get();
 			unset($existing_drugs_lc);
 			foreach( $data['drugs'] as $dg){                        
@@ -2300,7 +2712,8 @@ value='".$drugs['id']."' name='drugs[]' type='checkbox'>".$drugs['name']."</div>
          }      
         
 		//dd($existing_drugs_lc); die;
-        $dstdrugs = LCDSTDrugs::select('id','name')->where('status',1)->get();		
+        $dstdrugs = LCDSTDrugs::select('id','name')       
+        ->where('status',1)->get();		
         $html .= '<div class="row col-md-12 dst_drugs_lc_section" style="display: none;"><label class="col-md-12"><h5>LC DST Drugs:</h5></label>';
         foreach($dstdrugs as $key=>$drugdata){					   
 		  $checkedlc = "";
@@ -2405,6 +2818,8 @@ value='".$addtestdata->id."' name='addtest[]' type='checkbox' ".$checked." ".$re
 		 //dd($existing_service_ids);
         return $existing_service_ids;
     }
+
+
 	public function sendToNikshay(Request $request)
     {
 		//dd($request->all());
@@ -2412,8 +2827,10 @@ value='".$addtestdata->id."' name='addtest[]' type='checkbox' ".$checked." ".$re
 		//Update enrolls display_flag for display/not display in enrolls listing
 		Enroll::where('label',$request->enrolid1)->update(['display_flag'=>1, 'updated_at' => date('Y-m-d H:i:s')]);		
 		return redirect('/microbiologist');
-
 	}
+
+    
+
     public function getRetestSentToMap($serviceId,$optionId,$tagId){
 
         $senttolist='';
@@ -2784,7 +3201,7 @@ value='".$addtestdata->id."' name='addtest[]' type='checkbox' ".$checked." ".$re
             //dd($data['done']);           
             return view('admin.microbiologist.history',compact('data'));
     }
-	public function checkForTestRequest($enroll_id,$service_id,$tag=null,$reqServ_service_id)
+	public function checkForTestRequest($enroll_id,$service_id,$tag=null,$reqServ_service_id, $log_id)
     { 
 		 
           //DB::enableQueryLog();		  
@@ -2828,10 +3245,112 @@ value='".$addtestdata->id."' name='addtest[]' type='checkbox' ".$checked." ".$re
 			}else{
 				$servicesexist=1;
 			}
+
+            $reponse = array(
+                'log_id'        => $log_id,
+                'servicesexist' => $servicesexist
+            );
 			
 
-			echo json_encode($servicesexist);
+			echo json_encode($reponse);
 			
 
     }
+
+    function sendToBMW($log_id, $enroll_id, $sample_id, $service_id)
+    {
+        $get_service_data = ServiceLog::find( $log_id );
+
+        Microbio::where(['sample_id' => $sample_id, 'enroll_id' => $enroll_id, 'service_id' => $service_id, 'rec_flag' => $get_service_data->rec_flag])->update([ 'bmw_flag' => '1' ]);
+
+        $micro_data = Microbio::create([
+            'sample_id' => $sample_id,
+            'enroll_id' => $enroll_id,
+            'service_id' => '26',
+            'status' => '0',                       
+            'created_by' => Auth::user()->id,
+            'updated_by' => Auth::user()->id,
+            'rec_flag' => '0',
+            'bmw_flag' => '1'            
+          ]);
+
+          $service_data = ServiceLog::create([
+            'sample_id' => $sample_id,
+            'enroll_id' => $enroll_id,
+            'service_id' => '26',
+            'status' => '1',                       
+            'created_by' => Auth::user()->id,
+            'updated_by' => Auth::user()->id,
+            'rec_flag' => '0',              
+          ]);
+
+          $reponse = array(
+            'micro_data'        => $micro_data,
+            'service_data'      => $service_data
+        );
+        
+
+        echo json_encode($reponse);         
+
+
+    }
+
+    public function sendToNikshayBulk(Request $request)
+    {
+		//dd($request->all());
+
+        $tsl_id_arr = array();
+        $tsl_id_arr = $request->tsl_id;
+        $data_arr = $request->all();
+
+        //dd($data_arr);
+
+        foreach($tsl_id_arr as $tsl_id)
+        {  
+            if($request->isBMW == '0') 
+            {
+                ServiceLog::where('id',$tsl_id)->update(['sent_to_nikshay'=>1,'sent_to_nikshay_date' => date('Y-m-d H:i:s'), 'updated_by' => Auth::user()->id, 'updated_at' => date('Y-m-d H:i:s')]);
+            //Update enrolls display_flag for display/not display in enrolls listing
+                Enroll::where('label',$data_arr['enrolid_nikshay'.$tsl_id])->update(['display_flag'=>1, 'updated_at' => date('Y-m-d H:i:s')]);
+
+                $service_data = ServiceLog::find( $tsl_id );
+
+                Microbio::where(['sample_id' => $service_data->sample_id, 'enroll_id' => $service_data->enroll_id, 'service_id' => $service_data->service_id, 'rec_flag' => $service_data->rec_flag])->update(['microbio_comments' => $request->comments]); 
+
+            } else {
+
+                $get_service_data = ServiceLog::find( $tsl_id );
+
+                Microbio::where(['sample_id' => $get_service_data->sample_id, 'enroll_id' => $get_service_data->enroll_id, 'service_id' => $get_service_data->service_id, 'rec_flag' => $get_service_data->rec_flag])->update([ 'bmw_flag' => '1' ]);
+
+                $micro_data = Microbio::create([
+                    'sample_id' => $get_service_data->sample_id,
+                    'enroll_id' => $get_service_data->sample_id,
+                    'service_id' => '26',
+                    'status' => '0',                       
+                    'created_by' => Auth::user()->id,
+                    'updated_by' => Auth::user()->id,
+                    'rec_flag' => '0',
+                    'bmw_flag' => '1'            
+                ]);
+
+                $service_data = ServiceLog::create([
+                    'sample_id' => $get_service_data->sample_id,
+                    'enroll_id' => $get_service_data->sample_id,
+                    'service_id' => '26',
+                    'status' => '1',                       
+                    'created_by' => Auth::user()->id,
+                    'updated_by' => Auth::user()->id,
+                    'rec_flag' => '0',              
+                ]);
+
+            }      
+            
+
+        }
+
+        //dd($data_arr);
+
+		return redirect('/microbiologist');
+	}
 }

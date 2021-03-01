@@ -205,11 +205,12 @@ class LCFlaggedMGITFurtherController extends Controller
     {
         try{
           $data = [];
+          //DB::enableQueryLog();	
             $data['sample'] = ServiceLog::select('m.enroll_id','m.id as sample_id', 'm.receive_date as receive','m.test_reason as reason','is_accepted',
 			's.result','t_service_log.sample_label as samples','t_service_log.enroll_label as enroll_label','t_service_log.service_id',
 			't_service_log.id as log_id', 't_service_log.status','m.no_of_samples','t.status as dna_status','t.created_at as date_of_extraction',
 			'ci.mgit_id','ci.tube_id_lj','ci.tube_id_lc','ci.inoculation_date', 'lfm.gu','lfm.flagging_date','lfmf.ict', 'lfmf.culture_smear', 'lfmf.bhi', 
-			'lfmf.result as final_result', 'lfmf.result_date','t_service_log.tag','t_service_log.enroll_id AS enrollID','t_service_log.sample_id AS sampleID',
+			'lfmf.result as final_result', 'lfmf.result_date','t_service_log.tag','t_service_log.enroll_id AS enrollID', 't_service_log.sample_id AS sampleID',
 		  't_service_log.rec_flag')
           ->leftjoin('sample as m','m.id','=','t_service_log.sample_id')
           ->leftjoin('t_dnaextraction as t', function ($join) {
@@ -221,13 +222,29 @@ class LCFlaggedMGITFurtherController extends Controller
                    ->where('s.status', 1);
           })
           //->leftjoin('t_microscopy as s','s.sample_id','=','t_service_log.sample_id')
-          ->leftjoin('t_culture_inoculation as ci','ci.sample_id','=','t_service_log.sample_id')
-          ->leftjoin('t_lc_flagged_mgit as lfm','lfm.sample_id','=','t_service_log.sample_id')
-          ->leftjoin('t_lc_flagged_mgit_further as lfmf','lfmf.sample_id','=','t_service_log.sample_id')
-          ->where('t_service_log.id',$id)
+          ->leftjoin('t_culture_inoculation as ci','ci.rec_flag','=','t_service_log.rec_flag')
+          
+
+          /* ->leftjoin('t_lc_flagged_mgit as lfm1','lfm1.enroll_id','=','t_service_log.enroll_id') */
+          ->leftjoin('t_lc_flagged_mgit as lfm','lfm.rec_flag','=','t_service_log.rec_flag')
+
+          //->leftjoin('t_lc_flagged_mgit_further as lfmf','lfmf.rec_flag','=','t_service_log.rec_flag')
+          ->leftjoin('t_lc_flagged_mgit_further as lfmf', function($join) {
+            $join->on('lfmf.rec_flag','=','t_service_log.rec_flag')
+                  ->on('lfmf.enroll_id','=','t_service_log.enroll_id');
+          })
+          //->leftjoin('t_lc_flagged_mgit_further as lfmfk','lfmfk.rec_flag','=','t_service_log.rec_flag')
+         
+
+           //->leftjoin('t_lc_flagged_mgit_further as lfmf2','lfmf2.enroll_id','=','t_service_log.enroll_id') 
+           //->leftjoin('t_lc_flagged_mgit_further as lfmfc','lfmfc.sample_id','=','t_service_log.sample_id') 
+         /* ->join('t_lc_flagged_mgit_further as lfmfk','lfmfk.rec_flag','=','t_service_log.rec_flag') */  
+          ->where('t_service_log.id',$id) 
+                     
          // ->where('s.status',1)
           ->whereIn('t_service_log.status',[0,1,2,4])
           ->first();
+          //dd(DB::getQueryLog());
           //dd($data['sample']);
           return view('admin.lc_flagged_mgit_further.dashboard',compact('data'));
         }catch(\Exception $e){
@@ -279,14 +296,18 @@ class LCFlaggedMGITFurtherController extends Controller
 	  DB::beginTransaction();
       try {
 		  $logdata = ServiceLog::find($request->log_id);
-		  $count=  LCFlaggedMGITFurther::where('sample_id',$logdata->sample_id)->where('enroll_id',$logdata->enroll_id)->count();
+		  $count=  LCFlaggedMGITFurther::where('sample_id',$logdata->sample_id)
+                                    ->where('enroll_id',$logdata->enroll_id)
+                                    ->where('rec_flag', $logdata->rec_flag)
+                                    ->count();
 		  //dd($count);
 		  if($count < 1){
 
 					 LCFlaggedMGITFurther::create([
 					  'sample_id' => $logdata->sample_id,
 					  'enroll_id' => $logdata->enroll_id,
-					  'ict' => $request->ict
+					  'ict' => $request->ict,
+            'rec_flag' => $logdata->rec_flag
 				   ]);
 
 		  }else{
@@ -326,14 +347,18 @@ class LCFlaggedMGITFurtherController extends Controller
 		try {
 
           $logdata = ServiceLog::find($request->log_id);
-          $count=  LCFlaggedMGITFurther::where('sample_id',$logdata->sample_id)->where('enroll_id',$logdata->enroll_id)->count();
+          $count=  LCFlaggedMGITFurther::where('sample_id',$logdata->sample_id)
+          ->where('enroll_id',$logdata->enroll_id)
+          ->where('rec_flag', $logdata->rec_flag)          
+          ->count();
             //dd($count);
             if($count < 1){
 
                        $data = LCFlaggedMGITFurther::create([
                         'sample_id' => $logdata->sample_id,
                         'enroll_id' => $logdata->enroll_id,
-                        'culture_smear' => $request->culture_smear
+                        'culture_smear' => $request->culture_smear,
+                        'rec_flag' => $logdata->rec_flag
                      ]);
 
             }else{
@@ -370,14 +395,18 @@ class LCFlaggedMGITFurtherController extends Controller
 		DB::beginTransaction();
 		try {
 		  $logdata = ServiceLog::find($request->log_id);
-		  $count=  LCFlaggedMGITFurther::where('sample_id',$logdata->sample_id)->where('enroll_id',$logdata->enroll_id)->count();
+		  $count=  LCFlaggedMGITFurther::where('sample_id',$logdata->sample_id)
+      ->where('enroll_id',$logdata->enroll_id)
+      ->where('rec_flag', $logdata->rec_flag)
+      ->count();
 		  //  dd($count);
         if($count < 1){
 
                    $data = LCFlaggedMGITFurther::create([
                     'sample_id' => $logdata->sample_id,
                     'enroll_id' => $logdata->enroll_id,
-                    'bhi' => $request->bhi
+                    'bhi' => $request->bhi,
+                    'rec_flag' => $logdata->rec_flag
                  ]);
 
         }else{

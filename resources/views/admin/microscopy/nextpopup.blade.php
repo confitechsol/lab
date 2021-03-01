@@ -50,7 +50,7 @@
                        <option value="16" id="liquid_culture">Liquid Culture</option>
                        <option value="16" id="both">Solid and Liquid Culture</option>
                        <option value="11" id="storage">Sent for storage</option>
-						           <!-- <option value="25" id="Sent_for">Sent for microbiologist</option> -->
+						           <option value="25" id="Sent_for">Sent for microbiologist</option> 
                        <!-- <option value="12" id="Sent_for">Sent for microbiologist</option> -->
 
                      </select>

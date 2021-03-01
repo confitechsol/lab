@@ -37,7 +37,7 @@
                 <div class="col-md-12">
                    <label class="col-md-12">Positive MGIT sequence ID <span class="red">*</span></label>
                    <div class="col-md-12">
-                      <input type="text" name="mgit_seq_id" id="mgit_seq_id" class="form-control form-control-line" value=""  required readonly>
+                      <input type="text" name="mgit_seq_id" id="mgit_seq_id" class="form-control form-control-line" value=""  required>
                   </div>
                </div>
             </div>
@@ -123,7 +123,7 @@ $(function(){
 		
 	
 		$.ajax({
-				  url: "{{url('check_for_lcdst_inaucolation_already_process')}}"+'/'+enroll_id,
+				  url: "{{url('check_for_lcdst_inaucolation_already_process')}}"+'/'+enroll_id+'/'+rec_flag,
 				  type:"GET",
 				  processData: false,
 				  contentType: false,

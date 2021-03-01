@@ -249,7 +249,7 @@ $(document).ready(function() {
   today = dd + '-' + mm + '-' + yyyy;
      var dataTable =$('#exampl').DataTable( {
         dom: 'Bfrtip',
-		pageLength:25,
+		pageLength:5,
 		processing: true,
 		language: {
             loadingRecords: '&nbsp;',

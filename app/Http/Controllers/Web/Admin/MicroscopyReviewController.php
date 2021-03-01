@@ -188,6 +188,8 @@ class MicroscopyReviewController extends Controller
      */
     public function bulkStore( Request $request ){      
 
+      // dd('2');
+     /* dd($request->all()); */
 
         // Validate User Inputs ===========================================
         $this->validate( $request, [
@@ -215,14 +217,14 @@ class MicroscopyReviewController extends Controller
             if(count($data['sample']) > 0){                  
                 foreach($data['sample'] as $key => $value){
                     
-                   // dd($value);
+                   //dd($value);
                   // Log this change to ServiceLog ==============================
                   
                   if($service_id1 == 25){
                       Microbio::create([
                         'enroll_id' => $value->enroll_id,
                         'sample_id' => $value->sample_id,
-                        'service_id' => 14,
+                        'service_id' => $value->service_id,
                         //'service_id' => $value->service_id,
                         //'service_id' => $service_id1,
                         'status'    => '0',        
@@ -238,7 +240,7 @@ class MicroscopyReviewController extends Controller
                             'id' => $key,                   
                           ])->update([
                             'comments'=> $comments,
-                            'service_id'=> 14,
+                            'service_id'=> $value->service_id,
                             //'stage'=> 0,
                             'status' => 0,                    
                             'created_by' => Auth::user()->id,
@@ -247,6 +249,10 @@ class MicroscopyReviewController extends Controller
 
 
                   }else{
+
+
+
+
                     //dd($value);
                 ServiceLog::where([
                     'id' => $key,                   
@@ -272,6 +278,21 @@ class MicroscopyReviewController extends Controller
                     'created_by' => Auth::user()->id,
                     'updated_by' => Auth::user()->id
                   ]);
+
+                  Microbio::create([
+                    'enroll_id' => $value->enroll_id,
+                    'sample_id' => $value->sample_id,
+                    'service_id' => $value->service_id,
+                    //'service_id' => $value->service_id,
+                    //'service_id' => $service_id1,
+                    'status'    => '0',        
+                    'report_type'    => 'End Of Report',        
+                    'tag' => $value->tag,
+                    'next_step' => '',
+                    'created_by' => Auth::user()->id,
+                    'updated_by' => Auth::user()->id
+                  ]);
+                  
                   }
                 }             
             }     

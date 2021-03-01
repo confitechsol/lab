@@ -2,6 +2,7 @@
 @section('content')
 <link rel="stylesheet" href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.18/themes/smoothness/jquery-ui.css" />
 <link rel="stylesheet" href="{{ url('/css/bootstrap-toggle.min.css') }}"/>
+
 <style>
 .overlay {
     background-color:#EFEFEF;
@@ -183,14 +184,6 @@ border-color: #5cb85c;
                    </div>
                    </div>
 
-
-
-
-
-
-
-
-
                  </div>
                     <div class="row">
                       <div class="col">
@@ -215,6 +208,16 @@ border-color: #5cb85c;
                                         <!-- <input type="text" name="enroll_label" class="form-control form-control-line" value="<?php //echo  str_pad($data['enroll_id'], 10, "0", STR_PAD_LEFT); ?>" id="enroll_label" required> -->
 
                                         <input type="text" id="enroll_label" name="enroll_label" class="form-control form-control-line" onKeyPress="if(this.value.length==11) return false;" id="enroll_label" readonly required>
+
+                                        <input type="hidden" id="state_id" name="state_id" value="" />
+                                        <input type="hidden" id="state_name" name="state_name" value="" />
+                                        <input type="hidden" id="district_id" name="district_id" value="" />
+                                        <input type="hidden" id="district_name" name="district_name" value="" />
+                                        <input type="hidden" id="tu_id" name="tu_id" value="" />
+                                        <input type="hidden" id="tu_name" name="tu_name" value="" />
+                                        <input type="hidden" id="phi_id" name="phi_id" value="" />
+                                        <input type="hidden" id="phi_name" name="phi_name" value="" />
+
                                       </div>
                                     </div>
                                   </div>
@@ -246,9 +249,6 @@ border-color: #5cb85c;
                                 <div class="card-block">
                                     <h4>Sample </h4>
                                     <div class="row">
-
-
-
                                         <div class="col ">
                                             <label class="col-md-12">Sample ID <span class="red">*</span> </label>
                                             <div class="col-md-12">
@@ -462,9 +462,93 @@ border-color: #5cb85c;
             <!-- ============================================================== -->
             <!-- End footer -->
             <!-- ============================================================== -->
-        </div>
+        </div>        
+          <!-- Button HTML (to Trigger Modal) -->         
+          
+          <!-- Modal HTML -->
+          
+<button class="room" id="RM1" href="#my_modal" data-toggle="modal"  data-target="#my_modal" style="display: none;" data-rm-id="RM1">Save Click<i class="far fa-map iconMap"></i></button>
+
+<div id="my_modal" class="modal fade top10" role="dialog" data-keyboard="false" data-backdrop="static" style="z-index:100000 !important;">
+  <div class="modal-dialog" role="document">
+      <div class="modal-content">
+          <div class="modal-header">
+              <h5 class="modal-title">Confirmation</h5>
+              <div style="clear: both;"></div>
+              <div id="alert"></div>              
+          </div>
+          <div class="modal-body">
+            <div class="row">
+              <div class="col-sm-9">                
+                <div class="row">
+                  <div class="col-xs-6 col-sm-6">
+                    <label class="col-md-12">State <span class="red">*</span></label>
+                  </div>
+                  <div class="col-xs-6 col-sm-6">
+                    <select class="form-control form-control-line" name="state" value="" id="state" required>
+                      <option value="">select</option>
+                      @foreach ($data['states'] as $key => $state)
+                        <option value="{{ $state->id }}">{{ $state->name }}</option>
+                      @endforeach                      
+                    </select>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-sm-9">                
+                <div class="row">
+                  <div class="col-xs-6 col-sm-6">
+                    <label class="col-md-12">District <span class="red">*</span></label>
+                  </div>
+                  <div class="col-xs-6 col-sm-6">
+                    <select class="form-control form-control-line" name="district" value="" id="district" required>
+                      <option value="">select</option>         
+                    </select>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-sm-9">                
+                <div class="row">
+                  <div class="col-xs-6 col-sm-6">
+                    <label class="col-md-12">TU <span class="red">*</span></label>
+                  </div>
+                  <div class="col-xs-6 col-sm-6">
+                    <select class="form-control form-control-line" name="tu" value="" id="tu" required>
+                      <option value="">select</option>                                  
+                    </select>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-sm-9">                
+                <div class="row">
+                  <div class="col-xs-6 col-sm-6">
+                    <label class="col-md-12">PHI <span class="red">*</span></label>
+                  </div>
+                  <div class="col-xs-6 col-sm-6">
+                    <select class="form-control form-control-line" name="phi" value="" id="phi" required>
+                      <option value="">select</option>                              
+                    </select>
+                  </div>
+                </div>
+              </div>
+            </div>       
+          </div>
+          <div class="modal-footer">              
+              <button type="button" class="btn btn-primary" id="frm_submit">Submit</button>
+          </div>
+      </div>
+  </div>
+</div>
+
 
 </body>
+
+
 <script>
 $(document).on('change',"#next_testB", function(){	
     //alert($("#next_testA").val());
@@ -1012,9 +1096,9 @@ var alpha = ["A","B","C","D","E"];
             dateFormat: "dd/mm/yyyy"
         }).datepicker("setDate", "0");
 
-        $("#submit_sample").on('click',function(){
-		 var noOfSample=$("#noOfSample").val();
-			
+        $("#submit_sample").on('click',function(e){          
+
+		      var noOfSample=$("#noOfSample").val();			
           document.getElementById("test_reasonA").removeAttribute("disabled","disabled");
           document.getElementById("next_testA").removeAttribute("disabled","disabled");
           document.getElementById("sample_qualityA").removeAttribute("disabled","disabled");
@@ -1026,7 +1110,14 @@ var alpha = ["A","B","C","D","E"];
 			  //document.getElementById("test_reasonC").removeAttribute("disabled","disabled");
 			  //document.getElementById("next_testC").removeAttribute("disabled","disabled");
 			  //document.getElementById("sample_qualityC").removeAttribute("disabled","disabled");
-          }
+          }          
+              if( $('#sample_statusA').val() == "Rejected")
+              {
+
+                  e.preventDefault();
+                  $('#RM1').trigger('click');
+                  
+              }
         });
 
     });
@@ -1301,5 +1392,165 @@ $(document).ready(function(){
 		$('.submit_date').val(this.value);
 	});
 });
+
+/* $('#my_modal').on('show.bs.modal', function(e) {
+  var id = $(e.relatedTarget).attr('id')
+  console.log(id)
+}) */
+
+$(document).ready(function() {
+
+  $('#frm_submit').on('click', function(e) {
+
+    var result = true;
+    var html = "";
+
+    if($('#state').val() == "")
+    {
+      result = false;
+      html += '<h4>Please select a State</h4>';
+
+      $('#alert').addClass('alert alert-danger');
+      $('#alert').html(html);
+    }
+
+    if($('#district').val() == "")
+    {
+      result = false;
+      html += '<h4>Please select a District</h4>';
+
+      $('#alert').addClass('alert alert-danger');
+      $('#alert').html(html);
+    }
+
+    if($('#tu').val() == "")
+    {
+      result = false;
+      html += '<h4>Please select a TU</h4>';
+
+      $('#alert').addClass('alert alert-danger');
+      $('#alert').html(html);
+    }
+
+    if($('#phi').val() == "")
+    {
+      result = false;
+      html += '<h4>Please select PHI</h4>';
+
+      $('#alert').addClass('alert alert-danger');
+      $('#alert').html(html);
+    }
+
+    if(result == false)
+    {
+      e.preventDefault();
+    } else {
+      $('#addsampleform').submit();
+    }
+
+      
+  });
+
+  $('#state').on('change', function() {
+                       var state_id = $(this).val();
+                       $('#state_id').val(state_id);
+                       $('#state_name').val($("#state option:selected").text());
+                        var html_chapter = "";
+                       $.ajax({
+                           url: "{{ route('get-districts') }}",
+                           type: "GET",
+                           data: { state_id: state_id },
+                           success: function(response) {
+                               if(response.length >= 1)
+                               {
+                                //console.log(response);
+                                $('#district').find('option').remove();
+                                //$("#chapter_id").remove();
+                                var html_option = "";
+                                html_option += '<option value="">Select a District</option>';
+                                   for(var i=0; i<response.length; i++)
+                                   {
+                                        var id = response[i].id;
+                                        var name = response[i].name;
+                                        html_option += '<option value="'+id+'">'+name+'</option>';
+                                   }
+                                   $("#district").append(html_option);
+                               }
+                           }
+                       });
+                   });
+
+    $('#district').on('change', function() {
+                       var district_id = $(this).val();
+                       $('#district_id').val(district_id);
+                       $('#district_name').val($("#district option:selected").text());
+                        var html_chapter = "";
+                       $.ajax({
+                           url: "{{ route('get-tu') }}",
+                           type: "GET",
+                           data: { district_id: district_id },
+                           success: function(response) {
+                               if(response.length >= 1)
+                               {
+                                //console.log(response);
+                                $('#tu').find('option').remove();
+                                //$("#chapter_id").remove();
+                                var html_option = "";
+                                html_option += '<option value="">Select TU</option>';
+                                   for(var i=0; i<response.length; i++)
+                                   {
+                                        var id = response[i].id;
+                                        var name = response[i].TBUnitName;
+                                        html_option += '<option value="'+id+'">'+name+'</option>';
+                                   }
+                                   $("#tu").append(html_option);
+                               }
+                           }
+                       });
+                   });
+
+    $('#tu').on('change', function() {
+                       var tu_id = $(this).val();
+                       $('#tu_id').val(tu_id);
+                       $('#tu_name').val($("#tu option:selected").text());
+                        var html_chapter = "";
+                       $.ajax({
+                           url: "{{ route('get-phi') }}",
+                           type: "GET",
+                           data: { tu_id: tu_id },
+                           success: function(response) {
+                               if(response.length >= 1)
+                               {
+                                //console.log(response);
+                                $('#phi').find('option').remove();
+                                //$("#chapter_id").remove();
+                                var html_option = "";
+                                html_option += '<option value="">Select PHI</option>';
+                                   for(var i=0; i<response.length; i++)
+                                   {
+                                        var id = response[i].id;
+                                        var name = response[i].DMC_PHI_Name;
+                                        html_option += '<option value="'+id+'">'+name+'</option>';
+                                   }
+                                   $("#phi").append(html_option);
+                               }
+                           }
+                       });
+                   });
+
+                   $('#phi').on('change', function() {
+                       var phi_id = $(this).val();
+                       $('#phi_id').val(phi_id);
+                       $('#phi_name').val($("#phi option:selected").text());
+                   });
+
+
+});
+
 </script>
+
+
+
+
+
 @endsection

@@ -5,6 +5,8 @@ namespace App\Http\Controllers\Web\Admin;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Validator;
+use App\Model\State;
+use App\Model\District;
 use App\Model\Sample;
 use App\Model\Cbnaat;
 use App\Model\Enroll;
@@ -86,6 +88,55 @@ class SampleController extends Controller
      * @return \Illuminate\Http\Response
      */
     //public function create($enroll_id)
+
+    public function getDistricts(Request $request)
+    {       
+        $state_id = $request->state_id;
+        $get_stocode = State::find($state_id);       
+
+        $get_districts = District::select('id', 'name')
+                        ->where('STOCode', $get_stocode->STOCode)
+                        ->orderBy('name', 'ASC')
+                        ->get();        
+
+        return response()->json($get_districts);
+
+    }
+
+    public function getTU(Request $request)
+    {       
+        $district_id = $request->district_id;
+        $get_district_state_code = District::find($district_id);       
+
+        $get_tus = DB::table('m_tbunits_relation')
+                    ->select('id', 'TBUnitName')
+                    ->where('STOCode', $get_district_state_code->STOCode)
+                    ->where('DTOCode', $get_district_state_code->DTOCode)
+                    ->orderBy('TBUnitName', 'ASC')
+                    ->get();        
+
+        return response()->json($get_tus);
+    }
+
+    public function getPHI(Request $request)
+    {       
+        $tu_id = $request->tu_id;
+        $get_district_state_tu_code = DB::table('m_tbunits_relation')  
+                                    ->select('STOCode', 'DTOCode', 'TBUnitCode')
+                                    ->where('id', $tu_id)
+                                    ->first();
+
+        $get_phis = DB::table('m_dmcs_phi_relation')
+                    ->select('id', 'DMC_PHI_Name')
+                    ->where('STOCode', $get_district_state_tu_code->STOCode)
+                    ->where('DTOCode', $get_district_state_tu_code->DTOCode)
+                    ->where('TBUCode', $get_district_state_tu_code->TBUnitCode)
+                    ->orderBy('DMC_PHI_Name', 'ASC')
+                    ->get();        
+
+        return response()->json($get_phis);
+    }
+
 	public function create()
     {
         //$data['enroll_id'] = $enroll_id;
@@ -97,6 +148,9 @@ class SampleController extends Controller
         $data['labcode']=date('y').substr($data['labcode'],2,3);
 
         $data['services'] = Service::select('id','name')->get();
+
+        $data['states'] = State::select('id', 'name')->get();
+
         return view('admin.sample.form1',compact('data'));
     }
 
@@ -138,7 +192,8 @@ class SampleController extends Controller
          
             // Save the Sample & Redirect ===================
 			//dd($request->all());
-            Sample::store( $request );
+            $sample_data = Sample::store( $request );
+            //dd($sample_data);
             return redirect(route('sample.index'));
 
         }

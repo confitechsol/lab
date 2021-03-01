@@ -70,6 +70,23 @@ class ServiceLogController extends Controller
 				return $microbio;
 			}
 
+			if( $request->service_id == '25' )
+			{
+				Microbio::create([
+					'enroll_id' => $service->enroll_id,
+					'sample_id' => $service->sample_id,
+					'service_id' => $service->service_id,
+					//'service_id' => $value->service_id,
+					//'service_id' => $service_id1,
+					'status'    => '0',        
+					'report_type'    => 'End Of Report',        
+					'tag' => $request->tagID,
+					'next_step' => '',
+					'created_by' => Auth::user()->id,
+					'updated_by' => Auth::user()->id
+				  ]);
+			}
+
             $status = ServiceLog::STATUS_ACTIVE;
             if( $request->service_id == ServiceLog::TYPE_STORAGE ){
                 $status = ServiceLog::STATUS_STORAGE;
