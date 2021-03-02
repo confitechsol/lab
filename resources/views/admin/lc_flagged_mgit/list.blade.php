@@ -299,6 +299,7 @@ function arrangeTable(rd_val)
  
 	$('#exampl').DataTable({
         dom: 'Bfrtip',
+        stateSave: true,
 		pageLength:25,
     bDestroy: true,
         processing: true,

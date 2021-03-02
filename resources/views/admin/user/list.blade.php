@@ -98,6 +98,7 @@ $(document).ready(function() {
   today = dd + '-' + mm + '-' + yyyy;
     $('#exampl').DataTable({
         dom: 'Bfrtip',
+        stateSave: true,
         buttons: [
             {
                 extend: 'excelHtml5',
