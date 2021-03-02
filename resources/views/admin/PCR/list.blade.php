@@ -412,6 +412,7 @@ $(document).ready(function() {
     $('#exampl').DataTable({
         dom: 'Bfrtip',
 		pageLength:25,
+    stateSave: true,
         buttons: [
             {
                 extend: 'excelHtml5',

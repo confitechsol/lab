@@ -387,6 +387,7 @@ $(document).ready(function() {
   today = dd + '-' + mm + '-' + yyyy;
     $('#exampl').DataTable({
         dom: 'Bfrtip',
+        stateSave: true,
 		pageLength:25,
         buttons: [
             {
