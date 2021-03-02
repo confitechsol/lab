@@ -105,9 +105,19 @@ input[type="checkbox"][readonly] {
                     
 					<div class="col-lg-12 col-xlg-12 col-md-12 col-sm-12 " >
 					<!-- Pradip -->
-					<div class="card" >
+					<div class="card" >            
                             <div class="card-block col-lg-12 col-xlg-12 col-md-12 col-sm-12 col-sm-12">
+                              
                                 <div class="scroll-table scroll-table-micro" >
+                                  
+                                  <table>
+                                    <tr>
+                                      <td>
+                                      <meta name="csrf-token" content="{{ csrf_token() }}">
+                                      <input type="text" name="enrollment_no" id="enrollment_no"  placeholder="Search enrol. no from db" class="form-control" />
+                                      </td>									  
+                                    </tr>
+                                    </table>
 
                                     <table id="example1" class="table table-striped table-bordered responsive col-xlg-12" cellspacing="0" width="100%">
                                         <thead>
@@ -600,6 +610,10 @@ $(document).ready(function() {
 		columnDefs: [
 			  { targets: [1,2,3,4,5,6,7,8,9,10,11], orderable: false }
 		  ]
+    });
+
+    $('#enrollment_no').keyup(function () { //alert();
+        dataTable.draw();
     });
 } );
 </script>

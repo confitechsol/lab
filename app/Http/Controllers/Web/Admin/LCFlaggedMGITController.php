@@ -283,6 +283,8 @@ class LCFlaggedMGITController extends Controller
           $inputs = '';
 				  $submitBtn="Done";	
         }
+
+        $naatresult="<a class='detail_modal bmwoff' style='color:#1E88E5; cursor:pointer; font-size:12px;' onclick=\"showNaatResult()\">View Naat Result</a>";
         
         $cur_date = strtotime(date('Y-m-d'));
         $date_of_inocculation = strtotime($samples->inoculation_date);
@@ -321,6 +323,7 @@ class LCFlaggedMGITController extends Controller
 					 "mgit_tube_seq_id"=>$samples->mgit,
            "date_of_inocculation"=>date('d-m-Y', strtotime($samples->inoculation_date)),
            "submit_btn"=>$submitBtn,
+           "naatresult"=>$naatresult,
 					 "sample_result"=>$samples->result,					 
 					 "test_requested"=>'<span '.$tdStyle.' >'.$test_requested[$samples->enroll_id].'</span>',					 
 					 "reason_for_test"=>$samples->reason,

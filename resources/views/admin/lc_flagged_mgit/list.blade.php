@@ -127,6 +127,7 @@
                                           <th>MGIT Tube sequence ID</th>
                                           <th>Date of Inoculation</th>
                                           <th>Results</th>
+                                          <th class="noExport">Field NAAT Result</th>
                                           <th>Initial Smear  result</th>
 										                      <th>Test Requested</th>
                                           <th>Reason for test (DX/FU)</th>
@@ -149,6 +150,7 @@
                                           <td></td>
                                           <td></td>
                                           <td></td>
+                                          <td></td>
                                         </tr>
                                       </tbody>
                                     </table>
@@ -164,7 +166,90 @@
             <footer class="footer"> © Copyright Reserved 2017-2018, LIMS </footer>
         </div>
 
+        <div class="modal fade" id="myModal_naat" role="dialog" >
+          <div class="modal-dialog">
+        
+            <!-- Modal content-->
+            <div class="modal-content">
+              <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">Field NAAT Result</h4>
+              </div>
+        
+               <form class="form-horizontal form-material" action="" method="post" enctype='multipart/form-data' id="naat_result">
+                        @if(count($errors))
+                          @foreach ($errors->all() as $error)
+                             <div class="alert alert-danger"><h4>{{ $error }}</h4></div>
+                         @endforeach
+                       @endif
+                  <div class="modal-body">
+        
+                      <input type="hidden" name="_token" value="{{ csrf_token() }}">
+                      
+                      <label class="col-md-12"><h5>Enrollment Id:</h5></label>
+                          <div class="col-md-12">
+                            <input type="text" name="enrollid" class="form-control form-control-line sampleId"  id="enroll-id">
+                         </div>
+                         <label class="col-md-12"><h5>Field Sample Id:</h5></label>
+                          <div class="col-md-12">
+                            <input type="text" name="sampleid" class="form-control form-control-line sampleId"  id="sample-id">
+                         </div>
+                         <label class="col-md-12"><h5>Patient Name:</h5></label>
+                          <div class="col-md-12">
+                            <input type="text" name="patientname" class="form-control form-control-line sampleId"  id="patientname">
+                         </div>
+                         <label class="col-md-12"><h5>Name of PHI where<br> testing was done:</h5></label>
+                          <div class="col-md-12">
+                            <input type="text" name="phitest" class="form-control form-control-line sampleId"  id="phitest">
+                         </div>
+                         <label class="col-md-12"><h5>Type of Result <br>(CBNAAT/TrueNAT):</h5></label>
+                          <div class="col-md-12">
+                            <input type="text" name="resultcbnnat" class="form-control form-control-line sampleId"  id="resultcbnnat">
+                         </div>
+        
+                         <label class="col-md-12"><h5>Vaid/Invalid:</h5></label>
+                          <div class="col-md-12">
+                            <input type="text" name="valid" class="form-control form-control-line sampleId"  id="valid">
+                         </div>
+        
+                         <label class="col-md-12"><h5>If Not valid <br>(Invalid/NA/ No result/Error- specifiy):</h5></label>
+                          <div class="col-md-12">
+                            <input type="text" name="invalid" class="form-control form-control-line sampleId"  id="invalid">
+                         </div>
+        
+                         <label class="col-md-12"><h5>MTB Result:</h5></label>
+                          <div class="col-md-12">
+                            <input type="text" name="mtb_result" class="form-control form-control-line sampleId"  id="mtb_result">
+                         </div>
+                         <label class="col-md-12"><h5>RIF Result:</h5></label>
+                          <div class="col-md-12">
+                            <input type="text" name="rif_result" class="form-control form-control-line sampleId"  id="rif_result">
+                         </div>
+                         <label class="col-md-12"><h5>Date of Result:</h5></label>
+                          <div class="col-md-12">
+                            <input type="text" name="dor_result" class="form-control form-control-line sampleId"  id="dor_result">
+                         </div>
+                     
+                      <br>
+                  </div>
+                  <div class="modal-footer">
+                    <!-- <button type="submit" class="btn btn-default" data-dismiss="modal">Save</button> -->
+                    <button type="button" class="btn btn-default add-button cancel btn-md" data-dismiss="modal">Cancel</button>
+                    <button type="button" class="pull-right btn btn-primary btn-md" id="confirmok2" >Ok</button>
+                  </div>
+        
+            </form>
+            </div>
+          </div>
+        </div>
+
 <script>
+
+function showNaatResult()
+{
+  $('#myModal_naat').modal('toggle');
+}
+
 $(document).ready(function(){	
   $("#extractionpopupDiv").on("submit", function(){
     $("#pageloader").fadeIn();
@@ -244,7 +329,8 @@ function arrangeTable(rd_val)
 		   { data: 'sample_id'},		   
 		   { data: 'mgit_tube_seq_id'},		   
 		   { data: 'date_of_inocculation'},
-       { data: 'submit_btn' },	
+       { data: 'submit_btn' },
+       { data: 'naatresult' },	
 		   { data: 'sample_result'},		   
 		   { data: 'test_requested' },		   
 		   { data: 'reason_for_test' },		   
