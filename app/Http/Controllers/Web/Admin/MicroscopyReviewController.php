@@ -279,19 +279,17 @@ class MicroscopyReviewController extends Controller
                     'updated_by' => Auth::user()->id
                   ]);
 
-                  Microbio::create([
+                 /*  Microbio::create([
                     'enroll_id' => $value->enroll_id,
                     'sample_id' => $value->sample_id,
-                    'service_id' => $value->service_id,
-                    //'service_id' => $value->service_id,
-                    //'service_id' => $service_id1,
+                    'service_id' => $value->service_id,                    
                     'status'    => '0',        
                     'report_type'    => 'End Of Report',        
                     'tag' => $value->tag,
                     'next_step' => '',
                     'created_by' => Auth::user()->id,
                     'updated_by' => Auth::user()->id
-                  ]);
+                  ]); */
                   
                   }
                 }             

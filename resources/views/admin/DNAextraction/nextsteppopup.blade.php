@@ -53,7 +53,7 @@
                        <option value="">--Select--</option>
 					    <option value="4">Send for 1st line LPA</option>
 						<option value="5">Send for 2nd line LPA</option>
-                        <!--<option value="6">Both 1st & 2nd line LPA</option>-->
+            <option value="6">Both 1st & 2nd line LPA</option>
 						<option value="3">Repeat extraction same sample</option>
                         <option value="1">Decontamination with stand by sample</option>
                         <option value="2">Extraction with stand by sample</option>

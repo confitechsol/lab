@@ -132,6 +132,7 @@ input[type="checkbox"][readonly] {
 											  <!--/ Draft Result</th>-->
                                               <!--<th>Interim</th>-->
 											  <th>Generate Form-15A</th>
+                        <th>Add Test</th>
 											  <th>Referal Facility</th>
                                               <th>Sample type /No. of Samples</th>
 											  <th>Date of Receipt</th>
@@ -155,6 +156,7 @@ input[type="checkbox"][readonly] {
 													<td></td>
 													<td></td>
 													<td></td>
+                          <td></td>
 													<td></td>
                                                    
                                                 </tr>
@@ -172,7 +174,7 @@ input[type="checkbox"][readonly] {
                 </div>
 
             </div>
-            <footer class="footer"> © Copyright Reserved 2017-2018, LIMS </footer>
+            <footer class="footer">  </footer>
         </div>
 
 
@@ -204,9 +206,11 @@ input[type="checkbox"][readonly] {
                 <input type="hidden" name="_token" value="{{ csrf_token() }}">
                 <input type="hidden" name="enrollId1" id="enrollId15A" value="">
                 <input type="hidden" name="sample" id="sampleID15A" value="">
-                <input type="hidden" class="service1_class" name="service1" id="service15A" value="">
+                <input type="hidden" class="service1_class" name="service1" id="service15A" value="">                
                 <input type="hidden" name="bwm_status" id="bwm_status15A" value="0">
-				<input type="hidden" name="lpa_tag" id="tag15A" value="">
+				        <input type="hidden" name="lpa_tag" id="tag15A" value="">
+                <input type="hidden" name="rec_flag" id="rec_flag" value="">
+                <input type="hidden" name="drug_name" id="drug_name" value=""> 
                 <input type="hidden" name="no_sample" class="form-control form-control-line" value="0" id="no_sample15A">
                 <input type="hidden" name="nextStep" class="form-control form-control-line" value="Print Form-15A" id="nextStep15A">
 
@@ -260,7 +264,543 @@ input[type="checkbox"][readonly] {
       </div>
     </div>
  </div>
+
+ <div class="modal fade micro_log" id="myModalAddtest" role="dialog"  id="confirmDelete">
+  <div class="modal-dialog">
+
+    <!-- Modal content-->
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+        <h4 class="modal-title">Annexure 15a &nbsp;&nbsp;ADD TEST</h4>
+      </div>
+
+       <form class="form-horizontal form-material" action="{{ url('annexure15astore') }}" method="post" enctype='multipart/form-data' id="cbnaat_result_add">
+                   <div class="alert alert-danger"><h4></h4></div>                  
+          <div class="modal-body">
+
+              <input type="hidden" name="_token" value="{{ csrf_token() }}">
+              <input type="hidden" name="enrollId1" id="enrollId1Add" value="">
+              <input type="hidden" name="sample" id="sampleIDAdd" value="">
+              <input type="hidden" name="lpa_tag" id="lpa_tagAdd" value="">
+              <input type="hidden" class="service1_class" name="service1" id="service1Add" value="">
+              <input type="hidden" name="bwm_status" id="bwm_statusAdd" value="">
+               <input type="hidden" name="no_sample" class="form-control form-control-line" value="" id="no_sample_add">
+              <input type="hidden" name="oldSampleNo" id="oldSampleNo" value="">
+              <input type="hidden" name="oldSampleID" id="oldSampleID" value="">
+              <input type="hidden" name="nextStep" id="nextStepADD" value="Send Sample">
+               <input type="hidden" name="rec_flag" id="recFlagID" value="">               
+               <input type="hidden" name="third_onwards_afb_second_onwards_lcdst" id="third_onwards_afb_second_onwards_lcdst" value="0">       
+               <input type="hidden" name="first_time_another_sample" id="first_time_another_sample" value="0">
+              <label class="col-md-12"><h5>Sample ID:</h5></label>
+                  <div class="col-md-12">
+                     <input type="text" readonly class="form-control form-control-line sampleId" name="sampleid1" id="sampleid1">
+                 </div>
+              <br>
+      
+      <label class="col-md-12"><h5>Choose Sample:<span class="red">*</span></h5></label>
+                  <div class="col-md-12">
+                      <select class="form-control form-control-line" name="choose_sample" id="choose_sample">                            
+                          <option value="1" selected>With Same Sample</option>
+                          <option value="2">With Another Sample</option>
+                      </select>
+                 </div> 
+                 <br>
+              
+              <label class="col-md-12 "><h5>Sample Send To:<span class="red">*</span></h5></label>
+                   <div class="col-md-12">
+                       <select class="form-control form-control-line sampleId " name="sentstep[]" value="" id="sentstepadd" >
+                          @foreach($data['sendtolist'] as $sendtodata)
+            <option value="{{ $sendtodata->test_id }}" data-tag="{{ $sendtodata->tag_name }}">{{ $sendtodata->test_name }}</option>
+            @endforeach						
+                       </select>
+                  </div>
+                 <br>
+         
+       <label class="col-md-12 "><h5>Add Test:<span class="red">*</span></h5></label>
+                   <div class="col-md-12 row ajax_addtest_list">
+        
+         </div>
+                 <br>   
+         
+               <!--<div class="disp_dst_drug_section">--->              
+                  
+         <div class="col-md-12 row ajax_druglist">
+          
+        </div>
+                   <!--<div class="drug_section_data row"></div>--->
+        <!--</div>-->
+                       
+                 <br>
+                            </div>
+          <div class="modal-footer">
+            <!-- <button type="submit" class="btn btn-default" data-dismiss="modal">Save</button> -->
+            <button type="button" class="btn btn-default add-button cancel btn-md" data-dismiss="modal">Cancel</button>
+            <button type="button" class="pull-right btn btn-primary btn-md" id="confirmokadd" >Ok</button>
+          </div>
+
+    </form>
+    </div>
+  </div>
+</div>
+
 <script>
+
+function openCbnaatFormAddtest(enroll_id, sample_id, service, sample_ids,rec_flag){ //alert(rec_flag);
+    //console.log("sample_ids", sample_ids.split(','));	
+	$('#choose_sample').find('option:first').attr('selected', 'selected');
+	$('.alert-danger').hide();
+  $("#enrollId1Add").val(enroll_id);
+	$("#sampleIDAdd").val(sample_id);	
+  $("#service1Add").val(service);
+	$("#recFlagID").val(rec_flag);
+	$("#bwm_statusAdd").val(0);
+	$("#no_sample_add").val(0);
+	$(".sampleId").val(sample_ids);//set input type test
+	$("#oldSampleNo").val(sample_ids);
+	$("#oldSampleID").val(sample_id);
+	$('#confirmokadd').prop('disabled', true);
+	$('.dst_drugs_lc_section').hide();
+	$('.dst_drugs_lj_section').hide();
+	
+    //$("#sample-id").val(sample_ids);
+    
+	//DST Drugs ajax
+	$.ajax({
+          url: "{{url('get_add_dst_drugs')}}"+'/'+enroll_id+'/'+service,
+          type:"GET",
+          processData: false,
+          contentType: false,
+          dataType : "html",		  
+          success: function(data) {
+              console.log(data);
+              $(".ajax_druglist").html(data);
+          },
+          error: function() {
+            console.log("err")
+        }
+      });
+	  
+	//DST Drugs ajax
+	$.ajax({
+          url: "{{url('get_add_test_list')}}"+'/'+enroll_id,
+          type:"GET",
+          processData: false,
+          contentType: false,
+          dataType : "html",
+          success: function(data){
+              console.log(data);
+              $(".ajax_addtest_list").html(data);
+          },
+          error: function() {
+            console.log("err")
+        }
+      });
+	  
+	//existing service ids
+	$.ajax({
+      url:"{{ url('get_existing_service_ids') }}"+'/'+enroll_id,
+      method:"GET",
+	  dataType:"JSON",
+	  async: true,
+      success:function(response){
+           console.log("service ids"+response);
+
+           var len = 0;
+			if(response!= null){
+				len = response.length;
+			}
+			//alert(len);
+          $(".dst_drugs_lc_section").hide();
+		    $(".dst_drugs_lj_section").hide();   
+
+            if(len > 0){
+
+				    $(".dst_drugs_lc_section").hide();
+		         $(".dst_drugs_lj_section").hide();
+
+          $.each(response, function (key, val) {
+            
+              /* $(".dst_drugs_lc_section").hide();
+                $(".dst_drugs_lj_section").hide(); */ 
+
+            if(val==21){ //alert(val);
+            $(".dst_drugs_lc_section").show();
+            }
+            if(val==22){ //alert(val);
+            //alert(e);
+            $("div .ajax_druglist > .dst_drugs_lj_section").show();
+            //break;
+            }if(val==21 && val==22){ //alert(val);
+                $(".dst_drugs_lc_section").show();
+              $(".dst_drugs_lj_section").show();
+            }				   
+          });
+
+		    }else{
+          //alert('test');
+				 $(".dst_drugs_lc_section").hide();
+				 $(".dst_drugs_lj_section").hide();
+			}
+		   
+		},
+          error: function() {
+            console.log("err");
+			$(".dst_drugs_lc_section").hide();
+				 $(".dst_drugs_lj_section").hide();
+        }
+
+    });
+	  ///////////////////////////
+
+    $('#myModalAddtest').modal('toggle');
+ }
+
+ $(document).on('change', '.addtest_array', function() {	   
+        //alert(this.value);        
+		 var enroll_id=$("#enrollId1Add").val();
+		$.ajax({
+				  url: "{{url('check_for_request_service')}}"+'/'+enroll_id,
+				  type:"GET",
+				  processData: false,
+				  contentType: false,
+				  dataType: 'json',
+				  success: function(response){
+					  console.log(response);
+					  
+                        if(response==0){
+							$('.alert-danger').show();
+							$('.alert-danger').html("Please add atleast one test through test request interface");
+							$('#confirmokadd').prop('disabled', true);
+                            
+                            
+						}else{
+							$('.alert-danger').hide();
+							if($("#sentstepadd").val()!=""){
+							  $('#confirmokadd').prop('disabled', false);	
+							}
+							
+                        }
+				  },
+				failure: function(response){
+					console.log("err")
+				}
+		});
+      	if(this.value==21)
+        {
+			  $(".dst_drugs_lc_section").show();
+		}
+		if(this.value==22)
+        {
+			  $(".dst_drugs_lj_section").show();
+		}
+    if(this.value == 16)
+    {
+      $('.dst_drugs_lc_z_section').show();
+    }
+		
+		 //on unchecked
+        var ischecked= $(this).is(':checked');
+		if(!ischecked){
+		  //alert('uncheckd ' + $(this).val());
+		   //$(this).prop('checked', false);
+		   if($(this).val()==21){ //alert("here");
+			$(".dst_drugs_lc_section").hide();   
+		   }
+		   if($(this).val()==22){ //alert("here");
+			$(".dst_drugs_lj_section").hide();   
+		   }
+       if($(this).val()==16){ //alert("here");
+			$(".dst_drugs_lc_z_section").hide();   
+		   }
+		}		
+    });
+
+ $('#confirmokadd').click(function(){ //alert("button click");
+       
+       var sentStep=$("#sentstepadd").val();
+       var enroll_id=$("#enrollId1Add").val();	   
+       var tag=$("#lpa_tagAdd").val();
+       var rec_flag=$("#recFlagID").val();
+
+       var tag=$("#sentstepadd").find(':selected').data('tag');
+
+       if(tag != "")
+       {
+        $("#lpa_tagAdd").val(tag);
+
+       } else {
+        tag="NULL";
+       }
+  
+       
+       
+       if(sentStep==3){//If decontamination
+         $('#confirmokadd').prop('disabled', false);
+         var form = $(document).find('form#cbnaat_result_add');
+             form.submit();
+       }else{
+      $.ajax({
+            url: "{{url('check_for_sample_exist')}}"+'/'+enroll_id+'/'+sentStep+'/'+tag+'/'+rec_flag,
+            type:"GET",
+            processData: false,
+            contentType: false,
+            dataType: 'json',
+            success: function(response){
+              console.log(response);
+              
+                          if(response==0){
+                              $('.alert-danger').hide();							
+                var form = $(document).find('form#cbnaat_result_add');
+                              form.submit();                            
+              }else{
+                $('.alert-danger').show();
+                $('.alert-danger').html("Selected test already considered in the same enrollment");
+                $('#confirmokadd').prop('disabled', true);							
+                          }
+            },
+          failure: function(response){
+            console.log("err")
+          }
+      });
+      }
+         
+     });
+     
+
+
+  //choose sample onchange event
+  $('#choose_sample').change(function(){
+		if($(this).val()==2){//alert("with another sample");
+		    $(".sampleId").val("");
+			var enroll_id=$("#enrollId1Add").val();
+			
+			$.ajax({
+				  url: "{{url('check_for_storage')}}"+'/'+enroll_id,
+				  type:"GET",
+				  processData: false,
+				  contentType: false,
+				  dataType: 'json',
+				  success: function(response){
+					  console.log(response);
+					  var len = 0;
+                        if(response['items'] != null){
+                            len = response['items'].length;
+                        }
+                        //alert(len);
+                        
+                        if(len > 0){
+                            // data already exist 
+                            for(var i=0; i<len; i++){
+									//alert(response['items'][i].sample_id);
+									 $('.alert-danger').hide();
+									var sample_id = response['items'][i].sample_id;
+									var sample_label = response['items'][i].sample_label;
+								   
+									$("#sampleIDAdd").val(sample_id);
+									$(".sampleId").val(sample_label);
+                  $('#service1Add').val('16');
+                  //$('#recFlagID').val('0');
+
+                  $('#choose_sample > option').removeAttr('selected');
+                  document.getElementById('choose_sample').selectedIndex = 1;
+                  //$('option:selected', $(this)).attr('selected', true);
+
+                  /* If first time 2nd sample has choosen */
+                  $('#first_time_another_sample').val('1');
+                  $('#third_onwards_afb_second_onwards_lcdst').val('1');
+                  /*  end  */
+
+                              $.ajax({
+                                      url: "{{ url('check_for_lcdst_sample_exist') }}"+'/'+enroll_id,
+                                      type:"GET",
+                                      processData: false,
+                                      contentType: false,
+                                      dataType: 'json',
+                                      success: function(result){
+                                        console.log(result.data.service_id);
+                                        if(result.result)
+                                        {                                          
+                                          $('#recFlagID').val(result.data.rec_flag);                                          
+                                        }
+                                      }
+                                  }); 
+
+									if(typeof $("#sentstepadd option:selected").val()==='undefined'){
+										$('#confirmokadd').prop('disabled', true);
+									}else{
+									   $('#confirmokadd').prop('disabled', false);
+									}
+								
+                            }
+                            
+						}else{
+                                    $('.alert-danger').show();
+									$('.alert-danger').html("No Sample Found in the Storage");
+									//alert($("#sentstepadd option:selected").val());
+									$('#confirmokadd').prop('disabled', true);
+                        }
+				  },
+				failure: function(response){
+					console.log("err")
+				}
+			});
+
+
+		}else{  //alert("with same sample");
+			$(".sampleId").val($("#oldSampleNo").val());//set input type test
+			$("#sampleIDAdd").val($("#oldSampleID").val());//set input type test
+			
+			$('.alert-danger').hide();
+			//alert($("#sentstepadd option:selected").val());
+			if(typeof $("#sentstepadd option:selected").val()==='undefined'){
+				$('#confirmokadd').prop('disabled', true);
+			}else{
+			   $('#confirmokadd').prop('disabled', false);
+			}
+		}
+	});
+
+  $('#sentstepadd').change(function(){ //alert($(this).find(':selected').data('tag'));
+	   var sentStep=$(this).val();
+	   var enroll_id=$("#enrollId1Add").val();
+     var sample_id = $('#sampleIDAdd').val();
+	   var rec_flag=$("#recFlagID").val();
+
+	   var tag=$("#sentstepadd").find(':selected').data('tag');
+
+       if(tag != "")
+       {
+        $("#lpa_tagAdd").val(tag);
+
+       } else {
+        tag="NULL";
+       }
+
+	   if(sentStep==3){//If decontamination
+		   $('#confirmokadd').prop('disabled', false);
+	   }else{
+		$.ajax({
+				  url: "{{url('check_for_sample_exist')}}"+'/'+enroll_id+'/'+sentStep+'/'+tag+'/'+rec_flag,
+				  type:"GET",
+				  processData: false,
+				  contentType: false,
+				  dataType: 'json',
+				  success: function(response){
+					  console.log(response);					  
+                        if(response==0){
+                            $('.alert-danger').hide();							
+							//var sList = "";
+							//$('input[type=checkbox]').each(function () {
+							$("input[name='addtest[]']").each(function () {	
+							 if(this.checked){ //alert("checked");
+								//$('#confirmokadd').prop('disabled', false);	 
+							 }
+								//sList += "(" + $(this).val() + "-" + (this.checked ? "checked" : "not checked") + ")";
+							});
+							//console.log (sList);
+
+             if($('#choose_sample').val() == '2')
+             {
+              $.ajax({
+                            url: "{{url('check_for_storage')}}"+'/'+enroll_id,
+                            type:"GET",
+                            processData: false,
+                            contentType: false,
+                            dataType: 'json',
+                            success: function(response){
+                              console.log(response);
+                              var len = 0;
+                                          if(response['items'] != null){
+                                              len = response['items'].length;
+                                          }
+                                          //alert(len);
+                                          
+                                          if(len > 0){
+                                              // data already exist
+                                              $('#service1Add').val('16');
+                                              $('#confirmokadd').prop('disabled', false);
+                                              
+                              }else{
+                                                      $('.alert-danger').show();
+                                    $('.alert-danger').html("No Sample Found in the Storage");
+                                    //alert($("#sentstepadd option:selected").val());
+                                    $('#confirmokadd').prop('disabled', true);
+                                          }
+                            },
+                          failure: function(response){
+                            console.log("err")
+                          }
+                        });        
+             } else {
+
+              $('#confirmokadd').prop('disabled', false);
+
+             }
+                            
+						}else{
+                      //alert(sentStep);
+                      if( sentStep == '21' )
+                      {
+                        $('#confirmokadd').prop('disabled', false);
+                        $.ajax({
+                                      url: "{{ url('check_for_lcdst_sample_exist') }}"+'/'+enroll_id,
+                                      type:"GET",
+                                      processData: false,
+                                      contentType: false,
+                                      dataType: 'json',
+                                      success: function(result){
+                                        console.log(result.data.service_id);
+                                        if(result.result)
+                                        {
+                                          $('#service1Add').val(result.data.service_id);
+                                          $('#recFlagID').val(result.data.rec_flag);
+                                          $('#third_onwards_afb_second_onwards_lcdst').val(result.data.third_onwards_afb_second_onwards_lcdst);
+                                        }
+                                      }
+                                  });             
+                      
+                      
+                      } else if( sentStep == '22' ) { 
+
+                      $.ajax({
+                                    url: "{{ url('check_for_ljdst_sample_exist') }}"+'/'+enroll_id,
+                                    type:"GET",
+                                    processData: false,
+                                    contentType: false,
+                                    dataType: 'json',
+                                    success: function(result){
+                                      console.log(result.data.service_id);
+                                      if(result.result)
+                                      {
+                                        //$('#service1Add').val(result.data.service_id);
+                                        $('#recFlagID').val(result.data.rec_flag);
+                                        $('#third_onwards_afb_second_onwards_lcdst').val(result.data.third_onwards_afb_second_onwards_lcdst);
+                                      }
+                                    }
+                                }); 
+
+                            //alert(sentStep);
+                            $('#confirmokadd').prop('disabled', false);
+                            //$('#third_onwards_afb_second_onwards_lcdst').val(0);
+
+                      } else {                               
+
+                        $('.alert-danger').show();
+                        $('.alert-danger').html("Selected test already considered in the same enrollment");
+                        $('#confirmokadd').prop('disabled', true);
+
+                      }						
+							
+                  }
+				  },
+				failure: function(response){
+					console.log("err")
+				}
+		});
+		}
+  });
+
 function resetfunction() {
             document.getElementById("cbnaat_resultrt").reset();
         }
@@ -455,7 +995,7 @@ $(function(){
   // });
 });
    
-function openForm15AGenerate(enroll_id, sample_ids, service, sample, bwm_status, no, reg_by,tag){
+function openForm15AGenerate(enroll_id, sample_ids, service, sample, bwm_status, no, reg_by, tag, rec_flag, drug_name){
   //console.log(enroll_id, sample_ids, service);
   //console.log(sample_ids);
   //alert(reg_by);
@@ -466,10 +1006,16 @@ function openForm15AGenerate(enroll_id, sample_ids, service, sample, bwm_status,
   $("#sampleid15A").val(sample);//set input value
   $('#no_sample15A').val(no);
   $('#tag15A').val(tag);
+  $('#rec_flag').val(rec_flag);
+
+  if(drug_name == "")
+  {
+    $('#drug_name').val(0);
+  } else {
+    $('#drug_name').val(drug_name);
+  }
+ 
   $('#print15A15A').prop('checked', true);
-
-
-
 
   if( reg_by ){
       //$('#microscopy_review_logic').show();
@@ -481,8 +1027,6 @@ function openForm15AGenerate(enroll_id, sample_ids, service, sample, bwm_status,
       $('#confirmok15A').prop('disabled',true);
   }
 
-
-
   $('#myModalForm15A').modal('toggle');
   
 
@@ -492,14 +1036,31 @@ function openForm15AGenerate(enroll_id, sample_ids, service, sample, bwm_status,
         var sample = $("#sampleID15A").val();        
         //var detail = $("#detail2").val();
         var remark = $("#remark15A").val();
+        var tag = $('#tag15A').val();
+        var service_id = $('#service15A').val();
+        var drug_name = $('#drug_name').val();
         var form = $(document).find('form#cbnaat_result15A');
         form.submit();
-        var url = '{{ url("/pdfview", "id") }}';
+        //var url = '{{ url("/pdfview", "id") }}';
+
+        if(drug_name == "")
+        {
+          drug_name = 0;
+        }
+
+        var url = '{{ route("pdfview", [ "id" => "sampleId", "service_id" => "serviceId", "tag" => "stag", "recFlag" => "rec_flag", "drug_name" => "drug_name" ] ) }}';
+        
         // url = url.replace('id', sample+'/1');
-        url = url.replace('id',sample);
+        url = url.replace('sampleId',sample);
+        url = url.replace('serviceId',service_id);
+        url = url.replace('stag',tag);
+        url = url.replace('rec_flag',rec_flag);
+        url = url.replace('drug_name',drug_name);
+
        // url = url.replace('detail', detail);
        // url = url.replace('remark', remark);
         // url = url.replace('type', '1');
+
          window.open(url, '_blank');
 	   }
     
@@ -591,7 +1152,8 @@ $(document).ready(function() {
 		   { data: 'test_requested' },
 		   { data: 'reason_for_test' },
 		   { data: 'test_review' },
-		   { data: 'generate15a' },		  
+		   { data: 'generate15a' },		 
+       { data: 'add_test' }, 
 		   { data: 'referal_facility' },
 		   { data: 'sample_type' },
 		   { data: 'date_of_receipt' },

@@ -45,9 +45,9 @@
                    <br>
                   <label class="col-md-6"><h6>TUB Band : <span class="red">*</span> </h6></label>
                     <div class="col-md-6">
-                       <select class="form-control form-control-line" name="tbu_band" value="" id="tbu_band" required>                        
+                       <select class="form-control form-control-line tbu_band_cls" name="tbu_band" value="" id="tbu_band" required>                        
                         <option value="0">Absent</option>
-						<option value="1">Present</option>
+						            <option value="1">Present</option>
                        </select>
                    </div>
                    <br>
@@ -624,61 +624,87 @@
                    <br>
                   <div class="row">
                     <div class="col">
-                    <label class="col-md-12"><h6>MTB Result : <span class="red">*</span></h6></label>
-                    <div class="col-md-12">
-                       <select class="form-control form-control-line sampleId" name="mtb_result" value="" id="mtb_result" required>
-                        <option value="">select</option>
-                        <option value="MTB detected">MTB detected</option>
-                        <option value="MTB not detected">MTB not detected</option>
-                        <option value="Invalid">Invalid</option>
-                       </select>
-                   </div>
+                      <label class="col-md-12"><h6>Result : <span class="red">*</span></h6></label>
+                      <div class="col-md-12">
+                         <select class="form-control form-control-line sampleId new_mtb_result" name="mtb_result" id="mtb_result" required>
+                          <option value="">select</option>
+                          <option value="M.Tb. not detected">M.Tb. not detected</option>
+                            <option value="M.Tb. detected">M.Tb. detected</option>
+                          <option value="Invalid">Invalid</option>
+                          <option value="Indeterminate">Indeterminate</option>
+                          <option value="Contaminated">Contaminated</option>
+                         </select>
+                     </div>
                   </div>
                   <div class="col">
-                    <label class="col-md-12"><h6>RIF : <span class="red">*</span></h6></label>
+                    <label class="col-md-12"><h6>RIF Resi : <span class="red">*</span></h6></label>
+                  <div class="col-md-12">
+                     <select class="form-control form-control-line sampleId rif_1st_lpa" name="rif" value="" id="rif" required>
+                      <option value="">select</option>
+                      <option value="Not detected">Not detected</option>
+                      <option value="Detected">Detected</option>
+                      <!-- <option value="Indeterminate">Indeterminate</option> -->
+                     </select>
+                 </div>
+                  </div>
+                  <div class="col">
+                    <label class="col-md-12"><h6>KatG Resi : <span class="red">*</span></h6></label>
                     <div class="col-md-12">
-                       <select class="form-control form-control-line sampleId main_rif_val" name="rif" value="" id="rif" required>
+                       <select class="form-control form-control-line sampleId katg_resi_1st" name="katg_resi" value="" id="katg_resi" required>
                         <option value="">select</option>
-                        <option value="Not detected">Not detected</option>
+                        <option value="Inferred">Inferred</option>
                         <option value="Detected">Detected</option>
-
+                        <option value="Not detected">Not detected</option>
+                        <!-- <option value="Indeterminate">Indeterminate</option> -->
                        </select>
                    </div>
                   </div>
                   <div class="col">
-                    <label class="col-md-12"><h6>INH : <span class="red">*</span></h6></label>
-                    <div class="col-md-12">
-                       <select class="form-control form-control-line sampleId" name="inh" value="" id="inh" required>
-                        <option value="">select</option>
-                        <option value="InhA Detected">InhA Detected</option>
-                        <option value="KatG Detected">KatG Detected</option>
-						<option value="KatG&InhA Detected">KatG&InhA Detected</option>
-                        <option value="Not detected">Not detected</option>
-                       </select>
-                   </div>
+                    <label class="col-md-12"><h6>H Resi : <span class="red">*</span></h6></label>
+                  <div class="col-md-12">
+                     <select class="form-control form-control-line sampleId inh_1st_lpa" name="inh" value="" id="inh" required>
+                      <option value="">select</option>
+                      <option value="Inferred">Inferred</option>
+                      <option value="Detected">Detected</option>                     
+                      <option value="Not detected">Not detected</option>
+                     </select>
+                 </div>
                   </div>
                  </div>
                  <div class="row">
-                    <div class="col">
-                    <label class="col-md-12"><h6>SLID : <span class="red">*</span></h6></label>
+                  <div class="col">
+                    <label class="col-md-12"><h6>FQ Resi : <span class="red">*</span></h6></label>
                     <div class="col-md-12">
-                       <select class="form-control form-control-line sampleId" name="slid" value="" id="slid" required>
+                       <select class="form-control form-control-line sampleId quinolone_2nd_lpa" name="quinolone" value="" id="quinolone" required>
                         <option value="">select</option>
-                        <option value="eis Detected">eis Detected</option>
-                        <option value="rss Detected">rss Detected</option>
-                        <option value="eis Detected and rss Detected">eis Detected and rss Detected</option>
+                        <option value="Detected - Lfx, Mfx (high level)">Detected - Lfx, Mfx (high level)</option>
+                        <option value="Detected - Lfx, Mfx (low level)">Detected - Lfx, Mfx (low level)</option>
+                        <option value="Inferred- Lfx, Mfx (low level)">Inferred- Lfx, Mfx (low level)</option>
+                        <option value="Not detected">Not detected</option>
+                        <!-- <option value="Indeterminate">Indeterminate</option> -->
+                       </select>
+                   </div>
+                  </div>
+                  <div class="col">
+                    <label class="col-md-12"><h6>SLI (rrs) : <span class="red">*</span></h6></label>
+                    <div class="col-md-12">
+                       <select class="form-control form-control-line sampleId sli_rss_2nd" name="sli_rss" value="" id="sli_rss" required>
+                        <option value="">select</option>
+                        <option value="Detected">Detected</option>
+                        <option value="Inferred">Inferred</option>
+                        <option value="Inferred* (1402 mutation)">Inferred* (1402 mutation)</option>
                         <option value="Not detected">Not detected</option>
                        </select>
                    </div>
                   </div>
                   <div class="col">
-                    <label class="col-md-12"><h6>FQ Resi : <span class="red">*</span></h6></label>
+                    <label class="col-md-12"><h6>SLI (eis) : <span class="red">*</span></h6></label>
                     <div class="col-md-12">
-                       <select class="form-control form-control-line sampleId" name="quinolone" value="" id="quinolone" required>
+                       <select class="form-control form-control-line sampleId slid_2nd_lpa" name="slid" value="" id="slid" required>
                         <option value="">select</option>
                         <option value="Detected">Detected</option>
-                        <option value="Not detected">Not Detected</option>
-
+                        <option value="Inferred">Inferred</option>                      
+                        <option value="Not detected">Not detected</option>
                        </select>
                    </div>
                   </div>
@@ -693,19 +719,25 @@
                     <label class="col-md-12"><h6>Final Interpretation : <span class="red">*</span></h6></label>
                     <div class="col-md-12">
 					   <input type="hidden" name="hid_final_interpretation" id="hid_final_interpretation" value="">
-                       <select class="form-control form-control-line" name="final_interpretation" value="" id="final_interpretation" required>
-                        <option value="">select</option>
-                       </select>
+                       <input type="text" class="form-control form-control-line final_interpretation" name="final_interpretation" value="" id="final_interpretation" readonly>                        
                    </div>
                   </div>
 				 </div><br/>
+         <div class="row">
+          <div class="col">
+                     <label class="col-md-12"><h6>Remarks : <span class="red">*</span></h6></label>
+                     <div class="col-md-12">              
+                      <input class="form-control form-control-line clinical_trail" name="clinical_trail" value="" id="clinical_trail" readonly>                        
+                    </div>
+                   </div>
+          </div><br/>
 				 
                  <div class="row">
                   <div class="col">
                     <label class="col-md-12"><h6>Date Result :</h6></label>
                     <div class="col-md-12">
                        <div class="col-md-12">
-                       <input type="text" name="test_date" value="{{date('d/m/Y')}}" class="form-control form-control-line" disable>
+                       <input type="text" name="test_date" value="{{date('d-m-Y')}}" class="form-control form-control-line" readonly>
                    </div>
                    </div>
 
@@ -713,18 +745,18 @@
                   <div class="col">
                     <label class="col-md-12"><h6>Date Reported :</h6></label>
                     <div class="col-md-12">
-                       <input type="text" name="test_date" value="{{date('d/m/Y')}}" class="form-control form-control-line" disable>
+                       <input type="text" name="test_date" value="" class="form-control form-control-line" readonly>
                    </div>
                   </div>
                   <div class="col">
                     <label class="col-md-12"><h6>Reported By :</h6></label>
                     <div class="col-md-12">
-                      <input type="text" name="created_by" value="{{Auth::user()->name}}" class="form-control form-control-line" disable>
+                      <input type="text" name="created_by" value="" class="form-control form-control-line" readonly>
                    </div>
                   </div>
-                  <label class="col-md-12">Reason for Edit : <span class="red">*</span></label>
+                  <label class="col-md-12">Comments : <span class="red">*</span></label>
                      <div class="col-md-12">
-                         <input type="text" name="reason_edit" class="form-control form-control-line"  id="reason_edit" required>
+                         <input type="text" name="reason_edit" class="form-control form-control-line comments_edit"  id="reason_edit" >
                      </div>
                  </div>
 
@@ -1272,12 +1304,7 @@ $(window).on('load',function(){
 				}
 				//alert(len);
 
-				if(len > 0){
-					$("#final_interpretation").html(response);
-					$("#final_interpretation").val($("#hid_final_interpretation").val());
-				}else{
-					$("#final_interpretation").html('select');
-				}
+				
 
 			},
 			failure: function(response){
@@ -1365,4 +1392,443 @@ $(window).on('load',function(){
          }
 
      });
+
+     $(document).ready(function() {
+
+      $(".new_mtb_result").on("change", function() {
+    //alert('test');
+    var final_interpretation = "";
+    var clinical_trail = "";
+    //$('#final_interpretation1').val("");
+    if($(this).val() != "")
+    {
+      if($(this).val()=='M.Tb. not detected'){ 
+
+        //alert('test');
+
+        if($('#tag').val() == '1st line LPA')
+        {          
+          //alert('test');
+
+          $('.new_mtb_result').prop('selectedIndex', 1);          
+
+          $('.rif_1st_lpa').prop('selectedIndex', 0);
+          $('.rif_1st_lpa').prop('disabled', true);
+
+          $('.katg_resi_1st').prop('selectedIndex', 0);
+          $('.katg_resi_1st').prop('disabled', true);
+
+          $('.inh_1st_lpa').prop('selectedIndex', 0);
+          $('.inh_1st_lpa').prop('disabled', true);
+          
+
+          mtb_1st_result('<?php echo csrf_token();?>', $(this).val(), "", "", "");                       
+
+        } 
+        else if( $('#tag').val() == '2nd line LPA' )
+        {
+          $('.new_mtb_result').prop('selectedIndex', 1); 
+
+          $('.quinolone_2nd_lpa').prop('selectedIndex', 0);
+          $('.quinolone_2nd_lpa').prop('disabled', true);
+
+          $('.sli_rss_2nd').prop('selectedIndex', 0);
+          $('.sli_rss_2nd').prop('disabled', true);
+
+          $('.slid_2nd_lpa').prop('selectedIndex', 0);
+          $('.slid_2nd_lpa').prop('disabled', true);
+
+          mtb_2nd_result('<?php echo csrf_token();?>', $(this).val(), "", "", "");                       
+
+
+        }
+
+      } else {        
+
+        if($('#tag').val() == '1st line LPA')
+        {
+          //alert($(this).val());
+
+          $('.rif_1st_lpa').prop('selectedIndex', 0);
+          $('.rif_1st_lpa').prop('disabled', false);
+
+          $('.katg_resi_1st').prop('selectedIndex', 0);
+          $('.katg_resi_1st').prop('disabled', false);
+
+          $('.inh_1st_lpa').prop('selectedIndex', 0);
+          $('.inh_1st_lpa').prop('disabled', false);
+
+          mtb_1st_result('<?php echo csrf_token();?>', $(this).val(), "", "", "");                       
+
+        } else {
+
+          $('.quinolone_2nd_lpa').prop('selectedIndex', 0);
+          $('.quinolone_2nd_lpa').prop('disabled', false);
+
+          $('.sli_rss_2nd').prop('selectedIndex', 0);
+          $('.sli_rss_2nd').prop('disabled', false);
+
+          $('.slid_2nd_lpa').prop('selectedIndex', 0);
+          $('.slid_2nd_lpa').prop('disabled', false);
+
+          mtb_2nd_result('<?php echo csrf_token();?>', $(this).val(), "", "", "");
+
+        }
+      }
+
+    }
+    
+  });
+
+
+  $(".rif_1st_lpa").on("change", function() {
+    
+    var mtb = "";
+    var rif = "";
+    var katg = "";
+    var inh = "";
+    
+
+    if( $('.new_mtb_result').find('option:selected').text() == 'select')
+    {
+      mtb = "";
+
+    } else {
+
+      mtb = $('.new_mtb_result :selected').text();
+
+    }   
+     
+
+    if($(this).val() != "")
+    {
+      rif = $(this).val();
+    }
+
+      if( $('.katg_resi_1st').find('option:selected').text() == 'select' )
+      {
+        katg = "";        
+
+      } else {
+
+        katg = $('.katg_resi_1st').find('option:selected').text();
+
+      }
+        
+        //console.log(final_interpretation);
+    
+    
+    if($(".inh_1st_lpa").find('option:selected').text() == 'select')
+    {
+      var inh = "";   
+
+    } else {
+
+      var inh = $(".inh_1st_lpa").find('option:selected').text();
+
+    }
+
+    mtb_1st_result('<?php echo csrf_token();?>', mtb, rif, katg, inh);
+
+  });
+
+  $('.katg_resi_1st').on('change', function() {
+
+    var mtb = "";
+    var rif = "";
+    var katg = "";
+    var inh = "";
+
+    
+      
+    if( $('.new_mtb_result').find('option:selected').text() == 'select')
+    {
+      mtb = "";
+
+    } else {
+
+      mtb = $('.new_mtb_result').find('option:selected').text();
+
+    }   
+
+    if( $('.rif_1st_lpa').find('option:selected').text() == 'select')
+    {
+      rif = "";
+
+    } else {
+
+      rif = $('.rif_1st_lpa').find('option:selected').text();
+
+    }        
+
+     
+    if($(this).val() != "")
+    {
+      katg = $(this).val();
+    }
+      
+
+      if(  $('.inh_1st_lpa').find('option:selected').text() == "select")
+      {
+        inh = "";
+        
+      } else {
+                inh = $('.inh_1st_lpa').find('option:selected').text();
+
+      }   
+
+      mtb_1st_result('<?php echo csrf_token();?>', mtb, rif, katg, inh);
+
+  });
+
+
+  $(".inh_1st_lpa").on("change", function() {
+    
+    var mtb = "";
+    var rif = "";
+    var katg = "";
+    var inh = "";
+
+    
+      
+    if( $('.new_mtb_result').find('option:selected').text() == 'select')
+    {
+      mtb = "";
+
+    } else {
+
+      mtb = $('.new_mtb_result').find('option:selected').text();
+
+    }   
+
+    if( $('.rif_1st_lpa').find('option:selected').text() == 'select')
+    {
+      rif = "";
+
+    } else {
+
+      rif = $('.rif_1st_lpa').find('option:selected').text();
+
+    } 
+
+
+    if( $('.katg_resi_1st').find('option:selected').text() == 'select')
+    {
+      katg = "";
+
+    } else {
+
+      katg = $('.katg_resi_1st').find('option:selected').text();
+
+    }     
+
+      if($(this).val() != "")
+      {
+        inh = $(this).val(); 
+      }  
+    
+      mtb_1st_result('<?php echo csrf_token();?>', mtb, rif, katg, inh);
+
+  });
+
+  $('.quinolone_2nd_lpa').on("change", function() {
+
+    var mtb = "";
+    var rif = "";
+    var katg = "";
+    var inh = "";
+
+    if( $('.new_mtb_result').find('option:selected').text() == 'select')
+    {
+      mtb = "";
+
+    } else {
+
+      mtb = $('.new_mtb_result').find('option:selected').text();
+
+    }   
+     
+
+    if($(this).val() != "")
+    {
+      rif = $(this).val();
+    }
+
+      if( $('.sli_rss_2nd').find('option:selected').text() == 'select' )
+      {
+        katg = "";        
+
+      } else {
+
+        katg = $('.sli_rss_2nd').find('option:selected').text();
+
+      }
+        
+        //console.log(final_interpretation);
+    
+    
+    if($(".slid_2nd_lpa").find('option:selected').text() == 'select')
+    {
+      var inh = "";   
+
+    } else {
+
+      var inh = $(".slid_2nd_lpa").find('option:selected').text();
+
+    }
+
+
+    mtb_2nd_result('<?php echo csrf_token();?>', mtb, rif, katg, inh);
+
+  });
+
+  $('.sli_rss_2nd').on("change", function() {
+
+    var mtb = "";
+    var rif = "";
+    var katg = "";
+    var inh = "";
+      
+    if( $('.new_mtb_result').find('option:selected').text() == 'select')
+    {
+      mtb = "";
+
+    } else {
+
+      mtb = $('.new_mtb_result').find('option:selected').text();
+
+    }   
+
+    if( $('.quinolone_2nd_lpa').find('option:selected').text() == 'select')
+    {
+      rif = "";
+
+    } else {
+
+      rif = $('.quinolone_2nd_lpa').find('option:selected').text();
+
+    }        
+
+     
+    if($(this).val() != "")
+    {
+      katg = $(this).val();
+    }
+      
+
+      if(  $('.slid_2nd_lpa').find('option:selected').text() == "select")
+      {
+        inh = "";
+        
+      } else {
+                inh = $('.slid_2nd_lpa').find('option:selected').text();
+
+      }   
+
+      mtb_2nd_result('<?php echo csrf_token();?>', mtb, rif, katg, inh);
+  });
+
+  $('.slid_2nd_lpa').on("change", function() {
+
+    var mtb = "";
+    var rif = "";
+    var katg = "";
+    var inh = "";
+
+    
+    if( $('.new_mtb_result').find('option:selected').text() == 'select')
+    {
+      mtb = "";
+
+    } else {
+
+      mtb = $('.new_mtb_result').find('option:selected').text();
+
+    }   
+
+    if( $('.quinolone_2nd_lpa').find('option:selected').text() == 'select')
+    {
+      rif = "";
+
+    } else {
+
+      rif = $('.quinolone_2nd_lpa').find('option:selected').text();
+
+    } 
+
+
+    if( $('.sli_rss_2nd').find('option:selected').text() == 'select')
+    {
+      katg = "";
+
+    } else {
+
+      katg = $('.sli_rss_2nd').find('option:selected').text();
+
+    }     
+
+      if($(this).val() != "")
+      {
+        inh = $(this).val(); 
+      }  
+    
+
+      mtb_2nd_result('<?php echo csrf_token();?>', mtb, rif, katg, inh);
+
+  });
+  
+
+     });
+
+
+
+
+
+function mtb_1st_result(token, mtb, rif_1st_lpa, katg_resi_1st, inh_1st_lpa)
+  {
+
+          $.ajax({
+                type: "post",
+                url: "{{ route('get-mtb-1st-result') }}",
+                data: {
+                      _token: token,
+                      mtb: mtb,
+                      rif_1st_lpa: rif_1st_lpa,
+                      katg_resi_1st: katg_resi_1st,
+                      inh_1st_lpa: inh_1st_lpa
+                },
+                success: function (data) {
+                  result = JSON.parse(data);
+                  //console.log(result.final_interpretation);
+                  $('.final_interpretation').val(result.final_interpretation);
+                  $('.clinical_trail').val(result.clinical_interpretation);                
+                }
+            });
+
+  }
+
+  function mtb_2nd_result(token, mtb, quinolone_2nd_lpa, sli_rss_2nd, slid_2nd_lpa)
+  {
+
+          $.ajax({
+                type: "post",
+                url: "{{ route('get-mtb-2nd-result') }}",
+                data: {
+                      _token: token,
+                      mtb: mtb,
+                      rif_1st_lpa: quinolone_2nd_lpa,
+                      katg_resi_1st: sli_rss_2nd,
+                      inh_1st_lpa: slid_2nd_lpa
+                },
+                success: function (data) {
+                  result = JSON.parse(data);
+                  //console.log(result.final_interpretation);
+                  $('.final_interpretation').val(result.final_interpretation);
+                  $('.clinical_trail').val(result.clinical_interpretation);                
+                }
+            });
+
+  }
+
+     
  </script>

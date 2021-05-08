@@ -122,9 +122,9 @@
           <div class="row">
 
             <div class="col">
-            <label class="col-md-12">Reason for Edit: <span class="red">*</span></label>
+            <label class="col-md-12">Comments: <span class="red">*</span></label>
                <div class="col-md-12">
-                   <input type="text" name="reason_edit" class="form-control form-control-line"  id="reason_edit" required>
+                   <input type="text" name="reason_edit" class="form-control form-control-line lc_edit_comments"  id="reason_edit" required>
                </div>
             </div>
           </div>

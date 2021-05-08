@@ -83,10 +83,11 @@
                                     <table id="exampl" class="table table-striped table-bordered responsive col-xlg-12 " cellspacing="0" >
                                       <thead>
                                           <tr>
+                                            <th><input type="checkbox" id="bulk-select-all"></th>
                                             <th class="hide">ID</th>
                                             <th>Enrolment ID</th>
                                             <th>Sample ID</th>
-											<th>Test Requested</th>
+											                    <th>Test Requested</th>
                                             <th>Visual Appearance</th>
                                             <th>Next Step</th>
                                             <th>Date of Receipt</th>
@@ -103,6 +104,7 @@
                                       <tbody>
                                         @foreach ($data['sample'] as $key=> $samples)
                                         <tr>
+                                          <td><input class="bulk-selected" type="checkbox" value="{{ $samples->log_id }}"></td>
                                           <td class="hide">{{$samples->ID}}</td>
                                           <td>{{$samples->enroll_label}}</td>
                                           <td>{{$samples->samples}}</td>
@@ -149,7 +151,7 @@
                 </div>
 
             </div>
-            <footer class="footer"> © Copyright Reserved 2017-2018, LIMS </footer>
+            <footer class="footer">  </footer>
 </div>
 
 <div class="modal fade" id="myModal_naat" role="dialog" >
@@ -178,7 +180,7 @@
                  </div>
                  <label class="col-md-12"><h5>Field Sample Id:</h5></label>
                   <div class="col-md-12">
-                    <input type="text" name="sampleid" class="form-control form-control-line sampleId"  id="sample-id">
+                    <input type="text" name="naa_sampleid" class="form-control form-control-line sampleId"  id="naa_sampleid">
                  </div>
                  <label class="col-md-12"><h5>Patient Name:</h5></label>
                   <div class="col-md-12">
@@ -228,6 +230,118 @@
     </div>
   </div>
 </div>
+
+
+
+<div class="modal fade" id="myModal_bulk" role="dialog" id="confirmDelete_bulk">
+  <div class="modal-dialog">
+
+    <!-- Modal content-->
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+        <h4 class="modal-title">CBNAAT Details</h4>
+      </div>
+       <form class="form-horizontal form-material" action="{{ url('/cbnaat_bulkstore') }}" method="post" enctype='multipart/form-data' id="cbnaat_result_bulk">
+                @if(count($errors))
+                  @foreach ($errors->all() as $error)
+                     <div class="alert alert-danger"><h4>{{ $error }}</h4></div>
+                 @endforeach
+               @endif
+       <div class="alert alert-danger hide"><h4></h4></div>
+          <div class="modal-body">
+
+               <input type="hidden" name="_token" value="{{ csrf_token() }}">
+               <input type="hidden" name="log_ids" id="log_ids" value="">               
+               <input type="hidden" name="enrollId" id="bulk_enrollId" value="">
+              <input type="hidden" name="sampleID" id="bulk_sampleID" value="">
+              <input type="hidden" name="serviceId" id="bulk_serviceId" value="">
+              <input type="hidden" name="status" id="bulk_statusId" value="">
+              <input type="hidden" name="tag" id="bulk_tagId" value="">
+              <input type="hidden" name="rec_flag" id="bulk_recFlagId" value="">
+
+                  <div class="col-md-12" style="display: none;">                    
+                     <input type="text" name="sampleid" class="form-control form-control-line sampleid"  id="bulk_sampleid" readonly>
+                 </div>
+
+                   <label class="col-md-12">Result of MTB:<span class="red">*</span></label>
+              <div class="col-md-12">
+                <select name="mtb" id="bulk_mtb" class="form-control form-control-line" id="mtb" required>
+                  <option>--Select--</option>
+                  <option value="MTB Detected">MTB Detected</option>
+                  <option value="MTB Not Detected">MTB Not Detected</option>
+                  <option value="Invalid">Invalid</option>
+                  <option value="Error">Error</option>
+          <option value="No Result">No Result</option>
+          <option value="NA">NA</option>
+                </select>
+             </div>
+
+             <div id="error" class="hide">
+                <label class="col-md-12">Error:</label>
+              <div class="col-md-12">
+                     <input type="number" name="error" value="" class="form-control form-control-line">
+                 </div>
+                 </div>
+
+
+              <label class="col-md-12">Result of RIF:<span class="red">*</span></label>
+              <div class="col-md-12">
+                <select name="rif" id="bulk_rif" class="form-control form-control-line" id="rif" required>
+                  <option>--Select--</option>
+                  <option value="RIF Detected">RIF Resistance Detected</option>
+                  <option value="RIF Not Detected">RIF Resistance Not Detected</option>
+                  <option value="RIF Indeterminate">RIF Indeterminate</option>
+                  <option value="NA">NA</option>
+                </select>
+             </div>
+
+            <!--  <label class="col-md-12">Date Tested: {{$data['today']}}</label>
+             <div></div> -->
+             <label class="col-md-12">Date Tested</label>
+                  <div class="col-md-12">
+                     <input type="date" name="test_date" value="<?php echo date("Y-m-d");?>" max="<?php echo date("Y-m-d");?>" class="form-control form-control-line" >
+                 </div>
+
+                         <label class="col-md-12">Machine Serial No.</label>
+                         <div class="col-md-12">
+                           <select name="cbnaat_equipment_name" class="form-control form-control-line">
+
+                             <option value="">--Select--</option>
+                             <?php foreach ($data['equipments_list'] as $key => $equipments_list) {
+                              echo "<option value='$equipments_list->eqipments'>$equipments_list->eqipments</option>";
+                             } ?>
+                           </select>
+                        </div>
+
+             <label class="col-md-12">Next Step: </label>
+              <div class="col-md-12">
+                <select name="next_step" class="form-control form-control-line" id="bulk_next_step" required>
+                  <option value="">--Select--</option>
+          <!--<option value="Interim Report Submit another sample">Interim Report Submit another sample</option>--->
+          <option value="Repeat Test with another sample">Repeat Test with another sample</option>
+                  <option value="Repeat Test with same sample">Repeat Test with same sample</option>
+                  <option value="Submit result for finalization">Submit result for finalization</option>
+                      <option value="Send to BWM">Send to BMW</option>
+                </select>
+             </div>
+                     
+                     <div class="col-md-12" style="display: none;">
+                       <textarea name="comments" class="form-control form-control-line" id="bulk_comments" rows="5" cols="5"></textarea>
+                    </div>
+          </div>
+          <div class="modal-footer">
+            <!-- <button type="submit" class="btn btn-default" data-dismiss="modal">Save</button> -->
+            <button type="button" class="btn btn-default add-button cancel btn-md" data-dismiss="modal">Cancel</button>
+            <button type="button" class="pull-right btn btn-primary btn-md" id="confirm_bulk">Ok</button>
+          </div>
+
+    </form>
+    </div>
+  </div>
+</div>
+
+
 
 <div class="modal fade" id="myModal" role="dialog"  id="confirmDelete">
     <div class="modal-dialog">
@@ -302,8 +416,6 @@
                        <input type="date" name="test_date" value="<?php echo date("Y-m-d");?>" max="<?php echo date("Y-m-d");?>" class="form-control form-control-line" >
                    </div>
 
-
-
                            <label class="col-md-12">Machine Serial No.</label>
                            <div class="col-md-12">
                              <select name="cbnaat_equipment_name" class="form-control form-control-line">
@@ -312,14 +424,8 @@
                                <?php foreach ($data['equipments_list'] as $key => $equipments_list) {
                                 echo "<option value='$equipments_list->eqipments'>$equipments_list->eqipments</option>";
                                } ?>
-
-
                              </select>
                           </div>
-
-
-
-
 
 		           <label class="col-md-12">Next Step: </label>
 		            <div class="col-md-12">
@@ -329,19 +435,13 @@
 						<option value="Repeat Test with another sample">Repeat Test with another sample</option>
 		                <option value="Repeat Test with same sample">Repeat Test with same sample</option>
 		                <option value="Submit result for finalization">Submit result for finalization</option>
-                        <option value="Send to BWM">Send to BWM</option>
+                        <option value="Send to BWM">Send to BMW</option>
 		              </select>
 		           </div>
-
-
-
                        <label class="col-md-12">Comments:</label>
                        <div class="col-md-12">
                          <textarea name="comments" class="form-control form-control-line" id="comments" rows="5" cols="5"></textarea>
                       </div>
-
-
-
 		        </div>
 		        <div class="modal-footer">
 		          <!-- <button type="submit" class="btn btn-default" data-dismiss="modal">Save</button> -->
@@ -377,6 +477,23 @@ $(document).ready(function(){
 
     setTimeout(function(){$("#pageloader").css("display", "none");}, 5000);
   });//submit
+
+  $("#cbnaat_result_bulk").on("submit", function(){
+    $("#pageloader").fadeIn();
+	var zIndex = 9999;
+
+    if ($('body').hasClass('modal-open')) {
+        zIndex = parseInt($('div.modal').css('z-index')) + 1;
+    }
+
+    $("#pageloader").css({
+        'display': 'block',
+        'z-index': zIndex
+    });
+
+    setTimeout(function(){$("#pageloader").css("display", "none");}, 5000);
+  });//submit
+
 });//document ready
 
 
@@ -412,8 +529,16 @@ $(function(){
             else {
               document.getElementById("rif").addAttribute("disabled","disabled");
             }
+        });
 
-
+        $("#confirm_bulk").change(function(){
+            var _sample = $("#mtb").val();
+            if(_sample == 'Error' || _sample == 'No Result'){
+                document.getElementById("rif").removeAttribute("disabled","disabled");
+            }
+            else {
+              document.getElementById("rif").addAttribute("disabled","disabled");
+            }
         });
 
 
@@ -439,6 +564,13 @@ $(function(){
 		var form = $(e.relatedTarget).closest('form');
 		$(this).find('.modal-footer #confirm').data('form', form);
 	});
+
+  $('#confirmDelete_bulk').on('show.bs.modal', function (e) {
+
+// Pass form reference to modal for submission on yes/ok
+var form = $(e.relatedTarget).closest('form');
+$(this).find('.modal-footer #confirm_bulk').data('form', form);
+});
 
 	/* Form confirm (yes/ok) handler, submits form*/
 
@@ -517,6 +649,10 @@ $(document).ready(function() {
             {
                 extend: 'excelHtml5',
                 title: 'LIMS_Cbnaat_'+today+''
+            },
+            {
+                            text: 'Submit',						
+                            action: bulk_action_review
             }
         ],
          "order": [[ 1, "desc" ]]
@@ -568,7 +704,75 @@ $(document).ready(function() {
 		});
 		
 	});
+
+
+  /* Bulk submit click */
+
+  $('.resultbtn, #confirm_bulk').click( function(e) {
+		//alert("here");		
+		
+    $('.alert-danger').addClass('hide');
+							$('.alert-danger').hide();
+							//$('form#cbnaat_result').submit();	
+							$('#confirm_bulk').prop("type", "submit");
+							$("#confirm_bulk").text("OK");
+    });
+
 });
+
+/* Batch process script */
+
+        var $bulk_checkboxes = $('.bulk-selected');
+        var $bulk_select_all_checkbox = $('#bulk-select-all');
+
+
+        // Automatically Check or Uncheck "all select" checkbox
+        // based on the state of checkboxes in the list.
+        $bulk_checkboxes.click(function(){
+            if( $bulk_checkboxes.length === $bulk_checkboxes.filter(':checked').length ){
+                $bulk_select_all_checkbox.prop('checked', true);
+            }
+        });
+
+
+        // Check or Uncheck checkboxes based on the state
+        // of "all select" checkbox.
+        $bulk_select_all_checkbox.click(function(){
+            var checked = $(this).prop('checked');
+            $('.bulk-selected').prop('checked', checked);
+        });
+
+function bulk_action_review()
+{
+  var $modal = $('#myModal_bulk');
+            var selected = [];
+            var final_interpretation = "";
+            var remarks = "";
+            var $checkboxes = $('.bulk-selected:checked');
+
+            $("#bulk_mtb").prop('selectedIndex', 1);
+            $("#bulk_rif").prop('selectedIndex', 2);
+
+            //$('#mtb')
+
+            // Display an error message and stop if no checkboxes are selected.
+            if( $checkboxes.length === 0 ){
+                alert("First select one or more items from the list.");
+                return;
+            }
+
+            $modal.modal('show');
+
+            $checkboxes.each(function(i, e){
+                selected.push( $(e).val() );
+
+                // Last iteration of the loop.
+                if( i === $checkboxes.length - 1 ){
+                    $modal.find('input[name="log_ids"]').val( selected.join(',') );
+                }
+            });
+}
+
 </script>
 
 

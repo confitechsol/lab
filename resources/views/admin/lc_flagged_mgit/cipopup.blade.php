@@ -21,9 +21,13 @@
             <!-- <input type="text" name="report_result" readonly id="report_result" value="Not required" /> -->
           </div>
           <div class="col-md-12 my_con">
-            <input type="radio" name="test_type" id="test_type_1" class="set_radio" value="1" >&nbsp;LC Reporting
-            <br>
-            <input type="radio" name="test_type" id="test_type_2" class="set_radio" value="2" >&nbsp;Microbiologist
+              <div id="flgm_lc">
+                <input type="radio" name="test_type" id="test_type_1" class="set_radio" value="1" >&nbsp;LC Reporting
+              </div>
+              
+              <div id="flgm_mi">
+                <input type="radio" name="test_type" id="test_type_2" class="set_radio" value="2" >&nbsp;Microbiologist
+              </div>
             </div>
             
 

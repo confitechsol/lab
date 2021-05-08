@@ -9,6 +9,7 @@
 <script src="{{ url('https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.32/vfs_fonts.js') }}"></script>
 <script src="{{ url('https://cdn.datatables.net/buttons/1.5.1/js/buttons.html5.min.js') }}"></script>
 <script src="{{ url('https://cdn.datatables.net/buttons/1.5.1/js/buttons.print.min.js') }}"></script>
+
         <div class="page-wrapper">
 
             <div class="container-fluid">
@@ -25,23 +26,36 @@
 									  <div class="loader"></div>
 									</div>
 									<!----------loader------------>
-                                      <form method="post" action="{{ url('/report/annexurel') }}" id="anxr15l">
-                                        <input type="hidden" name="_token" value="{{ csrf_token() }}">
+                                      <form name="frmannex" id="anxr15l">
+                                        <input type="hidden" name="_token" id="token" value="{{ csrf_token() }}">
                                         <div class="row">
                                           <div class="col-sm-1">
-                                            From:
+                                            Year <span>*</span>
                                           </div>
                                           <div class="col-sm-11">
-                                            <input type="text" name="from_date"  value="{{$data['from_date']}}" id="from_date" class="datepicker" max="<?php echo date("Y-m-d");?>" required>
+                                            <input type="number" name="year" class="form-control"  value="" id="year" min="2020" max="2050" maxlength="4" oninput="javascript: if (this.value.length > this.maxLength) this.value = this.value.slice(0, this.maxLength);" required>
                                           </div>
                                           <div class="col-sm-1">
-                                            To:
+                                            Select Quarter <span>*</span>
                                           </div>
                                           <div class="col-sm-11">
-                                            <input type="text" name="to_date" id="to_date" value="{{ $data['to_date'] }}" class="datepicker" max="<?php echo date("Y-m-d");?>" required>
+                                            <select name="quarter" id="quarter" class="form-control" required>
+												<option value="">--Select Quarter--</option>
+												@foreach ($data['quarter'] as $quarter)
+													<option value="{{ $quarter->quarter_no }}">{{ $quarter->quarter_name }}</option>													
+												@endforeach
+											</select>
+                                          </div>
+										  <div class="col-sm-1">
+                                            Select Month(s) <span>*</span>
+                                          </div>
+                                          <div class="col-sm-11">
+                                            <select name="quarter_months[]" class="form-control" id="quarter_months" multiple required>
+																								
+											</select>
                                           </div>
                                           <div class="col-sm-12">
-                                            <button type="submit" style="padding: 5px 15px; border-radius: 4px; background: #009efb; color: #ffffff; margin-right: 3px;">Generate</button>
+                                            <button type="button" class="btn btn-info" id="btnSubmit" style="padding: 5px 15px; border-radius: 4px; background: #009efb; color: #ffffff; margin-right: 3px;">Show</button>
                                           </div>
                                         </div>
                                       </form>
@@ -56,229 +70,223 @@
 										<h2 align="center" style="font-family:Lucida Console;">TB Laboratory Register</h2>
 
 
-										<h4 align="center"><u>Sample Registrar Details</u></h4>
+										<h4 id="period" align="center" style="display: none;"><u>Period: <span id="sp_qt_no"></span> ( <span id="sp_month_name"></span> ) of <span id="sp_year"></span></u></h4>
 
 
 										<a style="padding: 5px 15px;
 											border-radius: 4px;
-											background: #009efb;
+											background: #008000;
 											color: #ffffff;
-											margin-right: 3px; cursor:pointer;" onclick="fnExcelReport();">Excel for Sample Registrar Details</a>
+											margin-right: 3px; cursor:pointer;" onclick="fnExcelReport();">Excel</a>
 										<br> <br>
 
-										<table id="result1" class="tg">
+										 {{-- {{ dd($data) }}  --}}
 
-
+										<table id="result1" class="tg">  
 											<tr>
-												<th class="tg-yw4l" rowspan="3"><span style="writing-mode:vertical-rl; white-space: nowrap; text-orientation: initial;text-align:center;">Lab Serial No.</span></th>
-												<th class="tg-yw4l" rowspan="3">NIKSHAY ID</th>
-												<!-- <th class="tg-yw4l" rowspan="3">Date of colllection of first specimen</th> -->
-												<th class="tg-yw4l" style="text-align:center;" rowspan="3">Patient's full name (Address/contact details)</th>
-												<th class="tg-yw4l" rowspan="3">Age</th>
-												<th class="tg-yw4l" rowspan="3"><span
-															style="writing-mode:vertical-rl; white-space: nowrap; text-orientation: initial;">Gender (M/F/TG)</span>
-												</th>
-												<th class="tg-yw4l" rowspan="3">Key Population</th>
-												<!-- <th class="tg-yw4l" rowspan="3">Complete Address</th> -->
-												<th class="tg-yw4l" style="text-align:center;" rowspan="3">Name of referring health facility</th>
-												<th class="tg-yw4l" style="text-align:center;" colspan="5">Reasons for Testing</th>
-												<!-- <th class="tg-yw4l" colspan="3">Date</th> -->
-												<th class="tg-yw4l" style="text-align:center;" colspan="3">Date</th>
-												<th class="tg-yw4l" style="text-align:center;" rowspan="3">Type(Sputum/other-specify)</th>
-												<th class="tg-yw4l" rowspan="3">Specimen Condition ( M/B/S/C)</th>
-												<th class="tg-yw4l" rowspan="3">C&DST Lab Microscopy Result</th>
-
-
-
-												<!-- =============== -->
-												<!-- Result Headings -->
-												<!-- =============== -->
-
-												<th class="tg-031e" style="text-align:center;" colspan="10">Rapid DST Results</th>
-												<th class="tg-031e" style="text-align:center;" colspan="3">Culture Results</th>
-												<th class="tg-031e" style="text-align:center;" colspan="24">Reporting of Results</th>
-
-												<!-- ===================== -->
-												<!-- Result Headings - END -->
-												<!-- ===================== -->
-
+											  <td rowspan="3" width="111">Lab Serial No.</td>
+											  <td rowspan="3" width="98">Sample </td>
+											  <td rowspan="3" width="98">NIKSHAY ID</td>
+											  <td colspan="6" rowspan="2" width="1065">Patient's full name    (Address/contact details)</td>
+											  <td rowspan="3" width="85">Age</td>
+											  <td rowspan="3" width="102">Gender (M/F/TG)</td>
+											  <td rowspan="3" width="167">Key Population</td>
+											  <td rowspan="3" width="296">Name of referring    health facility</td>
+											  <td colspan="6" width="691">Reasons    for Testing</td>
+											  <td colspan="2" width="186">Date</td>
+											  <td rowspan="3" width="98">Type(Sputum/other-specify)</td>
+											  <td rowspan="3" width="103">Specimen Condition (    M/B/S/C)</td>
+											  <td rowspan="3" width="97">C&amp;DST Lab    Microscopy Result</td>
+											  <td rowspan="3" width="123">Method (ZN/FM)</td>
+											  <td rowspan="3" width="97">Date of Microscopy Result</td>
+											  <td width="261">Test Requested</td>
+											  <td colspan="5" width="669">CBNAAT </td>
+											  <td width="240">&nbsp;</td>
+											  <td width="83">&nbsp;</td>
+											  <td colspan="13" width="1745"> FL LPA</td>
+											  <td width="87">&nbsp;</td>
+											  <td colspan="13" width="1913">SL LPA</td>
+											  <td width="83">&nbsp;</td>
+											  <td colspan="13" width="1008">Liquid    Culture Results</td>
+											  <td colspan="26" width="2246">Solid    Culture Results (to incorporate data captured in LIMS and as per Culture    register format)</td>
+											  <td colspan="23" width="2560">Drug Susceptibility Testing </td>
+											  <td colspan="19" width="1790">Drug    Susceptibility Testing (2nd test, if done)</td>
+											  <td colspan="4" width="414">Field NAAT Result</td>
 											</tr>
 											<tr>
-												<td class="tg-yw4l" style="text-align:center;" colspan="3">Diagnosis/DST</td>
-												<td class="tg-yw4l" style="text-align:center;" colspan="2">Follow-up</td>
-												<td class="tg-yw4l"><span style="writing-mode:vertical-rl; white-space: nowrap; text-orientation: initial;">Specimen Collection</span>
-												</td>
-												<td class="tg-yw4l"><span style="writing-mode:vertical-rl; white-space: nowrap; text-orientation: initial;">Specimen sent to lab</span>
-												</td>
-												<td class="tg-yw4l"><span style="writing-mode:vertical-rl; white-space: nowrap; text-orientation: initial;">Specimen receipt at laboratory</span>
-												</td>
-												<!-- <td class="tg-yw4l"></td>
-												<td class="tg-yw4l"></td> -->
-
-
-												<!-- =============== -->
-												<!-- Result Headings -->
-												<!-- =============== -->
-
-												<td class="tg-031e" rowspan="2"><span style="writing-mode:vertical-rl; white-space: nowrap; text-orientation: initial;">Test performed (FL-LPA/SL-LPA/CBNAAT)</span>
-												</td>
-												<td class="tg-031e" rowspan="2"><span style="writing-mode:vertical-rl; white-space: nowrap; text-orientation: initial;">Date of receipt</span>
-												</td>
-												<td class="tg-031e" rowspan="2"><span style="writing-mode:vertical-rl; white-space: nowrap; text-orientation: initial;">Valid* (Y/N)</span>
-												</td>
-												<td class="tg-031e" rowspan="2"><span style="writing-mode:vertical-rl; white-space: nowrap; text-orientation: initial;">TB + (Y/N)</span>
-												</td>
-												<td class="tg-031e" rowspan="2"><span style="writing-mode:vertical-rl; white-space: nowrap; text-orientation: initial;">RIF</span>
-												</td>
-											   
-												<td class="tg-031e" rowspan="2"><span style="writing-mode:vertical-rl; white-space: nowrap; text-orientation: initial;">INH(InhA)</span>
-												</td>
-												<td class="tg-031e" rowspan="2"><span style="writing-mode:vertical-rl; white-space: nowrap; text-orientation: initial;">INH(KatG)</span>
-												</td>
-												<td class="tg-031e" rowspan="2"><span style="writing-mode:vertical-rl; white-space: nowrap; text-orientation: initial;">FQ class resistance (ND/D)</span>
-												</td>
-												<td class="tg-031e" rowspan="2"><span style="writing-mode:vertical-rl; white-space: nowrap; text-orientation: initial;">SLI class (resi)</span></td>
-                                                 <td class="tg-031e" rowspan="2"><span style="writing-mode:vertical-rl; white-space: nowrap; text-orientation: initial;">SLID(eis)</span></td>
-												<td class="tg-031e" rowspan="2"><span style="writing-mode:vertical-rl; white-space: nowrap; text-orientation: initial;">Type (LJ/LC)</span>
-												</td>
-												<td class="tg-031e" rowspan="2"><span style="writing-mode:vertical-rl; white-space: nowrap; text-orientation: initial;">Results</span>
-												</td>
-												<td class="tg-031e" rowspan="2"><span style="writing-mode:vertical-rl; white-space: nowrap; text-orientation: initial;">Date of receipt </span>
-												</td>
-
-												<td class="tg-031e" rowspan="2"><span style="writing-mode:vertical-rl; white-space: nowrap; text-orientation: initial;">Rifampicin</span>
-												</td>
-												<td class="tg-031e" rowspan="2"><span style="writing-mode:vertical-rl; white-space: nowrap; text-orientation: initial;">Isoniazid 0.1</span>
-												</td>
-												<td class="tg-yw4l" rowspan="2"><span style="writing-mode:vertical-rl; white-space: nowrap; text-orientation: initial;">Isoniazid 0.4</span>
-												</td>
-												<td class="tg-yw4l" rowspan="2"><span style="writing-mode:vertical-rl; white-space: nowrap; text-orientation: initial;">Streptomycin</span>
-												</td>
-												<td class="tg-yw4l" rowspan="2"><span style="writing-mode:vertical-rl; white-space: nowrap; text-orientation: initial;">Ethambutol</span>
-												</td>
-												<td class="tg-yw4l" rowspan="2"><span style="writing-mode:vertical-rl; white-space: nowrap; text-orientation: initial;">Pyrazinamide</span>
-												</td>
-												<td class="tg-yw4l" rowspan="2"><span style="writing-mode:vertical-rl; white-space: nowrap; text-orientation: initial;">Kanamycin</span>
-												</td>
-												<td class="tg-yw4l" rowspan="2"><span style="writing-mode:vertical-rl; white-space: nowrap; text-orientation: initial;">Capreomycin</span>
-												</td>
-												<td class="tg-yw4l" rowspan="2"><span style="writing-mode:vertical-rl; white-space: nowrap; text-orientation: initial;">Amicacin</span>
-												</td>
-												<td class="tg-yw4l" rowspan="2"><span style="writing-mode:vertical-rl; white-space: nowrap; text-orientation: initial;">Levofloxacin</span>
-												</td>
-
-												<td class="tg-yw4l" rowspan="2"><span style="writing-mode:vertical-rl; white-space: nowrap; text-orientation: initial;">Maxifloxacin (0.25)</span>
-												</td>
-												<td class="tg-yw4l" rowspan="2"><span style="writing-mode:vertical-rl; white-space: nowrap; text-orientation: initial;">Maxifloxacin (1.0)</span>
-												</td>
-												<td class="tg-yw4l" rowspan="2"><span style="writing-mode:vertical-rl; white-space: nowrap; text-orientation: initial;">Ethionamide</span>
-												</td>
-												<td class="tg-yw4l" rowspan="2"><span style="writing-mode:vertical-rl; white-space: nowrap; text-orientation: initial;">PAS</span>
-												</td>
-												<td class="tg-yw4l" rowspan="2"><span style="writing-mode:vertical-rl; white-space: nowrap; text-orientation: initial;">Linezolid</span>
-												</td>
-												<td class="tg-yw4l" rowspan="2"><span style="writing-mode:vertical-rl; white-space: nowrap; text-orientation: initial;">Clofazimine</span>
-												</td>
-												<td class="tg-yw4l" rowspan="2"><span style="writing-mode:vertical-rl; white-space: nowrap; text-orientation: initial;">Bedaquiline</span>
-												</td>
-												<td class="tg-yw4l" rowspan="2"><span style="writing-mode:vertical-rl; white-space: nowrap; text-orientation: initial;">Delamanid</span>
-												</td>
-												<td class="tg-yw4l" rowspan="2"><span style="writing-mode:vertical-rl; white-space: nowrap; text-orientation: initial;">Azythromycin</span>
-												</td>
-												<td class="tg-yw4l" rowspan="2"><span style="writing-mode:vertical-rl; white-space: nowrap; text-orientation: initial;">Clarithromycin</span>
-												</td>
-												<!-- <td class="tg-yw4l" rowspan="2"><span
-															style="writing-mode:vertical-rl; white-space: nowrap; text-orientation: initial;"></span></td> -->
-												<td class="tg-yw4l" rowspan="2"><span style="writing-mode:vertical-rl; white-space: nowrap; text-orientation: initial;">Date of reporting culture result</span>
-												</td>
-												<td class="tg-yw4l" rowspan="2"><span style="writing-mode:vertical-rl; white-space: nowrap; text-orientation: initial;">Date of reporting DST result</span>
-												</td>
-												<td class="tg-yw4l" rowspan="2"><span style="writing-mode:vertical-rl; white-space: nowrap; text-orientation: initial;">Remarks</span>
-												</td>
-
-
-												<!-- ===================== -->
-												<!-- Result Headings - END -->
-												<!-- ===================== -->
-
-
+											  <td colspan="4" width="517">Diagnosis</td>
+											  <td colspan="2" width="174">Follow-up</td>
+											  <td rowspan="2" width="92">Specimen Collection</td>
+											  <td rowspan="2" width="94">Specimen receipt at laboratory</td>
+											  <td width="261">(CBNAAT/FLLPA/SLLPA/AFB    Culture/DST/ Sputum Microscopy)</td>
+											  <td rowspan="2" width="150">Date of receipt for test </td>
+											  <td rowspan="2" width="150">Valid* (Y/N)</td>
+											  <td rowspan="2" width="142">TB +    (Y/N)</td>
+											  <td rowspan="2" width="134">RIF(D/    ND/NA</td>
+											  <td rowspan="2" width="93">Date of    Report submission to NK</td>
+											  <td rowspan="2" width="240">Remarks</td>
+											  <td rowspan="2" width="83">Direct/Indirect </td>
+											  <td rowspan="2" width="97">Date of Decontamination </td>
+											  <td rowspan="2" width="101">Date of    DNA Extraction </td>
+											  <td width="101">&nbsp;</td>
+											  <td rowspan="2" width="101">Date of Hybridization</td>
+											  <td rowspan="2" width="111">Valid*    (Y/N)</td>
+											  <td rowspan="2" width="115">MTB    (Y/N)</td>
+											  <td rowspan="2" width="104">RIF<br />
+												(D,ND,I)</td>
+											  <td rowspan="2" width="113">INH(InhA)    (D,ND,I)</td>
+											  <td rowspan="2" width="116">INH(KatG)D,ND,I)</td>
+											  <td rowspan="2" width="219">Test Interpretation</td>
+											  <td rowspan="2" width="243">Clinical Interpretation </td>
+											  <td rowspan="2" width="97">Date of    Report submission to NK</td>
+											  <td rowspan="2" width="227">Remarks</td>
+											  <td rowspan="2" width="87">Direct/Indirect</td>
+											  <td rowspan="2" width="121">Date of Decontamination </td>
+											  <td rowspan="2" width="111">Date    of DNA Extraction </td>
+											  <td width="101">&nbsp;</td>
+											  <td rowspan="2" width="116">Date of Hybridization</td>
+											  <td rowspan="2" width="99">Valid*    (Y/N)</td>
+											  <td rowspan="2" width="114">MTB(Y/N)</td>
+											  <td rowspan="2" width="109">FQ    class resistance (ND/D/I)</td>
+											  <td rowspan="2" width="118">SLI    (resi)<br />
+												(ND/D/I)</td>
+											  <td rowspan="2" width="161">SLID    (eis)<br />
+												(ND/D/I)</td>
+											  <td rowspan="2" width="222">Test Interepretation </td>
+											  <td rowspan="2" width="196">Clinical interpretation </td>
+											  <td rowspan="2" width="120">Date    of Report submission</td>
+											  <td rowspan="2" width="325">Remarks</td>
+											  <td rowspan="2" width="83">Type    (LC)</td>
+											  <td rowspan="2" width="70">Date of Inoculation </td>
+											  <td colspan="2" width="158">Flagged MGIT tube</td>
+											  <td colspan="2" width="110">Culture    Microscopy</td>
+											  <td colspan="2" width="90">BHI</td>
+											  <td colspan="2" width="109">ID test </td>
+											  <td colspan="2" width="171">Final Results</td>
+											  <td rowspan="2" width="102">Date Result Submit to Nikshay</td>
+											  <td rowspan="2" width="198">Remarks</td>
+											  <td rowspan="2" width="70">Type    (LJ)</td>
+											  <td rowspan="2" width="131">Date of Inoculation </td>
+											  <td colspan="16" width="1120">Week </td>
+											  <td colspan="2" width="170">Culture Microscopy result</td>
+											  <td colspan="2" width="135">ID test </td>
+											  <td rowspan="2" width="112">Final Results</td>
+											  <td width="107">&nbsp;</td>
+											  <td rowspan="2" width="103">Date    of Results submission to Nk</td>
+											  <td rowspan="2" width="298">Remarks</td>
+											  <td rowspan="2" width="85">Date of    Inoculation on DST </td>
+											  <td rowspan="2" width="148">Drugs for which inoculated</td>
+											  <td rowspan="2" width="76">Rifampicin<br />
+												( R )</td>
+											  <td rowspan="2" width="82">Isoniazid<br />
+												( H )</td>
+											  <td rowspan="2" width="90">Streptomycin<br />
+												( S )</td>
+											  <td rowspan="2" width="79">Ethambutol<br />
+												( E )</td>
+											  <td rowspan="2" width="74">Kanamycin<br />
+												( Km )</td>
+											  <td rowspan="2" width="88">Capreomycin<br />
+												( Cm )</td>
+											  <td rowspan="2" width="63">Amicacin<br />
+												( Am )</td>
+											  <td rowspan="2" width="85">Levofloxacin<br />
+												( Lfx )</td>
+											  <td rowspan="2" width="118">Maxifloxacin<br />
+												(Mfx[1])</td>
+											  <td rowspan="2" width="86">Ethionamide<br />
+												( Eto )</td>
+											  <td rowspan="2" width="134">PAS</td>
+											  <td rowspan="2" width="97">Linezolid<br />
+												( Lzd )</td>
+											  <td rowspan="2" width="81">Clofazimine<br />
+												( Cfz )</td>
+											  <td rowspan="2" width="82">Bedaquiline<br />
+												( BDQ )</td>
+											  <td rowspan="2" width="74">Delamanid<br />
+												( Dim )</td>
+											  <td rowspan="2" width="80">Date of    reporting DST result</td>
+											  <td width="276">&nbsp;</td>
+											  <td rowspan="2" width="159">Date of Innoculation Paranzamide (PZA)</td>
+											  <td rowspan="2" width="80">PZA Drug</td>
+											  <td rowspan="2" width="141">Date of Reporting (PZA)</td>
+											  <td rowspan="2" width="282">Remarks</td>
+											  <td rowspan="2" width="85">Date of    Inoculation on DST </td>
+											  <td rowspan="2" width="85">Drugs for which inoculated</td>
+											  <td rowspan="2" width="73">Rifampicin<br />
+												( R )</td>
+											  <td rowspan="2" width="62">Isoniazid<br />
+												( H )</td>
+											  <td rowspan="2" width="90">Streptomycin<br />
+												( S )</td>
+											  <td rowspan="2" width="79">Ethambutol<br />
+												( E )</td>
+											  <td rowspan="2" width="74">Kanamycin<br />
+												( Km )</td>
+											  <td rowspan="2" width="107">Capreomycin<br />
+												( Cm )</td>
+											  <td rowspan="2" width="102">Amicacin<br />
+												( Am )</td>
+											  <td rowspan="2" width="85">Levofloxacin<br />
+												( Lfx )</td>
+											  <td rowspan="2" width="118">Maxifloxacin<br />
+												(Mfx[1])</td>
+											  <td rowspan="2" width="86">Ethionamide<br />
+												( Eto )</td>
+											  <td rowspan="2" width="66">PAS</td>
+											  <td rowspan="2" width="63">Linezolid<br />
+												( Lzd )</td>
+											  <td rowspan="2" width="81">Clofazimine<br />
+												( Cfz )</td>
+											  <td rowspan="2" width="82">Bedaquiline<br />
+												( BDQ )</td>
+											  <td rowspan="2" width="74">Delamanid<br />
+												( Dim )</td>
+											  <td rowspan="2" width="80">Date of    reporting DST result</td>
+											  <td rowspan="2" width="298">Remarks</td>
+											  <td rowspan="2" width="64">Valid*    (Y/N)</td>
+											  <td rowspan="2">TB + (Y/N)</td>
+											  <td rowspan="2" width="105">RIF(D/    ND/NA</td>
+											  <td rowspan="2" width="144">Date    of Report submission</td>
 											</tr>
 											<tr>
-												<td class="tg-yw4l">New PT</td>
-												<td class="tg-yw4l">Presumptive MDR TB</td>
-												<td class="tg-yw4l">Predominant symptom and duration</td>
-												<td class="tg-yw4l">PMDT TB No</td>
-												<td class="tg-yw4l">Month of FU</td>
-
-												<td class="tg-yw4l"></td>
-												<td class="tg-yw4l"></td>
-												<td class="tg-yw4l"></td>
-											</tr>
-
-										   
-
-										   @foreach($data['annexure_data'] as $key=> $anx_data)
-												<tr>
-													<td class="tg-yw4l">{{ $anx_data->colA }}</td>
-													<td class="tg-yw4l">{{ $anx_data->colB }}</td>            
-													<td class="tg-yw4l">{{ $anx_data->colC }}</td>
-													<td class="tg-yw4l">{{ $anx_data->colD }}</td>
-													<td class="tg-yw4l">{{ $anx_data->colE }}</td>
-													<td class="tg-yw4l">{{ $anx_data->colF }}</td>           
-													<td class="tg-yw4l">{{ $anx_data->colG }}</td>
-													<td class="tg-yw4l">{{ $anx_data->colH }}</td>
-													<td class="tg-yw4l">{{ $anx_data->colI }}</td>
-													<td class="tg-yw4l">{{ $anx_data->colJ }}</td>         
-													<td class="tg-yw4l">{{ $anx_data->colK }}</td>
-													<td class="tg-yw4l">{{ $anx_data->colL }}</td>
-													<td class="tg-yw4l">{{ $anx_data->colM }}</td>
-													<td class="tg-yw4l">{{ $anx_data->colN }}</td>
-													<td class="tg-yw4l">{{ $anx_data->colO }}</td>
-													<td class="tg-yw4l">{{ $anx_data->colP }}</td>
-													<td class="tg-yw4l">{{ $anx_data->colQ }}</td>
-													<td class="tg-yw4l">{{ $anx_data->colR }}</td>
-													<td class="tg-031e">{{ $anx_data->colS }}</td>
-													<td class="tg-031e">{{ $anx_data->colT }}</td>
-													<td class="tg-031e">{{ $anx_data->colU }}</td>
-													<td class="tg-031e">{{ $anx_data->colV }}</td>
-													<td class="tg-031e">{{ $anx_data->colW }}</td>
-													<td class="tg-031e">{{ $anx_data->colX }}</td>
-													<td class="tg-031e">{{ $anx_data->colY }}</td>           
-													<td class="tg-031e">{{ $anx_data->colZ }}</td>
-													<td class="tg-031e">{{ $anx_data->colAA }}</td>
-													<td class="tg-031e">{{ $anx_data->colAB }}</td>
-													<td class="tg-031e">{{ $anx_data->colAC }}</td>
-													<td class="tg-031e">{{ $anx_data->colAD }}</td>
-													<td class="tg-031e">{{ $anx_data->colAE }}</td>
-													<td class="tg-yw4l">{{ $anx_data->colAF }}</td>
-													<td class="tg-yw4l">{{ $anx_data->colAG }}</td>
-													<td class="tg-yw4l">{{ $anx_data->colAH }}</td>
-													<td class="tg-yw4l">{{ $anx_data->colAI }}</td>
-													<td class="tg-yw4l">{{ $anx_data->colAJ }}</td>
-													<td class="tg-yw4l">{{ $anx_data->colAK }}</td>
-													<td class="tg-yw4l">{{ $anx_data->colAL }}</td>
-													<td class="tg-yw4l">{{ $anx_data->colAM }}</td>
-													<td class="tg-yw4l">{{ $anx_data->colAN }}</td>
-													<td class="tg-yw4l">{{ $anx_data->colAO }}</td>
-													<td class="tg-yw4l">{{ $anx_data->colAP }}</td>
-													<td class="tg-yw4l">{{ $anx_data->colAQ }}</td>
-													<td class="tg-yw4l">{{ $anx_data->colAR }}</td>
-													<td class="tg-yw4l">{{ $anx_data->colAS }}</td>
-													<td class="tg-yw4l">{{ $anx_data->colAT }}</td>
-													<td class="tg-yw4l">{{ $anx_data->colAU }}</td>
-													<td class="tg-yw4l">{{ $anx_data->colAV }}</td>
-													<td class="tg-yw4l">{{ $anx_data->colAW }}</td>
-													<td class="tg-yw4l">{{ $anx_data->colAX }}</td>
-													<td class="tg-yw4l">{{ $anx_data->colAY }}</td>
-													<td class="tg-yw4l">{{ $anx_data->colBA }}</td>
-													<td class="tg-yw4l">{{ $anx_data->colBB }}</td>
-													 <td class="tg-yw4l">{{ $anx_data->colBC }}</td>
-												</tr>
-											@endforeach	
-										</table>
-
-
-
+											  <td width="176">Full Name </td>
+											  <td width="118">TU</td>
+											  <td width="95">Taluk</td>
+											  <td width="111">District</td>
+											  <td width="88">State </td>
+											  <td width="477">Address    and Contact </td>
+											  <td width="117">New    PT</td>
+											  <td width="155">Presumptive    MDR TB</td>
+											  <td width="155">Predominant    symptom </td>
+											  <td width="90">Duration</td>
+											  <td width="100">PMDT    TB No</td>
+											  <td width="74">Month    of FU</td>
+											  <td width="261">&nbsp;</td>
+											  <td width="101">Date of PCR</td>
+											  <td width="101">Date of PCR</td>
+											  <td width="88">Date    of flagging</td>
+											  <td width="70">GU</td>
+											  <td colspan="2" width="110">Result</td>
+											  <td colspan="2" width="90">Result</td>
+											  <td colspan="2" width="109">Result</td>
+											  <td width="80">Date</td>
+											  <td width="91">Result</td>
+											  <td colspan="2" width="140">WK1 </td>
+											  <td colspan="2" width="140">WK2 </td>
+											  <td colspan="2" width="140">WK3</td>
+											  <td colspan="2" width="140">WK4</td>
+											  <td colspan="2" width="140">WK5</td>
+											  <td colspan="2" width="140">WK6</td>
+											  <td colspan="2" width="140">WK7</td>
+											  <td colspan="2" width="140">WK8</td>
+											  <td colspan="2" width="170">Result</td>
+											  <td colspan="2" width="135">Result</td>
+											  <td width="107">Final Result    Date</td>
+											  <td width="276">Remarks</td>
+											</tr>											
+											
+										  </table>
 									</div>
 
 											<!------------------------------>
@@ -297,7 +305,7 @@
 
             </div>
 
-            <footer class="footer"> © Copyright Reserved 2017-2018, LIMS </footer>
+            <footer class="footer">  </footer>
 
         </div>
 		<style type="text/css">
@@ -369,7 +377,7 @@
 			  });//submit
 			});//document ready
           function fnExcelReport() {
-				var tab_text = "<table border='2px'><tr bgcolor='#87AFC6'>";
+				var tab_text = "<table border='2px'><tr>";
 				var textRange;
 				var j = 0;
 				tab = document.getElementById('result1'); // id of table
@@ -413,5 +421,114 @@
 				link.href = uri;
 				link.click();
 			}
+
+			$( document ).ready(function() {
+
+				$('#btnSubmit').on('click', function() {
+
+					var quarter_wise_month = [];
+					var year = "";
+					var quarter_no = "";
+					var len = 0;
+					var quarter_month = "";
+					var quarter_month_text = [];					
+
+					year = $('#year').val();
+					quarter_no = $('#quarter').val();
+
+					$.each($("#quarter_months option:selected"), function(){            
+						quarter_wise_month.push($(this).val());
+						quarter_month_text.push($(this).text());
+					});
+
+					//console.log(quarter_month_text);
+
+					if( quarter_wise_month.length > 0 )
+					{
+						len = quarter_wise_month.length;						
+					}
+
+						//alert(quarter_wise_month);
+
+					if( year == ""  || quarter_no == "" || len <= 0 )
+					{
+
+						$('#sp_qt_no').html("");
+						$('#sp_month_name').html("");
+						$('#sp_year').html("");						
+						$('#period').hide();
+						$('#result1 #dataRow').remove();						
+
+					} else {
+					
+						$('#sp_qt_no').html( $('#quarter option:selected').text() );
+						$('#sp_month_name').html( quarter_month_text.join(", ") );
+						$('#sp_year').html( $('#year').val() );
+						$('#period').show();
+
+						quarter_month = quarter_wise_month.join(", ");
+
+						$.ajax({
+							type: "POST",
+							dataType:"html",							
+							data: { "_token": "{{ csrf_token() }}", "year": year, "quarter_no": quarter_no, "quarter_wise_month": quarter_month },
+							url: "{{ route('ajax-annexure15l') }}",
+							
+							success: function (response) {
+
+								$('#result1 #dataRow').remove();
+								$('#result1').append(response);								
+							
+							}
+						});
+
+					}					
+				});
+
+				$('#year').change(function() {
+				var n = $('#year').val();
+				if (n < 2020)
+					$('#year').val('2020');
+				if (n > 2050)
+					$('#year').val('2050');
+				});
+
+				$('#year').blur(function() {
+
+				var n = $('#year').val();
+				if (n < 2020)
+					$('#year').val('2020');
+				if (n > 2050)
+					$('#year').val('2050');
+
+				});
+
+				$('#quarter').on('change', function() {
+
+					var quarter = $(this).val();
+
+					$.ajax({
+						url: '/getQuarterWiseMonth/'+quarter,
+						type: 'GET',
+						dataType: 'html',
+						success: function(response){
+							console.log(response);
+							var len = 0;
+							if(response != null){
+								
+								$('#quarter_months')
+								.empty()
+								.append(response);
+							}							
+						},
+						failure: function(response){
+							alert("failure");
+
+						}
+					});
+
+				})
+
+			});
        </script>
     @endsection

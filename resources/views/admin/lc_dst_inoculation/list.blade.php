@@ -27,6 +27,7 @@
                                   <table id="exampl" class="table table-striped table-bordered responsive col-xlg-12" cellspacing="0" width="100%">
                                       <thead>
                                         <tr>
+                                          <th class="hide">ID</th>
                                           <th>Sample ID</th>
                                          <!--  <th>TUBE sequence ID</th> -->
                                           <th>Positive MGIT sequence ID</th>
@@ -39,9 +40,10 @@
                                         </tr>
                                       </thead>
                                       <tbody>
-
+                                         {{-- {{ dd($data['sample']) }} --}}
                                         @foreach ($data['sample'] as $key=> $samples)
                                         <tr>
+                                          <td class="hide"></td>
                                           <td>{{$samples->samples}}</td>
                                           <!-- <td>
                                             @if($samples->tube_id_lj)
@@ -55,14 +57,14 @@
                                           <td>{{$samples->dst_c_id2}}</td>
                                           <td>{{$samples->dst_c_id3}}</td>
                                           <td>{{$samples->druglist}}</td>
-                                          <td>{{ !empty($samples->inoculation_date) ? date('d-m-Y',strtotime($samples->inoculation_date)) :  date('d-m-Y',strtotime($samples->inc_date)) }}</td>
+                                          <td>{{ !empty($samples->inoculation_date) ? date('d-m-Y',strtotime($samples->inoculation_date)) :  '' }}</td>
                                           <td>
                                             @if($samples->status==1)
-                                            <button onclick="openForm('{{$samples->samples}}', {{$samples->log_id}}, '{{$samples->lpa_type}}','{{$samples->mgit_id}}',{{$samples->enrollID}},{{$samples->sampleID}},{{$samples->service_id}},'{{$samples->tag}}',{{$samples->rec_flag}})",  value="" type="button" class = "btn btn-default btn-sm resultbtn">Submit</button>
+                                            <button onclick="openForm('{{$samples->samples}}', {{$samples->log_id}}, '{{$samples->lpa_type}}','{{$samples->mgit_id}}',{{$samples->enrollID}},{{$samples->sampleID}},{{$samples->service_id}},'{{$samples->tag}}',{{$samples->rec_flag}})",  value="" type="button" class = "btn btn-info btn-sm resultbtn">Submit</button>
                                             @elseif($samples->status==0)
                                             Done
                                             @else
-                                            <button onclick="resultForm('{{$samples->samples}}', {{$samples->log_id}}, {{$samples->lc_dst_tr_id}},'{{$samples->druglist}}','{{$samples->drug_ids}}',{{$samples->enrollID}},{{$samples->sampleID}},{{$samples->service_id}},'{{$samples->tag}}',{{$samples->rec_flag}})",  value="" type="button" class = "btn btn-default btn-sm resultbtn">Add Result</button>
+                                            <button onclick="resultForm('{{$samples->samples}}', {{$samples->log_id}}, {{$samples->lc_dst_tr_id}},'{{$samples->druglist}}','{{$samples->drug_ids}}',{{$samples->enrollID}},{{$samples->sampleID}},{{$samples->service_id}},'{{$samples->tag}}',{{$samples->rec_flag}})",  value="" type="button" class = "btn btn-info btn-sm resultbtn">Add Result</button>
                                             @endif
                                           </td>
                                         </tr>
@@ -79,7 +81,7 @@
                 </div>
 
             </div>
-            <footer class="footer"> © Copyright Reserved 2017-2018, LIMS </footer>
+            <footer class="footer">  </footer>
         </div>
 
 <script>
@@ -187,6 +189,7 @@ $(document).ready(function() {
                 title: 'LIMS_lc_dst_inoculation_'+today+''
             }
         ],
+
         "order": [[ 1, "desc" ]]
     });
 	

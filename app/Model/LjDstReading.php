@@ -16,12 +16,16 @@ class LjDstReading extends Model
     'dilution',
     'drug_media_1',
     'drug_media_2',
+    'drug_name',
     'drug_reading',
     'status',
     'flag',
     'created_by',
     'updated_by',
     'reason_edit',
-    'edit_microbiologist'
+    'edit_microbiologist',
+    'lab_code',
+    'sample_label',
+    'comments',
   ];
 }

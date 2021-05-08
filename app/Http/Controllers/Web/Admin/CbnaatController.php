@@ -34,7 +34,7 @@ $data['equipments_list']=Equipment::select('serial_no as eqipments')->where('nam
 
 // dd($data['equipments_list']);
 
-             $data['sample'] = ServiceLog::select('t_service_log.updated_at as ID','t_service_log.enroll_id','t_service_log.sample_id','t_service_log.service_id','t_service_log.tag','t_service_log.rec_flag',
+             $data['sample'] = ServiceLog::select('t_service_log.id as log_id', 't_service_log.updated_at as ID','t_service_log.enroll_id','t_service_log.sample_id','t_service_log.service_id','t_service_log.tag','t_service_log.rec_flag',
                               't_service_log.enroll_label','t_service_log.sample_label as samples',DB::raw('sample.receive_date as receive'),'sample.test_reason as reason',
                               'sample.sample_type','sample.sample_quality','sample.no_of_samples','s.result_MTB','s.result_RIF','s.next_step',
                               's.error',DB::raw('date_format(s.test_date,"%d-%m-%y") as test_date'),'t_service_log.status as STATUS')
@@ -85,6 +85,7 @@ $data['equipments_list']=Equipment::select('serial_no as eqipments')->where('nam
                               // ->orderBy('enroll_id','desc')
                               // ->get();
 
+			  //dd($data['sample']);
 
             return view('admin.cbnaat.list',compact('data'));
         }catch(\Exception $e){
@@ -93,6 +94,8 @@ $data['equipments_list']=Equipment::select('serial_no as eqipments')->where('nam
         }
         // return Cbnaat::cbnaat_list();
     }
+
+	
 
 
     /**
@@ -117,8 +120,8 @@ $data['equipments_list']=Equipment::select('serial_no as eqipments')->where('nam
        
 		DB::beginTransaction();
         try {		
-			$en_label = Enroll::select('label as l')->where('id',$request->enrollId)->first();
-			$s_id = Sample::select('id as l')->where('sample_label',$request->sampleid)->first();
+				$en_label = Enroll::select('label as l')->where('id',$request->enrollId)->first();
+				$s_id = Sample::select('id as l')->where('sample_label',$request->sampleid)->first();
 			 // dd( $s_id);
 			$enroll_label=$en_label->l;
 			$sample_id=$s_id->l;
@@ -131,7 +134,8 @@ $data['equipments_list']=Equipment::select('serial_no as eqipments')->where('nam
 			
             
 			if($request->editresult=='edit'){
-			  // dd($request->all());
+
+			   //dd($request->all());
 
 			  $cbnaat = Cbnaat::select('id as id')->where('enroll_id', $request->enrollId)->where('sample_id', $sample_id)->first();
 			  //dd($cbnaat);
@@ -151,6 +155,20 @@ $data['equipments_list']=Equipment::select('serial_no as eqipments')->where('nam
 					'created_at' => date('Y-m-d H:i:s'),
 					'updated_at' => ''
 				  ]);
+
+				  $cbnaat_final_interpretation = "";
+
+							$get_cbnat_final_interpretation = DB::table('m_cbnaat_final_interpretation')
+							->select('final_interpretation')
+						  ->where('mtb_result', $request->mtb)
+						  ->where('rif_result', $request->rif)
+						  ->first();
+
+						if(!empty($get_cbnat_final_interpretation))
+						{
+							$cbnaat_final_interpretation = $get_cbnat_final_interpretation->final_interpretation;
+						}
+
 				  if(!empty($request->mtb) && !empty($request->rif) ){
 				    $cbnaat_obj->error = NULL; //0;
 				  }else{
@@ -161,6 +179,7 @@ $data['equipments_list']=Equipment::select('serial_no as eqipments')->where('nam
 				  $cbnaat_obj->is_moved = 0;
 				  $cbnaat_obj->result_MTB = $request->mtb;
 				  $cbnaat_obj->result_RIF = $request->rif;
+				  $cbnaat_obj->final_interpretation = $cbnaat_final_interpretation;
 				  $cbnaat_obj->save();
 				}
 
@@ -170,7 +189,27 @@ $data['equipments_list']=Equipment::select('serial_no as eqipments')->where('nam
 			}
 
 			//dd($request->all());
-			
+
+			$get_lab_code = "";
+
+			$get_lab_code = DB::table('m_configuration')
+							->select('lab_code')
+							->where('status', '1')
+							->first();
+
+			$cbnaat_final_interpretation = "";
+
+							$get_cbnat_final_interpretation = DB::table('m_cbnaat_final_interpretation')
+							->select('final_interpretation')
+						  ->where('mtb_result', $request->mtb)
+						  ->where('rif_result', $request->rif)
+						  ->first();
+
+						if(!empty($get_cbnat_final_interpretation))
+						{
+							$cbnaat_final_interpretation = $get_cbnat_final_interpretation->final_interpretation;
+						}
+
             Cbnaat::where('enroll_id', $request->enrollId)->where('sample_id', $sample_id)->delete();
 			$cbnaat = Cbnaat::create([
 				'enroll_id' => $request->enrollId,
@@ -180,12 +219,17 @@ $data['equipments_list']=Equipment::select('serial_no as eqipments')->where('nam
 				'result_RIF' => $request->rif,
 				'next_step' => $request->next_step,
 				'cbnaat_equipment_name'=>$request->cbnaat_equipment_name,
+				'lab_code'	=> $get_lab_code->lab_code,
+				'sample_label' => $request->sampleid,
 				'error' => NULL,
 				'status' => 1,
 				'test_date' => date('Y-m-d H:i:s'),
 				'created_by' => Auth::user()->id,
-				 'updated_by' => Auth::user()->id
-			  ]);
+				 'updated_by' => Auth::user()->id,
+				 'comments' => $request->comments,
+				 'final_interpretation' => $cbnaat_final_interpretation
+			  ]);			 
+
 			  $cbnaat = Cbnaat::select('id as id')->where('enroll_id', $request->enrollId)->where('sample_id', $sample_id)->first();
 			  $cbnaat_obj = Cbnaat::find($cbnaat->id);
 
@@ -338,6 +382,223 @@ $data['equipments_list']=Equipment::select('serial_no as eqipments')->where('nam
 		
         return redirect('/cbnaat');
     }
+
+	public function bulkStore(Request $request)
+	{
+		$this->validate( $request, [
+            'log_ids' => 'required',            
+        ] );
+
+		DB::beginTransaction();
+        try {		
+
+			$log_ids = trim( $request->input('log_ids') );
+			            $log_ids = explode(',', $log_ids);
+
+                            $get_lab_code = "";
+                            $get_lab_code = DB::table('m_configuration')
+                                    ->select('lab_code')
+                                    ->where('status', '1')
+                                    ->first();
+
+                  foreach($log_ids as $log_id)
+                  {
+                    $get_log_data = ServiceLog::select('enroll_id', 'sample_id', 'status', 'sample_label', 'service_id', 'tag', 'rec_flag')
+                                    ->where('id', $log_id)
+                                    ->first();
+
+                    if(!empty($get_log_data))
+                    {
+                      $request->enrollId = $get_log_data->enroll_id;
+                      $request->sampleID = $get_log_data->sample_id;
+                      $request->sampleid = $get_log_data->sample_label;
+					  $request->serviceId = $get_log_data->service_id;
+					  $request->status = $get_log_data->status;
+                      $request->rec_flag = $get_log_data->rec_flag;
+                      $request->tag = $get_log_data->tag;
+                    }
+				  
+				$en_label = Enroll::select('label as l')->where('id',$request->enrollId)->first();
+				$s_id = Sample::select('id as l')->where('sample_label',$request->sampleid)->first();
+			 // dd( $s_id);
+			$enroll_label=$en_label->l;
+			$sample_id=$s_id->l;
+
+		  // dd($request->enrollId,$sample_id);
+			if(!$request->error){
+				$request->error=0000;
+			}			
+            		
+
+			//dd($request->all());
+
+			$get_lab_code = "";
+
+			$get_lab_code = DB::table('m_configuration')
+							->select('lab_code')
+							->where('status', '1')
+							->first();
+
+			
+            Cbnaat::where('enroll_id', $request->enrollId)->where('sample_id', $sample_id)->delete();
+
+			$cbnaat_final_interpretation = "";
+
+			$get_cbnat_final_interpretation = DB::table('m_cbnaat_final_interpretation')
+												->select('final_interpretation')
+						  						->where('mtb_result', $request->mtb)
+						  						->where('rif_result', $request->rif)
+						  						->first();
+
+						if(!empty($get_cbnat_final_interpretation))
+						{
+							$cbnaat_final_interpretation = $get_cbnat_final_interpretation->final_interpretation;
+						}
+
+			$cbnaat = Cbnaat::create([
+				'enroll_id' => $request->enrollId,
+				'sample_id' => $sample_id,
+				'result_MTB' => $request->mtb,
+				//'error' => $request->error,
+				'result_RIF' => $request->rif,
+				'next_step' => $request->next_step,
+				'cbnaat_equipment_name'=>$request->cbnaat_equipment_name,
+				'lab_code'	=> $get_lab_code->lab_code,
+				'sample_label' => $request->sampleid,
+				'error' => NULL,
+				'status' => 1,
+				'test_date' => date('Y-m-d H:i:s'),
+				'created_by' => Auth::user()->id,
+				 'updated_by' => Auth::user()->id,
+				 'comments' => $request->comments,
+				 'final_interpretation' => $cbnaat_final_interpretation
+			  ]);
+
+			  $cbnaat = Cbnaat::select('id as id')->where('enroll_id', $request->enrollId)->where('sample_id', $sample_id)->first();
+			  $cbnaat_obj = Cbnaat::find($cbnaat->id);
+
+			  $service_log_id = ServiceLog::select('id as id')->where('sample_id',$sample_id)->where('status',1)->where('service_id',4)->first();
+	          //dd($service_log_id);
+			  $cbnaat_update = ServiceLog::find($service_log_id->id);
+			  $cbnaat_update->comments=$request->comments;
+			  $cbnaat_update->tested_by=$request->user()->name;
+			  $cbnaat_update->released_dt=date('Y-m-d');
+			 
+			  if($request->next_step=='Repeat Test with same sample' || $request->next_step=='Repeat Test with another sample'){
+			  $cbnaat_update->status = 99;
+			  }else{
+			   $cbnaat_update->status = 0;
+			  }
+			  $cbnaat_update->updated_by = $request->user()->id;
+			  $cbnaat_update->save();
+
+			  if($request->next_step=='Submit result for finalization'){
+
+				  $microbio = Microbio::create([
+					'enroll_id' => $request->enrollId,
+					'sample_id' => $sample_id,
+					'service_id' => 4,
+					'next_step' => '',
+					'detail' => '',
+					'report_type'=>'End Of Report',
+					'remark' => '',
+					'sample_label' => $cbnaat_update->sample_label,
+					'status' => 0,
+					'created_by' => Auth::user()->id,
+					 'updated_by' => Auth::user()->id,
+					 'tag'		=> $request->tag,
+					  
+				  ]);
+			  }
+			  elseif($request->next_step=='Send to BWM'){
+
+				  $microbio = Microbio::create([
+					'enroll_id' => $request->enrollId,
+					'sample_id' => $sample_id,
+					'service_id' => 26,
+					'next_step' => '',
+					'detail' => '',
+					'remark' => '',
+					'status' => 0,
+					'bwm' => 1,
+					'created_by' => Auth::user()->id,
+					 'updated_by' => Auth::user()->id
+				  ]);
+				  $cbnaat_obj->status = 9;
+				  $cbnaat_obj->updated_by = $request->user()->id;
+				  $cbnaat_obj->save();
+
+				  ServiceLog::create([
+					 'enroll_id' => $request->enrollId,
+					 'sample_id' => $sample_id,
+					 'enroll_label' => $enroll_label,
+					 'sample_label' => $request->sampleid,
+					 'service_id' => 26,
+					 'previous_step' => 'CBNAAT',
+					 'status' => 1,
+					 'tag' => '',
+					 'test_date' => date('Y-m-d H:i:s'),
+					 'created_by' => Auth::user()->id,
+					 'updated_by' => Auth::user()->id
+				   ]);
+			  }
+			  elseif($request->next_step=='Repeat Test with same sample'){
+
+				$old_sample = Sample::select('sample_label')->where('id',$sample_id)->first();
+				$new_sample = $old_sample->sample_label.'R';
+				Sample::where('id',$sample_id)->update(['sample_label'=>$new_sample]);
+				ServiceLog::where('sample_id',$sample_id)->update(['sample_label'=>$new_sample]);
+
+				$cbnaat_update->status = 1;
+				$cbnaat_update->save();
+				$cbnaat_repeat = Cbnaat::where('sample_id',$sample_id)->where('status',1)->delete();
+
+			  }
+			  elseif($request->next_step=='Repeat Test with another sample'){
+					 $log = ServiceLog::where('enroll_id',$request->enrollId)->where('service_id',11)->first();
+					 if($log){
+						$log->service_id = 4;
+						$log->status = 1;
+						$log->updated_by = $request->user()->id;
+						$data = $log;
+						$log->save();
+
+					}
+					$cbnaat_repeat = Cbnaat::where('sample_id',$sample_id)->where('status',1)->delete();
+			  }
+			  elseif($request->next_step=='Interim Report Submit another sample'){
+	  // dd($cbnaat_update['sample_id']);
+
+				$microbio = Microbio::create([
+							'enroll_id' => $request->enrollId,
+							'sample_id' => $cbnaat_update->sample_id,
+							'service_id' => 4,
+							'next_step' => '',
+							'detail' => '',
+							'report_type'=>'Interim Report',
+							'remark' => '',
+							'status' => 0,
+							'created_by' => Auth::user()->id,
+							 'updated_by' => Auth::user()->id
+						  ]);
+				$cbnaat_obj->status = 10;
+				$cbnaat_obj->updated_by = $request->user()->id;
+				$cbnaat_obj->save();
+
+
+			  }
+			  
+		}
+		//});
+		 DB::commit();
+		}catch(\Exception $e){
+			DB::rollback();
+			return redirect('/cbnaat')
+			->withErrors(['Sorry!! Action already taken of the selected Sample']);
+		}
+		
+        return redirect('/cbnaat');
+	}
 
     /**
      * Display the specified resource.

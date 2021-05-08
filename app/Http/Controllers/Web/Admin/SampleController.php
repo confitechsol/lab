@@ -60,15 +60,14 @@ class SampleController extends Controller
 
 		}
 
-
-        $data['sample'] = Sample::select(DB::raw('sample.id, u.name, sample.others_type,e.patient_id,sample.enroll_id,e.label,group_concat(receive_date) as receive,group_concat(sample.sample_label) as samples,group_concat(test_reason) as reason,group_concat(fu_month) as fu_month,group_concat(sample_type) as sample_type, group_concat(sample_quality) as sample_quality,group_concat(is_accepted) as is_accepted, count(sample_quality) as no_of_samples, group_concat(s.name) as sname'))
+        /* $data['sample'] = Sample::select(DB::raw('sample.id, u.name, sample.others_type,e.patient_id,sample.enroll_id,e.label,group_concat(receive_date) as receive,group_concat(sample.sample_label) as samples,group_concat(test_reason) as reason,group_concat(fu_month) as fu_month,group_concat(sample_type) as sample_type, group_concat(sample_quality) as sample_quality,group_concat(is_accepted) as is_accepted, count(sample_quality) as no_of_samples, group_concat(s.name) as sname'))
 		 ->leftjoin('m_services as s','s.id','=','sample.service_id')
 		 ->leftjoin('enrolls as e','e.id','=','sample.enroll_id')
-		 ->leftJoin('users as u','u.id','=','sample.user_id')
+		 ->leftJoin('users as u','u.id','=','sample.user_id')         
          ->groupBy('sample.enroll_id')
 		 ->orderBy('sample.enroll_id','desc')
 		 ->distinct()
-		 ->limit(20)->get();
+		 ->limit(20)->get(); */
 // dd($data);
 
 // select distinct sample.id, u.name, sample.others_type,e.patient_id,sample.enroll_id,e.label,group_concat(receive_date) as receive,group_concat(sample.sample_label) as samples,group_concat(test_reason) as reason,group_concat(fu_month) as fu_month,group_concat(sample_type) as sample_type, group_concat(sample_quality) as sample_quality,group_concat(is_accepted) as is_accepted, count(sample_quality) as no_of_samples, group_concat(s.name) as sname from `sample` left join `m_services` as `s` on `s`.`id` = `sample`.`service_id` left join `enrolls` as `e` on `e`.`id` = `sample`.`enroll_id` left join `users` u on `sample`.user_id=u.id group by `sample`.`enroll_id` order by `sample`.`enroll_id` desc
@@ -80,6 +79,167 @@ class SampleController extends Controller
 
         return view('admin.sample.list',compact('data'));
 
+    }
+
+    public function ajaxSampleList(Request $request)
+    {
+        $draw = $_POST['draw'];
+		$row = $_POST['start'];
+		$rowperpage = $_POST['length']; // Rows display per page
+		$columnIndex = $_POST['order'][0]['column']; // Column index
+		$columnName = $_POST['columns'][$columnIndex]['data']; // Column name
+		$columnSortOrder = $_POST['order'][0]['dir']; // asc or desc
+		$searchValue = $_POST['search']['value']; // Search value
+
+		## Custom Field value
+		$searchByEnrollmentNo = $request->searchByEnrollmentNo;
+
+        ## Search 
+	$dateRangeQuery = " date(sample.receive_date) between date_add(curdate(), INTERVAL -90 DAY) AND curdate()";
+		$searchQuery = "";
+		if($searchByEnrollmentNo != ''){
+		   $searchQuery .= "  (sample.sample_label like '%".$searchByEnrollmentNo."%' ) ";
+		}else{
+		   $searchQuery .= "  date(sample.receive_date) between date_add(curdate(), INTERVAL -90 DAY) AND curdate()";
+		}
+
+        if($searchValue != ''){
+            $searchQuery .= " and ( e.label like '%".$searchValue."%' or 
+               sample.enroll_id like'%".$searchValue."%'  or
+               sample_label like'%".$searchValue."%'  or
+               receive_date like'%".$searchValue."%'  or
+               reason like'%".$searchValue."%'  or
+               fu_month like '%".$searchValue."%') ";
+         }
+
+         $sel = Sample::select(DB::raw('sample.id, u.name, sample.others_type,e.patient_id,sample.enroll_id,e.label,group_concat(receive_date) as receive,group_concat(sample.sample_label) as samples,group_concat(test_reason) as reason,group_concat(fu_month) as fu_month,group_concat(sample_type) as sample_type, group_concat(sample_quality) as sample_quality,group_concat(is_accepted) as is_accepted, count(sample_quality) as no_of_samples, group_concat(s.name) as sname'))
+		 ->leftjoin('m_services as s','s.id','=','sample.service_id')
+		 ->leftjoin('enrolls as e','e.id','=','sample.enroll_id')
+		 ->leftJoin('users as u','u.id','=','sample.user_id')
+         ->whereRaw("".$dateRangeQuery)
+         ->groupBy('sample.enroll_id')
+		 ->orderBy('sample.enroll_id','desc')
+		 ->distinct()
+		 ->limit(20)->get();
+
+         $totalRecords =$sel->count();
+
+         $sel = Sample::select(DB::raw('sample.id, u.name, sample.others_type,e.patient_id,sample.enroll_id,e.label,group_concat(receive_date) as receive,group_concat(sample.sample_label) as samples,group_concat(test_reason) as reason,group_concat(fu_month) as fu_month,group_concat(sample_type) as sample_type, group_concat(sample_quality) as sample_quality,group_concat(is_accepted) as is_accepted, count(sample_quality) as no_of_samples, group_concat(s.name) as sname'))
+		 ->leftjoin('m_services as s','s.id','=','sample.service_id')
+		 ->leftjoin('enrolls as e','e.id','=','sample.enroll_id')
+		 ->leftJoin('users as u','u.id','=','sample.user_id')
+         ->whereRaw("".$searchQuery)
+         ->groupBy('sample.enroll_id')
+		 ->orderBy('sample.enroll_id','desc')
+		 ->distinct()
+		 ->limit(20)->get();
+
+         $totalRecordwithFilter = $sel->count();
+
+         $empQuery = Sample::select(DB::raw('sample.id, u.name, sample.others_type,e.patient_id,sample.enroll_id,e.label,group_concat(receive_date) as receive,group_concat(sample.sample_label) as samples,group_concat(test_reason) as reason,group_concat(fu_month) as fu_month,group_concat(sample_type) as sample_type, group_concat(sample_quality) as sample_quality,group_concat(is_accepted) as is_accepted, count(sample_quality) as no_of_samples, group_concat(s.name) as sname'))
+		 ->leftjoin('m_services as s','s.id','=','sample.service_id')
+		 ->leftjoin('enrolls as e','e.id','=','sample.enroll_id')
+		 ->leftJoin('users as u','u.id','=','sample.user_id')
+         ->whereRaw("".$searchQuery)
+         ->groupBy('sample.enroll_id')
+		 ->orderBy('sample.enroll_id','desc')
+		 ->distinct()
+         ->skip($row)
+        ->take($rowperpage)
+         ->get();
+
+         $data = [];
+        $hide = "";
+        $created_by = "";
+        $enroll_id = "";
+        $sample_id = "";
+        $date_of_receipt = "";
+        $sample_type = "";
+        $other_sample_type = "";
+        $sample_quality = "";
+        $sample_accept = "";
+        $reason_for_test = "";
+        $fum = "";
+        $sample_submitted = "";
+        $sample_sent_to = "";
+        $view = "";
+
+         foreach($empQuery as $key=>$samples){
+
+            $dt= explode("," , $samples->receive);
+            $counter= count($dt);
+            $edit = "";
+
+            foreach( $dt as $recvdates){
+                $custdt= date('d-m-Y h:i:s', strtotime($recvdates));                  
+               }
+
+               $get_test_rec = DB::table('req_test')
+                                    ->select('enroll_id')
+                                    ->where('enroll_id', $samples->enroll_id)
+                                    ->first();
+
+                if(!empty($get_test_rec))
+                {
+                    $edit = '<a href="javascript:void(0)" class="btn btn btn-sm">Test requested <br>generated</a>';
+
+                } elseif( $samples->is_accepted == 'Rejected') {
+
+                    //$edit = "<a href=sample/editnew/".$samples->enroll_id." class='btn btn btn-sm'>Edit</a>";
+
+                } else {
+
+                    $edit = "<a href=sample/editnew/".$samples->enroll_id." class='btn btn btn-sm'>Edit</a>";
+
+                }
+                
+
+            $hide = $samples->enroll_id;
+            $created_by = $samples->name;
+            $enroll_id = $samples->label;
+            $sample_id = $samples->samples;            
+            $date_of_receipt = $custdt;
+            $sample_type = str_replace(',','<br/>', $samples->sample_type);
+            $other_sample_type = ($samples->sample_type=="Other" || $samples->sample_type=="Others") ? $samples->others_type : "";
+            $sample_quality = str_replace(',','<br/>', $samples->sample_quality);
+            $sample_accept = str_replace(',','<br/>', $samples->is_accepted);
+            $reason_for_test = str_replace(',','<br/>', $samples->reason);
+            $fum = str_replace(',','<br/>', $samples->fu_month);
+            $sample_submitted = $samples->no_of_samples;
+            $sample_sent_to = str_replace(',','<br/>', $samples->sname);
+            $view = "<a class='btn btn-default btn-sm' target='_blank'
+            href=samplePreview/".$samples->enroll_id.">View Details </a>";
+            $view .= $edit;
+
+            $data[] = array(
+                "DT_RowId"=> $key,
+                "DT_RowClass"=>'sel',
+                "ID"=>$hide,
+                "created_by" => $created_by,
+                "enroll_id" => $enroll_id,
+                "sample_id" => $sample_id,
+                "date_of_receipt" => $date_of_receipt,
+                "sample_type" => $sample_type,
+                "other_sample_type" => $other_sample_type,
+                "sample_quality" => $sample_quality,
+                "sample_accept" => $sample_accept,
+                "reason_for_test" => $reason_for_test,
+                "fum" => $fum,
+                "sample_submitted" => $sample_submitted,
+                "sample_sent_to" => $sample_sent_to,
+                "view" => $view                
+           );
+
+         }
+
+         $response = array(
+            "draw" => intval($draw),
+            "iTotalRecords" => $totalRecords,
+            "iTotalDisplayRecords" => $totalRecordwithFilter,
+            "aaData" => $data
+          );
+          echo json_encode($response);        
+        
     }
 
     /**
@@ -223,6 +383,7 @@ class SampleController extends Controller
     public function edit($id)
     {
        $data =  Sample::edit($id);
+      
        return view('admin.sample.form',compact('data'));
     }
 
@@ -235,7 +396,7 @@ class SampleController extends Controller
      */
     public function update(Request $request, $id)
     {
-        dd($request);
+        //dd($request);
     }
 
     public function newUpdate(Request $request)
@@ -260,7 +421,7 @@ class SampleController extends Controller
 
                 if($request->sample_ID[$i] == '0')
                 {
-                    //dd($request->is_accepted[$i]);
+                    //dd($request->sample_ID[$i]);
 
                     if ($request->has('is_accepted')) {                        
                         if( $request->is_accepted[0] === 'Rejected' ){
@@ -373,18 +534,34 @@ class SampleController extends Controller
                 }
                 else
                 {
+
+                    $service = "";
+
+                    $get_service_id = ServiceLog::select('service_id')
+                                    ->where('sample_id', $request->sample_ID[$i])
+                                    ->where('enroll_id', $request->EnrollID[$i])
+                                    ->first();
+
+                    $service = $get_service_id->service_id;
+
                     if ($request->has('is_accepted')) {                        
                         if( $request->is_accepted[0] === 'Rejected' ){
-                            $request->service_id[$i] = [ ServiceLog::TYPE_BWM ];
+                            $service = [ ServiceLog::TYPE_BWM ];
                         }
                     }
                     else
                     {
                         $smpdata = Sample::find($request->sample_ID[0]);
                         if( $smpdata->is_accepted === 'Rejected' ){
-                            $request->service_id[$i] = [ ServiceLog::TYPE_BWM ];
+                            $service = [ ServiceLog::TYPE_BWM ];
                         }
-                    }                    
+                    }
+                    
+                    //dd($request->sample_ID[$i]);
+
+                    
+
+                    //$request->service_id[$i] = $get_service_id->service_id;
 
                     $update_enroll = Enroll::find($request->EnrollID[$i]);
                     $update_enroll->patient_id = $request->EnrollID[$i];       
@@ -409,9 +586,12 @@ class SampleController extends Controller
                     $month=$request->fu_month[$i];
                     }
 
-                    if($request->service_id[$i] == '8F' || $request->service_id[$i] == '8S' ){
-                        $request->service_id[$i].set('8');
-                      }
+                    
+                        if($service == '8F' || $service == '8S' ){
+                            $service.set('8');
+                          }
+                   
+                    
 
                       $scan_code=strtoupper($request->sample_id[$i]);
                         $last_index=substr($scan_code,-1);
@@ -426,8 +606,7 @@ class SampleController extends Controller
                         $sampleData = Sample::find($request->sample_ID[0]);
 
                         $sampleData->name = $request->name;
-                        $sampleData->nikshay_id = $request->nikshay_id;
-                        $sampleData->sample_label = $request->sample_id[$i];
+                        $sampleData->nikshay_id = $request->nikshay_id;                        
                         $sampleData->receive_date = $request->receive_date[$i].' '.$custom_dt;
                         $sampleData->sample_quality = $request->sample_quality[$i];
                         $sampleData->other_samplequality=$request->othersample_quality[$i];
@@ -439,34 +618,15 @@ class SampleController extends Controller
                         $sampleData->enroll_id = $request->EnrollID[$i];			 
                         $sampleData->user_id = $request->user()->id;
                         $sampleData->no_of_samples = $request->no_of_samples;
-                        $sampleData->service_id = $request->service_id[$i];
+                        
+                            $sampleData->service_id = $service;
+                      
+                        
                         $sampleData->others_type = $request->others_type[$i];
                         $sampleData->created_at = date('Y-m-d H:i:s');
                         $sampleData->save();
 
-
-                        $type = '';
-                        if($request->service_id[$i] == '8F'){
-                        $type = 'LPA1';
-                        $request->service_id[$i].set('8');
-                        }else if($request->service_id[$i] == '8S'){
-                        $type = 'LPA2';
-                        $request->service_id[$i].set('8');
-                        }else if($request->service_id[$i] == 1){
-                        $type = 'ZN Microscopy';             
-                        }else if($request->service_id[$i] == 2){
-                        $type = 'FM Microscopy';             
-                        }else if($request->service_id[$i] == 3){
-                        $type = 'Decontamination';             
-                        }else if($request->service_id[$i] == 4){
-                        $type = 'CBNAAT';             
-                        }else if($request->service_id[$i] == 16){
-                        $type = 'LC';              
-                        }else if($request->service_id[$i] == 11){
-                        $type = 'STORAGE';              
-                        } 
-
-                        
+                        $type = '';              
                 }
             }
 			   
@@ -512,7 +672,7 @@ class SampleController extends Controller
         return view('admin.sample.preview',compact('data'));
     }
 
-    public function pdfview(Request $request, $id, $pdf=null)
+    public function pdfview(Request $request, $id, $service_id, $tag, $rec_flag, $drug_name, $pdf=null)
     {
         //dd($request->all());
 		// dd($pdf);
@@ -577,8 +737,6 @@ class SampleController extends Controller
             $data['report_type'] = 'Draft Report';
         }
 
-
-
         $data['user'] = Microbio::query()
             ->join('users', 'created_by', 'users.id')
             ->where('sample_id', $id)
@@ -622,6 +780,8 @@ class SampleController extends Controller
 			->leftjoin('state as msr', 'msr.STOCode', '=', 'r.state')
             ->where('sample.id', $id)
             ->first();
+
+            $data['sampleLable'] = $data['personal']->sample_label;
 
         //dd(  $data['personal']);
 
@@ -677,6 +837,7 @@ class SampleController extends Controller
 
         //dd($data['personal']);
 
+            $data['drug_name'] = $drug_name;
 
         $data['microscopy_data'] = ServiceLog::select('m.*', 't_service_log.service_id', 't_service_log.sample_label')
             ->leftjoin('t_microscopy as m', 'm.sample_id', '=', 't_service_log.sample_id')
@@ -797,7 +958,7 @@ class SampleController extends Controller
         //$data['lpa1'] = FirstLineLpa::where('enroll_id', $data['personal']->enroll_id)->where('status', 1)->first();
         $data['lpa1'] = FirstLineLpa::join('sample', 'sample.id', '=', 't_1stlinelpa.sample_id')
 		->leftjoin('t_service_log', 't_service_log.enroll_id', '=', 't_1stlinelpa.enroll_id') 
-		->select('t_1stlinelpa.*','sample.sample_label')
+		->select('t_1stlinelpa.*','sample.sample_label', 't_service_log.sent_to_nikshay_date')
 		->where('t_service_log.sent_to_nikshay',1)
 		->whereIn('t_service_log.service_id',[8,12,14,15])
 		->where('t_service_log.tag','1st line LPA')
@@ -809,7 +970,7 @@ class SampleController extends Controller
 		//$data['lpa2'] = SecondLineLpa::where('enroll_id', $data['personal']->enroll_id)->where('status', 1)->first();
         $data['lpa2'] = SecondLineLpa::join('sample', 'sample.id', '=', 't_2stlinelpa.sample_id')
 		->leftjoin('t_service_log', 't_service_log.enroll_id', '=', 't_2stlinelpa.enroll_id') 
-		->select('t_2stlinelpa.*','sample.sample_label')
+		->select('t_2stlinelpa.*','sample.sample_label', 't_service_log.sent_to_nikshay_date')
 		->where('t_service_log.sent_to_nikshay',1)
 		->whereIn('t_service_log.service_id',[8,12,14,15])
 		->where('t_service_log.tag','2nd line LPA')
@@ -828,8 +989,7 @@ class SampleController extends Controller
             $join->on('t_lpa_final.enroll_id', '=', 't_service_log.enroll_id')
                 ->on('t_service_log.enroll_id','=','t_lpa_final.enroll_id')
 		         ->on('t_service_log.sample_id','=','t_lpa_final.sample_id')
-		         ->on('t_service_log.tag','=','t_lpa_final.tag');
-				
+		         ->on('t_service_log.tag','=','t_lpa_final.tag');				
         })	
 		
 		//pradip-LPA Final
@@ -851,27 +1011,60 @@ class SampleController extends Controller
 		->get()->toArray();
 		
         //dd($data['microbio']);
-        $data['lj_dst'] = LjDstReading::select('t_lj_dst_reading.drug_reading', 't_lj_dst_reading.created_at','t_service_log.sent_to_nikshay_date','u.name')
-		->leftjoin('t_service_log', 't_service_log.enroll_id', '=', 't_lj_dst_reading.enroll_id') 
-		//pradip-LJ DST
-		->leftjoin('users as u', 'u.id', '=', 't_service_log.updated_by')
-		->where('t_service_log.sent_to_nikshay',1)	
-		->whereIn('t_service_log.service_id',[22])	
-		->where('t_lj_dst_reading.enroll_id', $data['personal']->enroll_id)
-		->orderBy('t_lj_dst_reading.id', 'DESC')
-		->first();
+
+        $data['lj_dst'] = array();
+
+        if( $service_id == '22' )
+        {
+
+            $drugnames = explode(',', $drug_name);
+
+            //dd($drugnames);
+
+            //$data['lj_dst'] = LjDstReading::select('drug_name as name', 'drug_reading as value', 'created_at as result_date')->where('enroll_id', $data['personal']->enroll_id)->whereIn('drug_name', $drug_names)->orderBy('id', 'DESC')->get();
+
+            $data['lj_dst'] = LjDstReading::select('t_lj_dst_reading.drug_name as dname', 't_lj_dst_reading.drug_reading as value', 't_lj_dst_reading.created_at','t_service_log.sent_to_nikshay_date','u.name')
+            ->leftjoin('t_service_log', 't_service_log.enroll_id', '=', 't_lj_dst_reading.enroll_id') 
+            //pradip-LJ DST
+            ->leftjoin('users as u', 'u.id', '=', 't_service_log.updated_by')
+            ->where('t_service_log.sent_to_nikshay',1)            		
+            ->whereIn('t_service_log.service_id',[22])
+            ->whereIn('drug_name', $drugnames)
+            ->where('t_lj_dst_reading.enroll_id', $data['personal']->enroll_id)
+            ->orderBy('t_lj_dst_reading.id', 'DESC')
+            ->get();
+
+        }        
+
        //dd($data['lj_dst']);
-        $data['lc_dst'] = LCDST::select('t_lc_dst.drug_name as name', 't_lc_dst.result as value', 't_lc_dst.result_date','t_service_log.sent_to_nikshay_date','u.name as uname' )
-		->leftjoin('t_service_log', 't_service_log.enroll_id', '=', 't_lc_dst.enroll_id') 
-		//pradip-LC DST
-		->leftjoin('users as u', 'u.id', '=', 't_service_log.updated_by')
-		->where('t_service_log.sent_to_nikshay',1)
-        ->whereIn('t_service_log.service_id',[21])		
-		->where('t_lc_dst.enroll_id', $data['personal']->enroll_id)
-		->orderBy('t_lc_dst.id', 'DESC')
-		->get();
-		//dd($data['lc_dst']);
-		
+
+       //
+
+       $data['lc_dst'] = array();       
+
+       if( $service_id == '21' )
+       {
+
+            $drugnames = explode(',', $drug_name);
+
+            //dd($drugnames);
+
+            $data['lc_dst'] = LCDST::select('t_lc_dst.drug_name as name', 't_lc_dst.result as value', 't_lc_dst.result_date','t_service_log.sent_to_nikshay_date','u.name as uname' )
+            ->leftjoin('t_service_log', 't_service_log.enroll_id', '=', 't_lc_dst.enroll_id') 
+            //pradip-LC DST
+            ->leftjoin('users as u', 'u.id', '=', 't_service_log.updated_by')
+            ->where('t_service_log.sent_to_nikshay',1)
+            ->whereIn('t_service_log.service_id',[21])
+            ->whereIn('drug_name', $drugnames)		
+            ->where('t_lc_dst.enroll_id', $data['personal']->enroll_id)
+            ->orderBy('t_lc_dst.id', 'DESC')
+            ->get();
+
+            //dd($data['lc_dst']);	
+
+       }        
+
+		//dd($data['lc_dst']);		
 		
         $data['lab_sr'] = DB::table('sample')->select('sample_label')
 		->where('sample.enroll_id', $data['personal']->enroll_id)
@@ -891,15 +1084,14 @@ class SampleController extends Controller
         $data['lc_dst_fld']['km'] = "";
         $data['lc_dst_fld']['cm'] = "";
         $data['lc_dst_fld']['am'] = "";
-        $data['lc_dst_fld']['lfx'] = "";
-        $data['lc_dst_fld']['mfx1'] = "";
+        $data['lc_dst_fld']['lfx'] = "";        
         $data['lc_dst_fld']['mfx2'] = "";
         $data['lc_dst_fld']['pas'] = "";
         $data['lc_dst_fld']['lzd'] = "";
         $data['lc_dst_fld']['cfz'] = "";
         $data['lc_dst_fld']['eto'] = "";
         $data['lc_dst_fld']['clr'] = "";
-        $data['lc_dst_fld']['azi'] = "";
+        $data['lc_dst_fld']['Dim'] = "";
 		$data['lc_dst_fld']['BDQ'] = "";
 
 //      print_r( json_decode( json_encode( $data ), false, 512, JSON_PRETTY_PRINT ) );
@@ -909,6 +1101,7 @@ class SampleController extends Controller
 		
 	      //echo '<pre>'; print_r($data['lj_dst']); die;
 		  //echo '<pre>'; print_r($data['lc_dst']); echo "p"; die;
+
 		  if(!empty($data['lc_dst'])){
 			 foreach ($data['lc_dst'] as $key => $value) {
 				 if ($value->name == "S") {
@@ -916,7 +1109,7 @@ class SampleController extends Controller
 
 				}
 			   
-				if ($value->name == "H(0_1)" || $value->name == "H(0.1)") {
+				if ($value->name == "H" || $value->name == "H") {
 
 					$data['lc_dst_fld']['H(inh A)'] = $value->value;
 
@@ -946,11 +1139,7 @@ class SampleController extends Controller
 				if ($value->name == "Lfx") {
 				   $data['lc_dst_fld']['lfx'] = $value->value;
 				} 
-				//if ($value->name == "Mfx(0_5)" OR $value->name == "Mfx(0.5)") {
-				if ($value->name == "Mfx(0_25)" OR $value->name == "Mfx(0.25)") {	
-					$data['lc_dst_fld']['mfx1'] = $value->value;
-				}
-				//if ($value->name == "Mfx(2)") {
+			
 				if ($value->name == "Mfx(1)") {	
 					$data['lc_dst_fld']['mfx2'] = $value->value;
 				} 
@@ -970,13 +1159,11 @@ class SampleController extends Controller
 				if ($value->name == "Clr") {
 				   $data['lc_dst_fld']['clr'] = $value->value;
 				} 
-				if ($value->name == "Azi") {
-					$data['lc_dst_fld']['azi'] = $value->value;
-
+				if ($value->name == "Dim") {
+					$data['lc_dst_fld']['Dim'] = $value->value;
 				} 
 				if ($value->name == "BDQ") {
 					$data['lc_dst_fld']['BDQ'] = $value->value;
-
 				} 
 				
 			 }	
@@ -1055,151 +1242,92 @@ class SampleController extends Controller
         $data['lj_dst_fld']['km'] = "";
         $data['lj_dst_fld']['cm'] = "";
         $data['lj_dst_fld']['am'] = "";
-        $data['lj_dst_fld']['lfx'] = "";
-        $data['lj_dst_fld']['mfx1'] = "";
+        $data['lj_dst_fld']['lfx'] = "";      
         $data['lj_dst_fld']['mfx2'] = "";
         $data['lj_dst_fld']['pas'] = "";
         $data['lj_dst_fld']['lzd'] = "";
         $data['lj_dst_fld']['cfz'] = "";
         $data['lj_dst_fld']['eto'] = "";
         $data['lj_dst_fld']['clr'] = "";
-        $data['lj_dst_fld']['azi'] = "";
+        $data['lj_dst_fld']['Dim'] = "";
 		$data['lj_dst_fld']['BDQ'] = "";
-        //dd($data['lj_dst']);
-		//echo count((array)$data['lj_dst']); die;
-        if(count((array)$data['lj_dst'])>0) {
-            $dil = json_decode($data['lj_dst']->drug_reading);
-            if (isset($dil->dil_2)) {
+        //dd($data['lj_dst_fld']);
+        
+                foreach ($data['lj_dst'] as $key => $value) {
 
-                foreach ($dil->dil_2 as $key => $value) {
-                    if ($value->name == "S") {
+                    if ($value->dname == "S") {
                         $data['lj_dst_fld']['s'] = $value->value;
                     }
-                    if ($value->name == "H(0_1)" OR $value->name == "H(0.1)") {
+                    if ($value->dname == "H") {
                         $data['lj_dst_fld']['H(inh A)'] = $value->value;
                     }
-                    if ($value->name == "H(0_4)" OR $value->name == "H(0.4)") {
+                    if ($value->dname == "H(0.4)") {
                         $data['lj_dst_fld']['H(Kat G)'] = $value->value;
                     }
-                    if ($value->name == "R") {
+                    if ($value->dname == "R") {
                         $data['lj_dst_fld']['r'] = $value->value;
                     }
-                    if ($value->name == "E") {
+                    if ($value->dname == "E") {
                         $data['lj_dst_fld']['e'] = $value->value;
                     }
-                    if ($value->name == "Z") {
+                    if ($value->dname == "Z") {
                         $data['lj_dst_fld']['z'] = $value->value;
                     }
-                    if ($value->name == "Km") {
+                    if ($value->dname == "Km") {
                         $data['lj_dst_fld']['km'] = $value->value;
                     }
-                    if ($value->name == "Cm") {
+                    if ($value->dname == "Cm") {
                         $data['lj_dst_fld']['cm'] = $value->value;
                     }
-                    if ($value->name == "Am") {
+                    if ($value->dname == "Am") {
                         $data['lj_dst_fld']['am'] = $value->value;
                     }
-                    if ($value->name == "Lfx") {
+                    if ($value->dname == "Lfx") {
                         $data['lj_dst_fld']['lfx'] = $value->value;
                     }
-                    //if ($value->name == "Mfx(0_5)" OR $value->name == "Mfx(0.5)") {
-					if ($value->name == "Mfx(0_25)" OR $value->name == "Mfx(0.25)") {	
-                        $data['lj_dst_fld']['mfx1'] = $value->value;
-                    }
-                    //if ($value->name == "Mfx(2)") {
-					if ($value->name == "Mfx(1)") {	
+                    
+					if ($value->dname == "Mfx(1)") {	
                         $data['lj_dst_fld']['mfx2'] = $value->value;
                     }
-                    if ($value->name == "PAS") {
+                    if ($value->dname == "PAS") {
                         $data['lj_dst_fld']['pas'] = $value->value;
                     }
-                    if ($value->name == "Lzd") {
+                    if ($value->dname == "Lzd") {
                         $data['lj_dst_fld']['lzd'] = $value->value;
                     }
-                    if ($value->name == "Cfz") {
+                    if ($value->dname == "Cfz") {
                         $data['lj_dst_fld']['cfz'] = $value->value;
                     }
-                    if ($value->name == "Eto") {
+                    if ($value->dname == "Eto") {
                         $data['lj_dst_fld']['eto'] = $value->value;
                     }
-                    if ($value->name == "Clr") {
+                    if ($value->dname == "Clr") {
                         $data['lj_dst_fld']['clr'] = $value->value;
                     }
-                    if ($value->name == "Azi") {
-                        $data['lj_dst_fld']['azi'] = $value->value;
-
+                    if ($value->dname == "Dim") {
+                        $data['lj_dst_fld']['Dim'] = $value->value;
                     }
-					 if ($value->name == "BDQ") {
+					 if ($value->dname == "BDQ") {
                         $data['lj_dst_fld']['BDQ'] = $value->value;
-
                     }
                 }
-            } elseif (isset($dil->dil_4)) {
-                foreach ($dil->dil_4 as $key => $value) {
-                    if ($value->name == "S") {
-                        $data['lj_dst_fld']['s'] = $value->value;
-                    }
-                    if ($value->name == "H(0_1)" OR $value->name == "H(0.1)") {
-                        $data['lj_dst_fld']['H(inh A)'] = $value->value;
-                    }
-                    if ($value->name == "H(0_4)" OR $value->name == "H(0.4)") {
-                        $data['lj_dst_fld']['H(Kat G)'] = $value->value;
-                    }
-                    if ($value->name == "R") {
-                        $data['lj_dst_fld']['r'] = $value->value;
-                    }
-                    if ($value->name == "E") {
-                        $data['lj_dst_fld']['e'] = $value->value;
-                    }
-                    if ($value->name == "Z") {
-                        $data['lj_dst_fld']['z'] = $value->value;
-                    }
-                    if ($value->name == "Km") {
-                        $data['lj_dst_fld']['km'] = $value->value;
-                    }
-                    if ($value->name == "Cm") {
-                        $data['lj_dst_fld']['cm'] = $value->value;
-                    }
-                    if ($value->name == "Am") {
-                        $data['lj_dst_fld']['am'] = $value->value;
-                    }
-                    if ($value->name == "Lfx") {
-                        $data['lj_dst_fld']['lfx'] = $value->value;
-                    }
-                    //if ($value->name == "Mfx(0_5)" OR $value->name == "Mfx(0.5)") {
-					if ($value->name == "Mfx(0_25)" OR $value->name == "Mfx(0.25)") {	
-                        $data['lj_dst_fld']['mfx1'] = $value->value;
-                    }
-                    //if ($value->name == "Mfx(2)") {
-					if ($value->name == "Mfx(1)") {	
-                        $data['lj_dst_fld']['mfx2'] = $value->value;
-                    }
-                    if ($value->name == "PAS") {
-                        $data['lj_dst_fld']['pas'] = $value->value;
-                    }
-                    if ($value->name == "Lzd") {
-                        $data['lj_dst_fld']['lzd'] = $value->value;
-                    }
-                    if ($value->name == "Cfz") {
-                        $data['lj_dst_fld']['cfz'] = $value->value;
-                    }
-                    if ($value->name == "Eto") {
-                        $data['lj_dst_fld']['eto'] = $value->value;
-                    }
-                    if ($value->name == "Clr") {
-                        $data['lj_dst_fld']['clr'] = $value->value;
-                    }
-                    if ($value->name == "Azi") {
-                        $data['lj_dst_fld']['azi'] = $value->value;
 
-                    }
-					if ($value->name == "BDQ") {
-                        $data['lj_dst_fld']['BDQ'] = $value->value;
+        $data['serviceId'] = $service_id;
+        $data['tag'] = $tag;
+        $data['rec_flag'] = $rec_flag;
 
-                    }
-                }
-            }
-        }
+        //DB::enableQueryLog();
+            $micro_bio_comment = Microbio::select('microbio_comments')
+                                ->where('sample_id', $id)
+                                ->where('enroll_id', $data['personal']->enroll_id)
+                                ->where('service_id', $service_id)
+                                ->where('rec_flag', $rec_flag)
+								->where('tag', $tag)
+                                ->first();
+        //dd(DB::getQueryLog());
+
+        
+        $data['microbio_comment'] = empty($micro_bio_comment->microbio_comments) ? "" : $micro_bio_comment->microbio_comments;
 
 
         $data['final_remark_list'] = DB::SELECT(DB::RAW("
@@ -1212,8 +1340,11 @@ class SampleController extends Controller
         // dd($data['final_remark_list']);
 		$data['config'] = Config::where('status',1)->first();//Amrita on  18/05/2020
 
+        //dd($data);
+
         if ($pdf == "pdf") {
-        // dd($data);
+
+        
 
             $pdfname = $data['personal'] ? $data['personal']->userName : "pdfview";
             $elabel = $data['personal'] ? $data['personal']->label : "";
@@ -1222,7 +1353,7 @@ class SampleController extends Controller
             // dd($pdffilename);
             $pdf = PDF::loadView('admin.sample.testpdf', compact('data'));
 			$pdf->getDomPDF()->set_option("enable_php", true);//Amrita on  18/05/2020
-            // dd($pdf);
+             //dd($pdf);
 
             return $pdf->stream($pdffilename);
 
@@ -1410,7 +1541,7 @@ class SampleController extends Controller
 
 
 
-    public function interimview(Request $request, $id, $pdf=null)
+    public function interimview(Request $request, $id, $service_id, $tag, $drug_ids, $pdf=null)
     {
         // dd($pdf);
         // dd($id);
@@ -1520,7 +1651,9 @@ class SampleController extends Controller
             ->where('sample.id', $id)
             ->first();
             //->toSql();
-        //dd(  $data['personal']);
+        //dd(  $data['personal'] );
+
+        $data['sampleLable'] = $data['personal']->sample_label;
 
         //  $res_query = DB::select(DB::raw("select `sample`.*,
         // `sample`.`id` as `smp_id`,
@@ -1585,7 +1718,6 @@ class SampleController extends Controller
 
             foreach ($data['microscopy_data'] as $micro_data) {
 
-
                 if ($data['microscopy_data']) {
                     $data['microscopy'] = $micro_data->service_id;
                     $sample_type = substr($micro_data->sample_label, -1);
@@ -1628,13 +1760,13 @@ class SampleController extends Controller
 
         // dd($data['microscopyB']);
         $data['culturelj'] = LJDetail::leftjoin('sample as s', 's.id', '=', 't_lj_detail.sample_id')
-            ->where('t_lj_detail.enroll_id', $data['personal']->enroll_id)
+            ->where('t_lj_detail.enroll_id', $data['personal']->enroll_id)            
             ->where('t_lj_detail.status', 1)
             ->first();
 
 
         $data['culturelc'] = LCFlaggedMGITFurther::leftjoin('sample as s', 's.id', '=', 't_lc_flagged_mgit_further.sample_id')
-            ->where('t_lc_flagged_mgit_further.enroll_id', $data['personal']->enroll_id)
+            ->where('t_lc_flagged_mgit_further.enroll_id', $data['personal']->enroll_id)            
             ->where('t_lc_flagged_mgit_further.status', 1)
             ->first();
            //->toSql();
@@ -1694,9 +1826,20 @@ class SampleController extends Controller
         //dd($data['test_requested'] );
         $data['microbio'] = Microbio::where('enroll_id', $data['personal']->enroll_id)->get()->toArray();
         //dd($data['microbio']);
-        $data['lj_dst'] = LjDstReading::select('drug_reading', 'created_at')->where('enroll_id', $data['personal']->enroll_id)->orderBy('id', 'DESC')->first();
+        
+        $drug_names = [];
+
+        if($drug_ids != '0')
+        {
+            $drug_names = explode(',', $drug_ids);
+        }
+
+        //dd($drug_names);        
+
+        $data['lj_dst'] = LjDstReading::select('drug_name as name', 'drug_reading as value', 'created_at as result_date')->where('enroll_id', $data['personal']->enroll_id)->whereIn('drug_name', $drug_names)->orderBy('id', 'DESC')->get();
         //dd($data['lj_dst']);
-        $data['lc_dst'] = LCDST::select('drug_name as name', 'result as value', 'result_date as result_date' )->where('enroll_id', $data['personal']->enroll_id)->orderBy('id', 'DESC')->get();
+       
+        $data['lc_dst'] = LCDST::select('drug_name as name', 'result as value', 'result_date as result_date' )->where('enroll_id', $data['personal']->enroll_id)->whereIn('drug_name', $drug_names)->orderBy('id', 'DESC')->get();
         //dd($data['lc_dst']);
 		$data['lab_sr'] = DB::table('sample')->select('sample_label')->where('sample.enroll_id', $data['personal']->enroll_id)->first();
         $data['lab_serial'] = DB::table('t_lpa_final')->select('type')->where('t_lpa_final.enroll_id', $data['personal']->enroll_id)->first();
@@ -1718,7 +1861,7 @@ class SampleController extends Controller
         $data['lc_dst_fld']['cfz'] = "";
         $data['lc_dst_fld']['eto'] = "";
         $data['lc_dst_fld']['clr'] = "";
-        $data['lc_dst_fld']['azi'] = "";
+        $data['lc_dst_fld']['Dim'] = "";
 		$data['lc_dst_fld']['BDQ'] = "";
 		
 		
@@ -1732,7 +1875,7 @@ class SampleController extends Controller
 
             }
            
-            if ($value->name == "H(0_1)" || $value->name == "H(0.1)") {
+            if ($value->name == "H" || $value->name == "H") {
 
                 $data['lc_dst_fld']['H(inh A)'] = $value->value;
 
@@ -1786,8 +1929,8 @@ class SampleController extends Controller
             if ($value->name == "Clr") {
                $data['lc_dst_fld']['clr'] = $value->value;
             } 
-            if ($value->name == "Azi") {
-                $data['lc_dst_fld']['azi'] = $value->value;
+            if ($value->name == "Dim") {
+                $data['lc_dst_fld']['dim'] = $value->value;
 
             } 
 			 if ($value->name == "BDQ") {
@@ -1878,21 +2021,16 @@ class SampleController extends Controller
         $data['lj_dst_fld']['cfz'] = "";
         $data['lj_dst_fld']['eto'] = "";
         $data['lj_dst_fld']['clr'] = "";
-        $data['lj_dst_fld']['azi'] = "";
+        $data['lj_dst_fld']['Dim'] = "";
 		$data['lj_dst_fld']['BDQ'] = "";
         //dd($data['lj_dst_fld']);
-        if ($data['lj_dst']) {
-            $dil = json_decode($data['lj_dst']->drug_reading);
-
-
-            if (isset($dil->dil_4)) {
-                // dd($dil->dil_4);
-                foreach ($dil->dil_4 as $key => $value) {
+        
+                foreach ($data['lj_dst'] as $key => $value) {
 
                     if ($value->name == "S") {
                         $data['lj_dst_fld']['s'] = $value->value;
                     }
-                    if ($value->name == "H(0.1)") {
+                    if ($value->name == "H") {
                         $data['lj_dst_fld']['H(inh A)'] = $value->value;
                     }
                     if ($value->name == "H(0.4)") {
@@ -1942,81 +2080,15 @@ class SampleController extends Controller
                     if ($value->name == "Clr") {
                         $data['lj_dst_fld']['clr'] = $value->value;
                     }
-                    if ($value->name == "Azi") {
-                        $data['lj_dst_fld']['azi'] = $value->value;
+                    if ($value->name == "Dim") {
+                        $data['lj_dst_fld']['Dim'] = $value->value;
 
                     }
 					 if ($value->name == "BDQ") {
                         $data['lj_dst_fld']['BDQ'] = $value->value;
-
                     }
                 }
-            } elseif (isset($dil->dil_2)) {
-                foreach ($dil->dil_2 as $key => $value) {
-                    if ($value->name == "S") {
-                        $data['lj_dst_fld']['s'] = $value->value;
-                    }
-                    if ($value->name == "H(inh A)") {
-                        $data['lj_dst_fld']['H(inh A)'] = $value->value;
-                    }
-                    if ($value->name == "H(Kat G)") {
-                        $data['lj_dst_fld']['H(Kat G)'] = $value->value;
-                    }
-                    if ($value->name == "R") {
-                        $data['lj_dst_fld']['r'] = $value->value;
-                    }
-                    if ($value->name == "E") {
-                        $data['lj_dst_fld']['e'] = $value->value;
-                    }
-                    if ($value->name == "Z") {
-                        $data['lj_dst_fld']['z'] = $value->value;
-                    }
-                    if ($value->name == "Km") {
-                        $data['lj_dst_fld']['km'] = $value->value;
-                    }
-                    if ($value->name == "Cm") {
-                        $data['lj_dst_fld']['cm'] = $value->value;
-                    }
-                    if ($value->name == "Am") {
-                        $data['lj_dst_fld']['am'] = $value->value;
-                    }
-                    if ($value->name == "Lfx") {
-                        $data['lj_dst_fld']['lfx'] = $value->value;
-                    }
-                    //if ($value->name == "Mfx(0.5)") {
-					if ($value->name == "Mfx(0_25)" OR $value->name == "Mfx(0.25)") {
-                        $data['lj_dst_fld']['mfx1'] = $value->value;
-                    }
-                    //if ($value->name == "Mfx(2)") {
-					if ($value->name == "Mfx(1)") {	
-                        $data['lj_dst_fld']['mfx2'] = $value->value;
-                    }
-                    if ($value->name == "PAS") {
-                        $data['lj_dst_fld']['pas'] = $value->value;
-                    }
-                    if ($value->name == "Lzd") {
-                        $data['lj_dst_fld']['lzd'] = $value->value;
-                    }
-                    if ($value->name == "Cfz") {
-                        $data['lj_dst_fld']['cfz'] = $value->value;
-                    }
-                    if ($value->name == "Eto") {
-                        $data['lj_dst_fld']['eto'] = $value->value;
-                    }
-                    if ($value->name == "Clr") {
-                        $data['lj_dst_fld']['clr'] = $value->value;
-                    }
-                    if ($value->name == "Azi") {
-                        $data['lj_dst_fld']['azi'] = $value->value;
-
-                    }
-					if ($value->name == "BDQ") {
-                        $data['lj_dst_fld']['BDQ'] = $value->value;
-
-                    }
-                }
-            }
-        }
+           
 		
 		//dd($data['lc_dst_fld']);
 		//dd($data['lj_dst_fld']);
@@ -2025,6 +2097,9 @@ class SampleController extends Controller
 		 
         $data['final_remark_list'] = DB::SELECT(DB::RAW("SELECT `ms`.name,`detail`,`remark` FROM `t_microbiologist`
       LEFT JOIN `m_services` as ms ON `t_microbiologist`.`service_id`=`ms`.`id` WHERE `enroll_id`= " . $data['personal']->enroll_id . " AND (`detail` > '' OR `remark`> '')"));
+
+      $data['serviceId'] = $service_id;
+      $data['tag'] = $tag;
 //       dd($data);
 
 // dd($data);
@@ -2085,7 +2160,7 @@ class SampleController extends Controller
 
     }
 	
-	 public function checkForSampleExist($enroll_id,$sentStep,$tag=null,$recflag)
+	public function checkForSampleExist($enroll_id,$sentStep,$tag=null,$recflag)
     { 
         //dd($enroll_id);
 		$qry="";

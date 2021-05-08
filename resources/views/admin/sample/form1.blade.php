@@ -348,11 +348,11 @@ border-color: #5cb85c;
                                                <!-- <input type="text" name="sample_quality[]" class="form-control form-control-line" required> -->
                                                <select name="sample_quality[]" class="form-control form-control-line sample_quality" id="sample_qualityA" required>
                                                  <option value="" selected>--Select--</option>
-                                                 <option value="Blood-stained purulent">Blood-stained purulent</option>
-                                                 <option value="Thick mucoid">Thick mucoid</option>
+                                                 <option value="Blood-stained">Blood-stained</option>
+                                                 {{-- <option value="Thick mucoid">Thick mucoid</option> --}}
                                                  <option value="Mucopurulent">Mucopurulent</option>
                                                  <option value="Saliva">Saliva</option>
-                                                 <option value="Food particles">Food particles</option>
+                                                 {{-- <option value="Food particles">Food particles</option> --}}
                                                  <option value="other">Other</option>
                                                </select>
                                            </div>
@@ -458,7 +458,7 @@ border-color: #5cb85c;
             <!-- ============================================================== -->
             <!-- footer -->
             <!-- ============================================================== -->
-            <footer class="footer"> © Copyright Reserved 2017-2018, LIMS </footer>
+            <footer class="footer">  </footer>
             <!-- ============================================================== -->
             <!-- End footer -->
             <!-- ============================================================== -->
@@ -482,10 +482,10 @@ border-color: #5cb85c;
               <div class="col-sm-9">                
                 <div class="row">
                   <div class="col-xs-6 col-sm-6">
-                    <label class="col-md-12">State <span class="red">*</span></label>
+                    <label class="col-md-12">State </label>
                   </div>
                   <div class="col-xs-6 col-sm-6">
-                    <select class="form-control form-control-line" name="state" value="" id="state" required>
+                    <select class="form-control form-control-line" name="state" value="" id="state" >
                       <option value="">select</option>
                       @foreach ($data['states'] as $key => $state)
                         <option value="{{ $state->id }}">{{ $state->name }}</option>
@@ -499,10 +499,10 @@ border-color: #5cb85c;
               <div class="col-sm-9">                
                 <div class="row">
                   <div class="col-xs-6 col-sm-6">
-                    <label class="col-md-12">District <span class="red">*</span></label>
+                    <label class="col-md-12">District </label>
                   </div>
                   <div class="col-xs-6 col-sm-6">
-                    <select class="form-control form-control-line" name="district" value="" id="district" required>
+                    <select class="form-control form-control-line" name="district" value="" id="district" >
                       <option value="">select</option>         
                     </select>
                   </div>
@@ -513,10 +513,10 @@ border-color: #5cb85c;
               <div class="col-sm-9">                
                 <div class="row">
                   <div class="col-xs-6 col-sm-6">
-                    <label class="col-md-12">TU <span class="red">*</span></label>
+                    <label class="col-md-12">TU </label>
                   </div>
                   <div class="col-xs-6 col-sm-6">
-                    <select class="form-control form-control-line" name="tu" value="" id="tu" required>
+                    <select class="form-control form-control-line" name="tu" value="" id="tu" >
                       <option value="">select</option>                                  
                     </select>
                   </div>
@@ -527,10 +527,10 @@ border-color: #5cb85c;
               <div class="col-sm-9">                
                 <div class="row">
                   <div class="col-xs-6 col-sm-6">
-                    <label class="col-md-12">PHI <span class="red">*</span></label>
+                    <label class="col-md-12">PHI </label>
                   </div>
                   <div class="col-xs-6 col-sm-6">
-                    <select class="form-control form-control-line" name="phi" value="" id="phi" required>
+                    <select class="form-control form-control-line" name="phi" value="" id="phi" >
                       <option value="">select</option>                              
                     </select>
                   </div>
@@ -540,6 +540,7 @@ border-color: #5cb85c;
           </div>
           <div class="modal-footer">              
               <button type="button" class="btn btn-primary" id="frm_submit">Submit</button>
+              {{-- <button type="button" class="btn btn-default add-button cancel btn-md" data-dismiss="modal">Cancel</button> --}}
           </div>
       </div>
   </div>
@@ -878,7 +879,7 @@ var alpha = ["A","B","C","D","E"];
             var _sample = $("#sample_statusA").val();
             if(_sample=='Rejected'){
                 $('#sample_qualityA').val('').trigger('change');
-              $('#next_testA').append($("<option></option>").attr("value",24).text('BWM'));
+              $('#next_testA').append($("<option></option>").attr("value",24).text('BMW'));
               $("#rejectA").removeClass("hide");
               document.getElementById("test_reasonA").value = "";
               document.getElementById("sample_qualityA").value = "";
@@ -917,7 +918,7 @@ var alpha = ["A","B","C","D","E"];
           if(_sample=='Rejected'){
           $('#sample_qualityB').val('').trigger('change');
             $("#rejectB").removeClass("hide");
-            $('#next_testB').append($("<option></option>").attr("value",24).text('BWM'));
+            $('#next_testB').append($("<option></option>").attr("value",24).text('BMW'));
             document.getElementById("test_reasonB").value = "";
             document.getElementById("sample_qualityB").value = "";
             document.getElementById("test_reasonB").setAttribute("disabled","disabled");
@@ -954,7 +955,7 @@ var alpha = ["A","B","C","D","E"];
           var _sample = $(this).val();
           if(_sample=='Rejected'){
             $("#rejectC").removeClass("hide");
-            $('#next_testC').append($("<option></option>").attr("value",24).text('BWM'));
+            $('#next_testC').append($("<option></option>").attr("value",24).text('BMW'));
             document.getElementById("test_reasonC").value = "";
             document.getElementById("sample_qualityC").value = "";
             document.getElementById("test_reasonC").setAttribute("disabled","disabled");
@@ -995,7 +996,7 @@ var alpha = ["A","B","C","D","E"];
           if(_sample=='Rejected'){
             $("#rejectD").removeClass("hide");
             document.getElementById("test_reasonD").value = "";
-            $('#next_testD').append($("<option></option>").attr("value",24).text('BWM'));
+            $('#next_testD').append($("<option></option>").attr("value",24).text('BMW'));
             document.getElementById("sample_qualityD").value = "";
             document.getElementById("test_reasonD").setAttribute("disabled","disabled");
             document.getElementById("next_testD").value = "24";
@@ -1402,7 +1403,7 @@ $(document).ready(function() {
 
   $('#frm_submit').on('click', function(e) {
 
-    var result = true;
+    /* var result = true;
     var html = "";
 
     if($('#state').val() == "")
@@ -1444,9 +1445,9 @@ $(document).ready(function() {
     if(result == false)
     {
       e.preventDefault();
-    } else {
+    } else { */
       $('#addsampleform').submit();
-    }
+    /* } */
 
       
   });

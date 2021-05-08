@@ -104,6 +104,56 @@ class LCFlaggedMGITController extends Controller
         return view('admin.lc_flagged_mgit.list',compact('data'));
 
   }
+
+  public function migitCount($searchQuery, $val)
+  {
+    $data = "";
+
+    if($val == '1')
+    {
+      $data=DB::select("select DISTINCT(t_service_log.id)  AS ID, `m`.`enroll_id`, `m`.`id` as `sample_id`, 
+      `m`.`receive_date` as `receive`, `m`.`test_reason` as `reason`, `is_accepted`, `s`.`result`, 
+      `t_service_log`.`sample_label` as `samples`, `t_service_log`.`enroll_label` as `enroll_label`,
+          `t_service_log`.`service_id`, `t_service_log`.`id` as `log_id`, `t_service_log`.`status`, `m`.`no_of_samples`, 
+          `t`.`status` as `dna_status`, `t`.`created_at` as `date_of_extraction`, `t_service_log`.`mgit`, `t_service_log`.`tube_id_lj`,
+          `t_service_log`.`tube_id_lc`, `ci`.`inoculation_date`, `t_service_log`.`gu`,`lfm`.`flagging_date`, `m`.`fu_month`,
+          `t_service_log`.`tag`, `t_service_log`.`enroll_id` as `enrollID`, `t_service_log`.`sample_id` as `sampleID`, 
+          `t_service_log`.`rec_flag` 
+          from `t_service_log` 
+          left join `sample` as `m` on `m`.`id` = `t_service_log`.`sample_id` 
+          left join `t_dnaextraction` as `t` on `t`.`sample_id` = `t_service_log`.`sample_id` 
+          and `t`.`tag` = `t_service_log`.`tag` and `t`.`status` = 1 
+          left join `t_microscopy` as `s` on `s`.`sample_id` = `t_service_log`.`sample_id` and `s`.`status` = 1 
+          left join `t_culture_inoculation` as `ci` on `ci`.`sample_id` = `t_service_log`.`sample_id` 
+          left join `t_lc_flagged_mgit` as `lfm` on `lfm`.`sample_id` = `t_service_log`.`sample_id` 
+          where DATEDIFF(CURRENT_DATE, `ci`.`inoculation_date`) >= 42 AND `t_service_log`.`service_id` =17 and `t_service_log`.`status` in (1) ".$searchQuery." 
+          order by `t_service_log`.`enroll_id` desc");
+
+
+    } else {
+
+      $data=DB::select("select DISTINCT(t_service_log.id)  AS ID, `m`.`enroll_id`, `m`.`id` as `sample_id`, 
+      `m`.`receive_date` as `receive`, `m`.`test_reason` as `reason`, `is_accepted`, `s`.`result`, 
+      `t_service_log`.`sample_label` as `samples`, `t_service_log`.`enroll_label` as `enroll_label`,
+          `t_service_log`.`service_id`, `t_service_log`.`id` as `log_id`, `t_service_log`.`status`, `m`.`no_of_samples`, 
+          `t`.`status` as `dna_status`, `t`.`created_at` as `date_of_extraction`, `t_service_log`.`mgit`, `t_service_log`.`tube_id_lj`,
+          `t_service_log`.`tube_id_lc`, `ci`.`inoculation_date`, `t_service_log`.`gu`,`lfm`.`flagging_date`, `m`.`fu_month`,
+          `t_service_log`.`tag`, `t_service_log`.`enroll_id` as `enrollID`, `t_service_log`.`sample_id` as `sampleID`, 
+      `t_service_log`.`rec_flag` 
+          from `t_service_log` 
+          left join `sample` as `m` on `m`.`id` = `t_service_log`.`sample_id` 
+          left join `t_dnaextraction` as `t` on `t`.`sample_id` = `t_service_log`.`sample_id` 
+          and `t`.`tag` = `t_service_log`.`tag` and `t`.`status` = 1 
+          left join `t_microscopy` as `s` on `s`.`sample_id` = `t_service_log`.`sample_id` and `s`.`status` = 1 
+          left join `t_culture_inoculation` as `ci` on `ci`.`sample_id` = `t_service_log`.`sample_id` 
+          left join `t_lc_flagged_mgit` as `lfm` on `lfm`.`sample_id` = `t_service_log`.`sample_id` 
+          where DATEDIFF(CURRENT_DATE, `ci`.`inoculation_date`) < 42 AND `t_service_log`.`service_id` =17 and `t_service_log`.`status` in (1) ".$searchQuery." 
+          order by `t_service_log`.`enroll_id` desc");
+    }
+
+    return count($data);
+      
+  }
 	public function ajaxLCFlaggedMGITList(Request $request, $id){
      //dd($request->all());
      //dd($id);
@@ -167,6 +217,8 @@ class LCFlaggedMGITController extends Controller
     //DB::enableQueryLog();
     $lcflaggedQry = "";
     $count = 0;
+    $greaterthan42 = 0;
+    $lessthan42 = 0;
 
     if($id == '1')
     {
@@ -187,8 +239,11 @@ class LCFlaggedMGITController extends Controller
           left join `t_lc_flagged_mgit` as `lfm` on `lfm`.`sample_id` = `t_service_log`.`sample_id` 
           where DATEDIFF(CURRENT_DATE, `ci`.`inoculation_date`) >= 42 AND `t_service_log`.`service_id` =17 and `t_service_log`.`status` in (1) ".$searchQuery." 
           order by `t_service_log`.`enroll_id` desc limit ".$row.",".$rowperpage);
+
+          
     }
     else {
+
       $lcflaggedQry=DB::select("select DISTINCT(t_service_log.id)  AS ID, `m`.`enroll_id`, `m`.`id` as `sample_id`, 
       `m`.`receive_date` as `receive`, `m`.`test_reason` as `reason`, `is_accepted`, `s`.`result`, 
       `t_service_log`.`sample_label` as `samples`, `t_service_log`.`enroll_label` as `enroll_label`,
@@ -210,6 +265,9 @@ class LCFlaggedMGITController extends Controller
     }		
 			    
      $count = count($lcflaggedQry);
+
+     $greaterthan42 = $this->migitCount($searchQuery, '1');
+     $lessthan42 = $this->migitCount($searchQuery, '0');
 		//dd($lcflaggedQry);
 		//dd(DB::getQueryLog());
 		foreach ($lcflaggedQry as $key => $value) {
@@ -341,9 +399,13 @@ class LCFlaggedMGITController extends Controller
 		  "iTotalRecords" => $totalRecords,
 		  "iTotalDisplayRecords" => $totalRecordwithFilter,
       "aaData" => $data,
-      "rc_count" => $count
+      "rc_count" => $count,
+      "above42" => $greaterthan42,
+      "less42" => $lessthan42,
 		);
+
 		echo json_encode($response);
+
 	}	  
     /**
      * Show the form for creating a new resource.

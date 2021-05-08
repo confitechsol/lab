@@ -34,6 +34,9 @@ class LCDSTInoculationController extends Controller
 
       try{
         $data = [];
+
+        //DB::enableQueryLog();
+
           $data['sample'] = ServiceLog::select('m.enroll_id','m.id as sample_id', DB::raw('date_format(m.receive_date,"%d-%m-%y") as receive'),
 		  'm.test_reason as reason','is_accepted',
           's.result','t_service_log.sample_label as samples','t_service_log.enroll_label as enroll_label',
@@ -42,13 +45,25 @@ class LCDSTInoculationController extends Controller
             'ldi.mgit_seq_id', 'ldi.dst_c_id1', 'ldi.dst_c_id2','ldi.dst_c_id3','t_service_log.enroll_id AS enrollID','t_service_log.sample_id AS sampleID','t_service_log.tag',
 		  't_service_log.rec_flag',
             DB::raw('date_format(ldi.inoculation_date,"%d-%m-%y") AS inc_date'))
-        ->leftjoin('sample as m','m.id','=','t_service_log.sample_id')
+            ->leftjoin('sample as m', function ($join) {
+              $join->on('m.id','=','t_service_log.sample_id')
+                   ->on('m.enroll_id', '=', 't_service_log.enroll_id');
+          })
+        
         //->leftjoin('t_microscopy as s','s.sample_id','=','t_service_log.sample_id')
          ->leftjoin('t_microscopy as s', function ($join) {
               $join->on('s.sample_id','=','t_service_log.sample_id')
+              ->on('s.enroll_id', '=', 't_service_log.enroll_id')
                    ->where('s.status', 1);
           })
-        ->leftjoin('t_culture_inoculation as ci','ci.rec_flag','=','t_service_log.rec_flag')
+
+          ->leftjoin('t_culture_inoculation as ci', function ($join) {
+            $join->on('ci.sample_id','=','t_service_log.sample_id')
+            ->on('ci.enroll_id', '=', 't_service_log.enroll_id')
+            //->on('ci.rec_flag', '=', 't_service_log.rec_flag')
+                 ->where('ci.status', 1);
+        })       
+        
        // ->leftjoin('t_dst_drugs_tr as ddt','ddt.enroll_id','=','t_service_log.enroll_id')
 	   ->leftjoin('t_dst_drugs_tr as ddt', function ($join) {
             $join->on('ddt.enroll_id', '=', 't_service_log.enroll_id')
@@ -58,6 +73,7 @@ class LCDSTInoculationController extends Controller
 
         ->leftjoin('t_lc_dst_inoculation as ldi', function ($join) {
           $join->on('ldi.enroll_id', '=', 't_service_log.enroll_id')
+          ->on('ldi.sample_id', '=', 't_service_log.sample_id')
           ->on('ldi.rec_flag', '=', 't_service_log.rec_flag');           
       })       
        
@@ -65,9 +81,12 @@ class LCDSTInoculationController extends Controller
         //->where('s.status',1)
         ->where('ddt.status',1)
         ->whereIn('t_service_log.status',[1,2]) //      ->whereIn('t_service_log.status',[0,1,2])
-        ->orderBy('enroll_id','desc')
+        ->orderBy('samples','desc')
         ->get();
- //dd($data['sample']);
+        //dd(DB::getQueryLog());
+
+        //dd($data['sample']);
+
         $data['drugs'] = [];
         foreach ($data['sample'] as $key => $value) {
         if($value->drug_ids != ''){
@@ -109,6 +128,8 @@ class LCDSTInoculationController extends Controller
     public function store(Request $request)
     {
           //dd($request->all());
+
+          //dd('1');
 		  $success = true;
 		  DB::beginTransaction();
 		  try {  
@@ -136,10 +157,11 @@ class LCDSTInoculationController extends Controller
 
 						  $lcdst = LCDST::find($lcdstobj->id);
 						  $lcdst->result = $part;
-						  $lcdst->result_date = $resultDate;
+						  $lcdst->result_date = date('Y-m-d');
 						  $lcdst->created_by = $request->user()->id;
 						  $lcdst->reason_edit = $request->reason_edit;
 						  $lcdst->is_moved = 0;
+              $lcdst->comments = $request->reason_edit;
 						  $lcdst->save();
 						}
 					  }
@@ -213,6 +235,8 @@ class LCDSTInoculationController extends Controller
     public function update(Request $request, $id)
     {
       //dd($request->all());
+
+      //dd('2');
       $success = true;
 	  DB::beginTransaction();
       try{
@@ -237,6 +261,15 @@ class LCDSTInoculationController extends Controller
 	  $request->offsetUnset('rec_flag');
 	  
      //dd($request->except('_token','comments'));
+
+     $get_lab_code = "";
+     $get_lab_code = DB::table('m_configuration')
+             ->select('lab_code')
+             ->where('status', '1')
+             ->first();
+
+
+
       foreach ($request->except('_token','comments') as $key => $part) {
         if($part != ''){
           $data = LCDST::create([
@@ -245,12 +278,16 @@ class LCDSTInoculationController extends Controller
             'lc_dst_tr_id' => $lc_dst_tr_id,
             'drug_name' => $key,
             'result' => $part,
-            'result_date' => $resultDate,
+            'result_date' => date('Y-m-d', strtotime($resultDate)),
             'created_by' => $request->user()->id,
-            'updated_by' => $request->user()->id
+            'updated_by' => $request->user()->id,
+            'lab_code'  => $get_lab_code->lab_code,
+            'sample_label' => $logdata->sample_label,
+            'comments' => $request->comments,            
           ]);
         }
       }
+
       if($next_step==1){
         $drug_ids = implode(',',$repeat);
         $dst_d_tr = DSTDrugTR::find($lc_dst_tr_id);
@@ -331,7 +368,7 @@ class LCDSTInoculationController extends Controller
 	  DB::commit();		
 		 }catch(\Exception $e){ 
 		  
-			  //dd($e->getMessage());
+			  dd($e->getMessage());
 			  $error = $e->getMessage();		  
 			  DB::rollback(); 
 			  $success = false;

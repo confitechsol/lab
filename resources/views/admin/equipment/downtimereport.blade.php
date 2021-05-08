@@ -104,7 +104,7 @@ $to_date = app('request')->input('to_date') ?? date("d-m-Y");
 
                 </div>
             </div>
-            <footer class="footer"> © Copyright Reserved 2017-2018, LIMS </footer>
+            <footer class="footer">  </footer>
 </div>
 
 

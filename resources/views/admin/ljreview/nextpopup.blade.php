@@ -83,6 +83,42 @@ $(function(){
        $(this).find('.modal-footer #confirm').data('form', form);
    });
 
+   $('#service_id').on('change', function (e) {
+    var service = $("#service_id").val();
+    var no_sample = $("#no_sample").val();
+
+    if(service==6 && no_sample=='0'){
+      alert("standby sample not available");
+      $("#service_id").val('');
+    }
+
+    if( service== 1 || service==2 )
+    {
+      $.ajax({
+								  type: "POST",
+								  url: "{{url('check-for-sample-lj-review')}}",
+								  data: {
+									_token:"{{ csrf_token() }}",
+									sample_id: $("#sampleID").val(),
+									enroll_id: $("#enrollId").val(),
+									tag_id: $("#tagId").val(),									
+								  },
+								  success: function(data){
+									//console.log(data.result);
+
+                    if( data.result == true )
+                    {
+                      $('div .alert').html('<h4>Data will not be added</h4>');
+                      $('div .alert').show();
+                      $('#nxtconfirm').prop('disabled', true);
+                    }								
+								  },
+								  dataType: "json"
+								});
+      }
+
+   });
+
 
 });
 </script>

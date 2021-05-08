@@ -36,7 +36,7 @@ class BioWasteController extends Controller
                    // $data['today'] = date('Y-m-d H:i:s');
             $data['today_date']=DB::select('select date_format(now(),"%d-%m-%y %H:%i:%s") as date');
             $data['today']=$data['today_date'][0]->date;
-            $data['sample'] = BioWaste::orderBy('id','desc')
+            $data['sample'] = BioWaste::orderBy('status', 'ASC')->orderBy('generated_date', 'DESC')
                         ->distinct()
                         ->get();
             // foreach($data['sample'] as $key=>$value){
@@ -47,6 +47,7 @@ class BioWasteController extends Controller
             //     $value->today_end='';
             //   }
             // }
+              //dd($data['sample']);
 
             return view('admin.biowaste.list',compact('data'));
     }
@@ -58,10 +59,11 @@ class BioWasteController extends Controller
      */
     public function create()
     {
-      $data['today_date']=DB::select('select date_format(now(),"%d-%m-%y %H:%i:%s") as date');
+      $data['today_date']=DB::select('select date_format(now(),"%Y-%m-%d %H:%i:%s") as date');
       $data['today']=$data['today_date'][0]->date;
+      //dd(date('Y-m-d H:i:s', strtotime($data['today'])));
         $cbnaat = BioWaste::create([
-            'generated_date' =>   $data['today'],
+            'generated_date' =>   date('Y-m-d H:i:s', strtotime($data['today'])),
 
 
           ]);
@@ -87,6 +89,8 @@ class BioWasteController extends Controller
         $waste->packets = 2;
       } 
 
+      $waste->quantity_status=1;
+      $waste->status=1;
       $waste->yellow = $request->yellow;
       $waste->red = $request->red;
       $waste->white = $request->white;

@@ -57,8 +57,8 @@
                                 @endif
                     </div>
                       <input type="submit" class="btn" value="Login">
-					  <h6>Version 1.8</br>
-					  Date of Release: 26-May-2020</h6>
+					  <h6>Version 2.0</br>
+					  Date of Release: 12-March-2021</h6>
 			      </form>
 				    
                 </div>

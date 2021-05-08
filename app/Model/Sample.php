@@ -8,6 +8,7 @@ use App\Model\Barcodes;
 use App\Model\TSampleRejected;
 use DateTime;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\DB;
 
 /**
  * @property int $id
@@ -59,6 +60,8 @@ class Sample extends Model
 		  $custom_dt='';
 		}
 
+    //dd( $request->all() );
+
 		// dd($custom_dt);
 		// dd($submitted_date);
 		 // $labcode=Config::select('barcode_offset')->where('status',1)->get();
@@ -70,15 +73,29 @@ class Sample extends Model
           /*$enroll = Enroll::find($request->enroll_id);
             $enroll->label = substr_replace($request->sample_id[0] ,"",-1);       
             $enroll->save();*/
+
+                          $get_lab_code = "";
+                            $get_lab_code = DB::table('m_configuration')
+                                    ->select('lab_code')
+                                    ->where('status', '1')
+                                    ->first();
 			 
 			 //Create one record in enroll table
 			   $enroll_id = Enroll::insertGetId([
-				'label' => $request->enroll_label
+				'label' => $request->enroll_label,
+        'lab_code' => $get_lab_code->lab_code
 			   ]);
 			   
 			   //Patient table pk id=enroll table id
+
+         $get_enroll_label = Enroll::select('label')
+                              ->where('id', $enroll_id)
+                              ->first();
+
 			   $patient_id = Patient::insert([
-				'id' => $enroll_id
+				'id' => $enroll_id,       
+        'lab_code' => $get_lab_code->lab_code,
+        'lab_sample_label' => $get_enroll_label->label
 			   ]);
 			   
 			   //Update enroll table with patient id  
@@ -157,20 +174,67 @@ class Sample extends Model
               'created_at' => date('Y-m-d H:i:s'),
             ]);
 
-            $sample_rejected = TSampleRejected::create([
 
-              'sample_id' => $data,
-              'state_code' => $request->state_id,
-              'state_name' => $request->state_name,
-              'district_code' => $request->district_id,
-              'district_name' => $request->district_name,
-              'tbu_code'=>$request->tu_id,
-              'tbu_name' => $request->tu_name,
-              'phi_id' => $request->phi_id,
-              'phi_name'  => $request->phi_name,              
-              'created_by' => $request->user()->id,             
+              if( $request->state_id != "" && $request->district_id != "" && $request->tu_id != "" && $request->phi_id != "" )
+              {
+                $sample_rejected = TSampleRejected::create([
+                  'sample_id' => $data,
+                  'state_code' => $request->state_id,
+                  'state_name' => $request->state_name,
+                  'district_code' => $request->district_id,
+                  'district_name' => $request->district_name,
+                  'tbu_code'=>$request->tu_id,
+                  'tbu_name' => $request->tu_name,
+                  'phi_id' => $request->phi_id,
+                  'phi_name'  => $request->phi_name,              
+                  'created_by' => $request->user()->id,
+                ]);
 
-            ]);
+              } elseif( $request->state_id != "" && $request->district_id != "" && $request->tu_id != "" && $request->phi_id == "" )
+              {
+                $sample_rejected = TSampleRejected::create([
+                  'sample_id' => $data,
+                  'state_code' => $request->state_id,
+                  'state_name' => $request->state_name,
+                  'district_code' => $request->district_id,
+                  'district_name' => $request->district_name,
+                  'tbu_code'=>$request->tu_id,
+                  'tbu_name' => $request->tu_name,
+                  'phi_id' => $request->phi_id,
+                  'phi_name'  => $request->phi_name,              
+                  'created_by' => $request->user()->id,
+                ]);
+
+              } elseif( $request->state_id != "" && $request->district_id != "" && $request->tu_id == "" && $request->phi_id == "" )
+              {
+                $sample_rejected = TSampleRejected::create([
+                  'sample_id' => $data,
+                  'state_code' => $request->state_id,
+                  'state_name' => $request->state_name,
+                  'district_code' => $request->district_id,
+                  'district_name' => $request->district_name,
+                  'tbu_code'=>$request->tu_id,
+                  'tbu_name' => $request->tu_name,
+                  'phi_id' => $request->phi_id,
+                  'phi_name'  => $request->phi_name,              
+                  'created_by' => $request->user()->id,
+                ]);
+              } elseif( $request->state_id != "" && $request->district_id == "" && $request->tu_id == "" && $request->phi_id == "" )
+              {
+                $sample_rejected = TSampleRejected::create([
+                  'sample_id' => $data,
+                  'state_code' => $request->state_id,
+                  'state_name' => $request->state_name,
+                  'district_code' => $request->district_id,
+                  'district_name' => $request->district_name,
+                  'tbu_code'=>$request->tu_id,
+                  'tbu_name' => $request->tu_name,
+                  'phi_id' => $request->phi_id,
+                  'phi_name'  => $request->phi_name,              
+                  'created_by' => $request->user()->id,
+                ]);
+              }
+            
 
             //dd($data);
 

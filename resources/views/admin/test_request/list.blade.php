@@ -71,7 +71,7 @@
                 </div>
 
             </div>
-            <footer class="footer"> © Copyright Reserved 2017-2018, LIMS </footer>
+            <footer class="footer">  </footer>
         </div>
 
 
@@ -80,14 +80,14 @@
 
 <!-- Modal -->
 
-<div class="modal fade" id="myModal_naat" role="dialog" >
-  <div class="modal-dialog">
+<div class="modal fade" id="myModal_naat" role="dialog" width="100%" >
+  <div class="modal-dialog" style="max-width: 898px !important; width:898px !important;">
 
     <!-- Modal content-->
-    <div class="modal-content">
+    <div class="modal-content" >
       <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal">&times;</button>
-        <h4 class="modal-title">Field NAAT Result</h4>
+        <h4 class="modal-title">View Field NAAT Result</h4>
       </div>
 
        <form class="form-horizontal form-material" action="" method="post" enctype='multipart/form-data' id="naat_result">
@@ -99,51 +99,90 @@
           <div class="modal-body">
 
               <input type="hidden" name="_token" value="{{ csrf_token() }}">
+
+              <div class="row col-lg-12">
+                
+                  <div class="col-lg-4 col-md-4 col-sm-4">
+                    <label class="col-md-12"><h5>Enrollment Id:</h5></label>
+                    <div class="col-md-12">
+                      <input type="text" name="enrollid" class="form-control form-control-line sampleId" readonly  id="enroll-id">
+                   </div>
+                  </div>
+                  <div class="col-lg-4 col-md-4 col-sm-4">
+                    <label class="col-md-12"><h5>Nikashay Id:</h5></label>
+                    <div class="col-md-12">
+                      <input type="text" name="nikshayID" class="form-control form-control-line sampleId" readonly  id="nikshayID">
+                   </div>
+                  </div>
+                  <div class="col-lg-4 col-md-4 col-sm-4">
+                    <label class="col-md-12"><h5>Patient Name:</h5></label>
+                    <div class="col-md-12">
+                      <input type="text" name="patientname" class="form-control form-control-line sampleId" readonly  id="patientname">
+                   </div>
+                  </div>
+                
+              </div>
+
+              <div class="row col-lg-12">
+                
+                <div class="col-lg-4 col-md-4 col-sm-4">
+                  <label class="col-md-12"><h5>Type of Result:</h5></label>
+                  <div class="col-md-12">
+                    <input type="text" name="typeofresult" class="form-control form-control-line sampleId" readonly  id="typeofresult">
+                 </div>
+                </div>
+                <div class="col-lg-4 col-md-4 col-sm-4">
+                  <label class="col-md-12"><h5>Valid/Invalid:</h5></label>
+                  <div class="col-md-12">
+                    <input type="text" name="valid_invalid" class="form-control form-control-line sampleId" readonly  id="valid_invalid">
+                 </div>
+                </div>
+                <div class="col-lg-4 col-md-4 col-sm-4">
+                  <label class="col-md-12"><h5>If not valid:</h5></label>
+                  <div class="col-md-12">
+                    <input type="text" name="not_valid" class="form-control form-control-line sampleId" readonly  id="not_valid">
+                 </div>
+                </div>
               
-              <label class="col-md-12"><h5>Enrollment Id:</h5></label>
-                  <div class="col-md-12">
-                    <input type="text" name="enrollid" class="form-control form-control-line sampleId"  id="enroll-id">
-                 </div>
-                 <label class="col-md-12"><h5>Field Sample Id:</h5></label>
-                  <div class="col-md-12">
-                    <input type="text" name="sampleid" class="form-control form-control-line sampleId"  id="sample-id">
-                 </div>
-                 <label class="col-md-12"><h5>Patient Name:</h5></label>
-                  <div class="col-md-12">
-                    <input type="text" name="patientname" class="form-control form-control-line sampleId"  id="patientname">
-                 </div>
-                 <label class="col-md-12"><h5>Name of PHI where<br> testing was done:</h5></label>
-                  <div class="col-md-12">
-                    <input type="text" name="phitest" class="form-control form-control-line sampleId"  id="phitest">
-                 </div>
-                 <label class="col-md-12"><h5>Type of Result <br>(CBNAAT/TrueNAT):</h5></label>
-                  <div class="col-md-12">
-                    <input type="text" name="resultcbnnat" class="form-control form-control-line sampleId"  id="resultcbnnat">
-                 </div>
+            </div>
 
-                 <label class="col-md-12"><h5>Vaid/Invalid:</h5></label>
-                  <div class="col-md-12">
-                    <input type="text" name="valid" class="form-control form-control-line sampleId"  id="valid">
-                 </div>
+            <div class="row col-lg-12">
+                
+              <div class="col-lg-4 col-md-4 col-sm-4">
+                <label class="col-md-12"><h5>Name of Facility:</h5></label>
+                <div class="col-md-12">
+                  <input type="text" name="facility" class="form-control form-control-line sampleId" readonly  id="facility">
+               </div>
+              </div>
+              <div class="col-lg-4 col-md-4 col-sm-4">
+                <label class="col-md-12"><h5>MTB Result:</h5></label>
+                <div class="col-md-12">
+                  <input type="text" name="mtb_result" class="form-control form-control-line sampleId" readonly  id="mtb_result">
+               </div>
+              </div>
+              <div class="col-lg-4 col-md-4 col-sm-4">
+                <label class="col-md-12"><h5>Rif Result:</h5></label>
+                <div class="col-md-12">
+                  <input type="text" name="rif_result" class="form-control form-control-line sampleId" readonly  id="rif_result">
+               </div>
+              </div>
+            
+          </div>
 
-                 <label class="col-md-12"><h5>If Not valid <br>(Invalid/NA/ No result/Error- specifiy):</h5></label>
-                  <div class="col-md-12">
-                    <input type="text" name="invalid" class="form-control form-control-line sampleId"  id="invalid">
-                 </div>
-
-                 <label class="col-md-12"><h5>MTB Result:</h5></label>
-                  <div class="col-md-12">
-                    <input type="text" name="mtb_result" class="form-control form-control-line sampleId"  id="mtb_result">
-                 </div>
-                 <label class="col-md-12"><h5>RIF Result:</h5></label>
-                  <div class="col-md-12">
-                    <input type="text" name="rif_result" class="form-control form-control-line sampleId"  id="rif_result">
-                 </div>
-                 <label class="col-md-12"><h5>Date of Result:</h5></label>
-                  <div class="col-md-12">
-                    <input type="text" name="dor_result" class="form-control form-control-line sampleId"  id="dor_result">
-                 </div>
-             
+          <div class="row col-lg-12">
+                
+            <div class="col-lg-4 col-md-4 col-sm-4">
+              <label class="col-md-12"><h5>Date of Result:</h5></label>
+              <div class="col-md-12">
+                <input type="text" name="result_date" class="form-control form-control-line sampleId" readonly  id="result_date">
+             </div>
+            </div>
+            <div class="col-lg-4 col-md-4 col-sm-4">              
+            </div>
+            <div class="col-lg-4 col-md-4 col-sm-4">             
+            </div>
+          
+        </div>             
               <br>
           </div>
           <div class="modal-footer">
@@ -211,6 +250,7 @@ $(document).ready(function() {
   var dd = today.getDate();
   var mm = today.getMonth()+1; //January is 0!
   var yyyy = today.getFullYear();
+  var savestate = false;
 
   if(dd<10) {
       dd = '0'+dd
@@ -223,7 +263,9 @@ $(document).ready(function() {
   today = dd + '-' + mm + '-' + yyyy;
     var dataTable =$('#exampl').DataTable( {
         dom: 'Bfrtip',
-		pageLength:5,
+        
+		pageLength:25,
+    bDestroy: true,    
 		processing: true,
         serverSide: true,
         serverMethod: 'post',
@@ -232,17 +274,16 @@ $(document).ready(function() {
 			   url: "{{url('search_test_request')}}",
 			   data: function(data){
 				     // Read values
-                    var enrollment_no = $('#enrollment_no').val();          
-
-					  // Append to data
-					  data.searchByEnrollmentNo = enrollment_no;
-         
+          var enrollment_no = $('#enrollment_no').val();	  // Append to data
+					  data.searchByEnrollmentNo = enrollment_no;         
 				},
+            stateSave: true,
 				headers: 
 				{
 					'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
 				}
-		  },
+		  }, 
+      
 		 columns: [
 		   { data: 'enroll_id',className: "hide_column" },
 		   { data: 'name' },
@@ -263,11 +304,20 @@ $(document).ready(function() {
                 }
             }
         ],
-        "order": [[ 2, "desc" ]]
+        "order": [[ 2, "desc" ]],
+        //stateSave: getTotal()
     });
 	$('#enrollment_no').keyup(function () { //alert();
         dataTable.draw();
     });
 } );
+
+function getTotal()
+{
+  var oTable = $('#myTable').dataTable();
+  alert(oTable.fnGetData().length);
+
+  //return table.data().count() > 5 ? true : false;
+}
 </script>
 @endsection

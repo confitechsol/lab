@@ -41,7 +41,7 @@
                               </div>
                               <div class="col-lg-6 col-xlg-6 col-md-6 col-sm-6 col-sm-6">
                                 <label>Result<span style="color:red;">*</span></label>
-                                <select name="result" class="form-control form-control-line" >
+                                <select name="result" class="form-control form-control-line result" >
                                   <option value="">--Select--</option>
                                   @foreach ($data['result_data'] as $key => $result_data)
                                   <option value="{{$key}}"
@@ -106,7 +106,7 @@
                 </div>
 
             </div>
-            <footer class="footer"> © Copyright Reserved 2017-2018, LIMS </footer>
+            <footer class="footer">  </footer>
         </div>
 
 <script>
@@ -134,6 +134,26 @@ function openNextForm(sample_label, log_id, enroll_id){
 <script>
 
 $(document).ready(function() {
+
+  $('.test_reason').on('change', function() {
+
+    var week_val = $(this).val();
+
+    if( week_val == '8' )
+    {
+      $(".result option[value='Ongoing']").hide();
+
+    } else {
+
+      $(".result option[value='Ongoing']").show();
+
+    }
+    
+
+  });
+
+
+
   var today = new Date();
   var dd = today.getDate();
   var mm = today.getMonth()+1; //January is 0!

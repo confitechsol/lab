@@ -148,7 +148,7 @@
         </div>
 
     </div>
-    <footer class="footer"> © Copyright Reserved 2017-2018, LIMS </footer>
+    <footer class="footer">  </footer>
 </div>
 
 
@@ -249,7 +249,8 @@ $(document).ready(function() {
   today = dd + '-' + mm + '-' + yyyy;
      var dataTable =$('#exampl').DataTable( {
         dom: 'Bfrtip',
-		pageLength:5,
+        stateSave: true,
+		pageLength:25,
 		processing: true,
 		language: {
             loadingRecords: '&nbsp;',
@@ -299,6 +300,7 @@ $(document).ready(function() {
 	$('#enrollment_no').keyup(function () { //alert();
         dataTable.draw();
     });
-} );
+});
+
 </script>
 @endsection

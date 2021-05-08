@@ -113,9 +113,9 @@
                             <div class="card-block">                              
                                 <div class="col-lg-12 col-xlg-12 col-md-12 col-sm-12 col-sm-12" style="width: auto;overflow-y: scroll;">
                                   <div class="col-md-12 my_con" style="padding: 0px;">
-                                    <input type="radio" name="sector_radio" class="setradio" value="1" checked="" required="">&nbsp;<span style="color: green;">>= 42 days</span>
+                                   <div id="default-btn" class="filterBtn" style="float: left; padding-right: 15px;"> <input type="radio" name="sector_radio" class="setradio" value="1" checked="" required="">&nbsp;<span style="color: #1e88e5;">>= 42 days&nbsp;<span id="above42">( 0 )</span></span> </div>
                                     <!-- <br> -->
-                                    <input type="radio" name="sector_radio" class="setradio" value="2" required="" style="margin-left: 20px;">&nbsp;<span style="color: #1e88e5;">< 42 days
+                                    <div class="filterBtn" style="width: 32%;"> <input type="radio" name="sector_radio" class="setradio" value="2" required="" style="margin-left: 20px;">&nbsp;<span style="color: #1e88e5;">< 42 days&nbsp;<span id="less42">( 0 )</span></span> </div>
                                     <div id="no_sample" style="color: gray;font-weight: bold;"></div>  
                                   </div>                                    
                                     <table id="exampl" class="table table-striped table-bordered responsive col-xlg-12" cellspacing="0" width="100%">
@@ -163,7 +163,7 @@
                 </div>
 
             </div>
-            <footer class="footer"> © Copyright Reserved 2017-2018, LIMS </footer>
+            <footer class="footer">  </footer>
         </div>
 
         <div class="modal fade" id="myModal_naat" role="dialog" >
@@ -268,9 +268,18 @@ $(document).ready(function(){
   });//submit
 
   $('.setradio').on('click', function() {
+
       var id = ($(this).val());
+
+    $('.filterBtn').css('background', '#ffffff');
+    $('.filterBtn').css('border', '#ffffff');
+
+    $(this).parent().css('background', '#FFA500');
+    $(this).parent().css('border', '#FFA500');
+
       arrangeTable(id);
   });
+
 });//document ready
 
 function arrangeTable(rd_val)
@@ -323,6 +332,8 @@ function arrangeTable(rd_val)
         var response = settings.json;
         //console.log(response);
         $('#no_sample').html('No. of Sample(s): '+response.rc_count);
+        $('#above42').html('('+response.above42+')');
+        $('#less42').html('('+response.less42+')');
     },
 		 columns: [
        { data: 'ID',className: "hide_column"},
@@ -404,6 +415,10 @@ function openForm(sample_id, lpa_type){
     $("#tube_id_lj").attr("disabled", true);
   }
 
+  $("#node").html("");
+  $('.bulk-selected').prop('checked', false);
+  $('#bulk-select-all').prop('checked', false);
+
   $('#sampleID_'+sample_id).prop('checked', true);
   showButtonWisePopup(2);
 }
@@ -420,6 +435,12 @@ function openNextForm(sample_label, log_id, enroll_id){
 $(document).ready(function() {
 
   var radio_val = $('input[name="sector_radio"]:checked').val();  
+
+  $('#default-btn').css('background', '#ffffff');
+  $('#default-btn').css('border', '#ffffff');
+
+    $('#default-btn').css('background', '#FFA500');
+    $('#default-btn').css('border', '#FFA500');
 
   arrangeTable(radio_val);  
 	
@@ -577,31 +598,43 @@ function showButtonWisePopup(id)
 
       if(id == '1' && $('input[name="sector_radio"]:checked').val() == '1')
       {
+        //alert('1');
         $('#test_type_2').prop('disabled', false);
         $('#test_type_2').prop('checked', true);
         $('#test_type_1').prop('disabled', true);
         $('#mff_result').show();
+        $('#flgm_lc').hide();
+        $('#flgm_mi').show();
       }
       else if(id == '2' && $('input[name="sector_radio"]:checked').val() == '1')
       {
+        //alert('2');
         $('#test_type_2').prop('disabled', false);
         $('#test_type_2').prop('checked', true);
         $('#test_type_1').prop('disabled', false);
+        $('#flgm_lc').show();
+        $('#flgm_mi').show();
         
       }
       else if(id == '1' && $('input[name="sector_radio"]:checked').val() == '2')
       {
+        //alert('3');
         $('#test_type_1').prop('disabled', false);
         $('#test_type_1').prop('checked', true);
         $('#test_type_2').prop('disabled', true);
         $('#mff_result').hide();
+        $('#flgm_mi').hide();
+        $('#flgm_lc').show();
       }
       else if(id == '2' && $('input[name="sector_radio"]:checked').val() == '2')
       {
+        //alert('4');
         $('#test_type_2').prop('disabled', false);
         $('#test_type_1').prop('checked', true);
         $('#test_type_1').prop('disabled', false);
         $('#mff_result').hide();
+        $('#flgm_lc').show();
+        $('#flgm_mi').show();
       }
       
 

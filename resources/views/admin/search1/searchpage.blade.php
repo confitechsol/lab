@@ -125,7 +125,7 @@
             </div>
 
         </div>
-        <footer class="footer"> © Copyright Reserved 2017-2018, LIMS</footer>
+        <footer class="footer"> </footer>
     </div>
 
 
@@ -185,12 +185,13 @@
                             <div class="alert alert-danger"><h4>{{ $error }}</h4></div>
                         @endforeach
                     @endif
+                    <div class="alert alert-danger"><h4></h4></div>
                     <div class="modal-body">
 
                         <input type="hidden" name="_token" value="{{ csrf_token() }}">
                         <input type="hidden" name="action" value="cancel-process">
-                        <input type="hidden" name="enrollId1" value="">
-                        <input type="hidden" name="sample" value="">
+                        <input type="hidden" id="enrollId1" name="enrollId1" value="">
+                        <input type="hidden" id="sample" name="sample" value="">
                         <input type="hidden" name="service1" value="">
                         <input type="hidden" name="no_sample" value="">
                         <input type="hidden" name="sampleid1" value="">
@@ -210,7 +211,7 @@
                         <label class="col-md-12"><h5>Sample sent for:<span class="red">*</span><span id="ssentfor"></span></br><span id="ssentforreq" class="red"></span></h5></label>
                         <div class="col-md-12">
                             <!--<select name="sentstep[]" class="form-control form-control-line test_reason services-selected multi-select-xl" multiple required>--->
-                            <select name="sentstep[]" class="form-control form-control-line test_reason services-selected sentStepClass"  required>
+                            <select name="sentstep[]" id="sentstep" class="form-control form-control-line test_reason services-selected sentStepClass"  required>
                                 {{--<option value="1">Zn Microscopy</option>--}}
                                 {{--<option value="2">Fm Microscopy</option>--}}
                                 {{--<option value="4">Cbnaat</option>--}}
@@ -257,6 +258,7 @@
         var $modalCancelProcess = $('#modal-cancel-process');
         $('body').on('click', '.btn-cancel-process', function (){
             var $btn = $(this);
+            $('.alert-danger').hide();
             var service_log = $btn.data('service-log');
             //console.log(service_log);
             $modalCancelProcess.find('input[name="enrollId1"]')     .val( service_log.enroll_id );
@@ -276,6 +278,7 @@
         });
 
         $(".services-selected").change(function() {
+            
             var value = $(this).children(":selected").val();
             var tag = '';
             switch( value ){
@@ -283,7 +286,45 @@
                 case 4: tag = 'LJ'; break;
                 case 5: tag = 'LC & LJ Both'; break;
             }
+
+            var sample_id = "";
+            var enroll_id = "";
+            var service_tag_id = "";
+
+            sample_id = $('#sample').val();
+            enroll_id = $('#enrollId1').val();
+            service_tag_id = value; 
+
             $modalCancelProcess.find('input[name="tag"]').val( tag );
+
+            //alert(tag);
+
+           $.ajax({
+                url: "{{url('check_sample_log_exists')}}" + '/' + sample_id + '/' + enroll_id+ '/' + service_tag_id,
+                        type: "GET",
+                        processData: false,
+                        contentType: false,
+                        success:function(response){
+                            console.log(response);
+                            if( response >= 1 ){
+                                    $('.alert-danger').show();
+									$('.alert-danger').html("Service already exists for this sample!!!");
+									//alert($("#sentstepadd option:selected").val());
+									$('.btn-md').prop('disabled', true);
+                                
+                            }else{
+
+                                    $('.alert-danger').hide();
+									$('.alert-danger').html("");
+									//alert($("#sentstepadd option:selected").val());
+									$('.btn-md').prop('disabled', false);                                
+                            }
+
+                        }
+
+                    }); 
+
+
         });
 
         $modalCancelProcess.on('show.bs.modal', function () {

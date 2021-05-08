@@ -10,6 +10,6 @@ class FinalInterpretation extends Model
     protected $fillable = ['enroll_id','sample_id','test_date','created_by','updated_by','status','lpa_interpretation_id',
     'type',
     'type_direct','type_indirect',
-    'mtb_result','rif','inh','quinolone','slid','report_date','reason_edit','edit_microbiologist','tub_band','nikshey_final_interpretation','tag'];
+    'mtb_result','rif','inh','quinolone','slid','report_date','reason_edit','edit_microbiologist','tub_band','nikshey_final_interpretation','tag', 'clinical_interpretation'];
 }
 

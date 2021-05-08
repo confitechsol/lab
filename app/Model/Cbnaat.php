@@ -8,7 +8,7 @@ class Cbnaat extends Model
 {
 	protected $table = 't_cbnaat';
     protected $fillable = ['enroll_id','sample_id','nikshay_id','user_id','result_MTB','result_RIF',
-		'next_step','status','test_date','created_by','updated_by','error','reason_edit','edit_microbiologist','cbnaat_equipment_name'];
+		'next_step','status','test_date','created_by','updated_by','error','reason_edit','edit_microbiologist','cbnaat_equipment_name', 'lab_code', 'sample_label', 'comments', 'final_interpretation'];
 
     // public static function cbnaat_list(){
     //     try{

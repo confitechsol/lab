@@ -129,10 +129,15 @@ class MicroscopyController extends Controller
         }
 
         
-        if($request->editresult){          
+        if($request->editresult){  
+          
+          //dd($request->all());
+
           $sample = Sample::select('id','enroll_id')->where('sample_label',$request->sample_id)->first();
           $microscopyObj = Microscopy::select('id','enroll_id','result')->where('sample_id',$sample->id)->first();
           if($microscopyObj){
+
+            //dd($microscopyObj);
 
             $edit = ResultEdit::create([
               'enroll_id' => $sample->enroll_id,
@@ -155,13 +160,16 @@ class MicroscopyController extends Controller
               'created_by' => $request->user()->id,
               'updated_by' => $request->user()->id,
               'status' => 1,
-            ]);
+            ]); 
 
-            $microscopy = $microscopyObj->id;
+            //$microscopy = $microscopyObj->id;
             $microscopy = Microscopy::find($microscopyObj->id);
+            $microscopy->result = $request->result;
             $microscopy->reason_edit = $request->reason_edit;
             $microscopy->is_moved = 0;
             $microscopy->save();
+
+            DB::commit();		
           }
           return redirect('/microbiologist');
         }

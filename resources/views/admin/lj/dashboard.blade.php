@@ -138,7 +138,7 @@
                                       <div class="col ">
                                           <label class="col-md-12">Week reading</label>
                                           <div class="col-md-12">
-                                             <input type="number" name="status" class="form-control form-control-line" value="{{$data['sample']->week_log}}" disabled>
+                                             <input type="number" id="status" name="status" class="form-control form-control-line" value="{{$data['sample']->week_log}}" disabled>
                                          </div>
                                       </div>
                                   </div>
@@ -238,7 +238,6 @@
 <?php } ?>
 
 
-
                                         <div class="col hide" id="other_result">
                                             <label class="col-md-12">Enter Details </label>
                                             <div class="col-md-12">
@@ -257,8 +256,15 @@
                                                <input type="text" name="lj_result_date" max="<?php echo date("Y-m-d");?>" class="form-control form-control-line datepicker" id="lj_result_date" required>
                                            </div>
                                         </div>
-
-                                    </div>
+                                      </div>
+                                      <div class="row">
+                                        <div class="col">
+                                          <label class="col-md-12">Comments</label>
+                                            <div class="col-md-12">
+                                                <input type="text" name="comments" class="form-control form-control-line lc_dst_edit_reason"  id="lj_comments" >
+                                            </div>
+                                          </div>
+                                      </div>
 
                                 </div>
                             </div>
@@ -286,7 +292,7 @@
             <!-- ============================================================== -->
             <!-- footer -->
             <!-- ============================================================== -->
-            <footer class="footer"> © Copyright Reserved 2017-2018, LIMS </footer>
+            <footer class="footer">  </footer>
             <!-- ============================================================== -->
             <!-- End footer -->
             <!-- ============================================================== -->
@@ -299,6 +305,23 @@ $(document).ready(function(){
     $("#pageloader").fadeIn();
   });//submit
   //Confirm ok submit
+
+  $('#lj_result').click( function() {
+
+    //alert('test');
+
+    if( $('#status').val() == 8 )
+    {
+      $("#lj_result option[value='Ongoing']").hide();
+
+    } else {
+
+      $("#lj_result option[value='Ongoing']").show();
+
+    }
+
+  });
+
 	$('#lj_result').change( function() {
 		//alert("here");
 		var enroll_id=$("#enrollId").val();

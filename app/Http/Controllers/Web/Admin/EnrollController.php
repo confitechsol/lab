@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Model\Enroll;
 use App\Model\Patient;
+use App\Model\EnrollsNikshayLog;
 use Illuminate\Support\Facades\Validator;
 use App\Model\Sample;
 use App\Model\Config;
@@ -165,7 +166,7 @@ class EnrollController extends Controller
 			   $custdt= date('d-m-Y h:i:s', strtotime($recvdates));  
 			   
 			  }
-			$actionBtn="<button class='btn btn-default btn-sm' onclick=\"window.open('".url('/enroll/patient/'.$samples->patient_id.'/edit')."');"
+			$actionBtn="<button class='btn btn-info btn-sm' onclick=\"window.open('".url('/enroll/patient/'.$samples->patient_id.'/edit')."');"
   ." $('#exampl tr.bg-selected').removeClass('bg-selected');$(this).parents('tr').addClass('bg-selected') \"> "
   . ($samples->reg_by  ? 'Enrolled' : 'Enroll' )
    ."</button>";
@@ -326,5 +327,280 @@ class EnrollController extends Controller
         $result =DB::select('call show_failed_nikshay_generation(?)',array($sample_label));
         return $result;
 
+    }
+
+    public function nikshayVerificationList()
+    {
+        return view('admin.enroll.nikshay_verification');
+    }
+
+    public function ajaxenrollVerification( Request $request )
+    {
+
+            $draw = $_POST['draw'];
+            $row = $_POST['start'];
+			$rowperpage = $_POST['length']; // Rows display per page
+			$columnIndex = $_POST['order'][0]['column']; // Column index
+			$columnName = $_POST['columns'][$columnIndex]['data']; // Column name
+			$columnSortOrder = $_POST['order'][0]['dir']; // asc or desc
+			$searchValue = $_POST['search']['value']; // Search value
+
+			## Custom Field value
+			$searchByEnrollmentNo = $request->searchByEnrollmentNo;
+
+            
+
+             $sel= Enroll::select('enrolls.id as enrollId', 'enrolls.label as enlabel', 'enrolls.nikshay_id', 's.id as sampleID', 's.sample_label as sample_label', 's.name as s_name', 's.receive_date as receive_date',  'p.firstname as firstname', 'p.surname as lastname', 'p.gender as gender', 'p.age as age', 'ph.DMC_PHI_Name as DMC_PHI_Name')
+            ->leftjoin('patient as p', 'p.id' ,'=', 'enrolls.patient_id')
+            ->leftjoin('sample as s', 's.enroll_id' ,'=', 'enrolls.id')
+            ->leftjoin('m_dmcs_phi_relation as ph', 'ph.id', '=', 'p.phi')
+            ->whereIn('enrolls.status_id', ['5'])
+            ->whereNotNull('enrolls.nikshay_id')  
+            ->orderBy('enrolls.id', 'desc')      
+            ->get();
+
+            $totalRecords =$sel->count();
+
+            if($searchValue != "" && $searchByEnrollmentNo != "")
+            {
+
+                $sel= Enroll::select('enrolls.id as enrollId', 'enrolls.label as enlabel', 'enrolls.nikshay_id', 's.id as sampleID', 's.sample_label as sample_label', 's.name as s_name', 's.receive_date as receive_date',  'p.firstname as firstname', 'p.surname as lastname', 'p.gender as gender', 'p.age as age', 'ph.DMC_PHI_Name as DMC_PHI_Name')
+                ->leftjoin('patient as p', 'p.id' ,'=', 'enrolls.patient_id')
+                ->leftjoin('sample as s', 's.enroll_id' ,'=', 'enrolls.id')
+                ->leftjoin('m_dmcs_phi_relation as ph', 'ph.id', '=', 'p.phi')
+                ->whereIn('enrolls.status_id', ['5'])
+                ->Where('enrolls.label', 'LIKE', '%'.$searchValue.'%')
+                ->orWhere('s.sample_label', 'LIKE', '%'.$searchValue.'%')
+                ->orWhere('enrolls.label', 'LIKE', '%'.$searchByEnrollmentNo.'%')
+                ->whereNotNull('enrolls.nikshay_id')             
+                ->orderBy('enrolls.id', 'desc')      
+                ->get();
+
+                $totalRecordwithFilter = $sel->count();
+
+                $sel= Enroll::select('enrolls.id as enrollId', 'enrolls.label as enlabel', 'enrolls.nikshay_id', 's.id as sampleID', 's.sample_label as sample_label', 's.name as s_name', 's.receive_date as receive_date',  'p.firstname as firstname', 'p.surname as lastname', 'p.gender as gender', 'p.age as age', 'ph.DMC_PHI_Name as DMC_PHI_Name')
+                ->leftjoin('patient as p', 'p.id' ,'=', 'enrolls.patient_id')
+                ->leftjoin('sample as s', 's.enroll_id' ,'=', 'enrolls.id')
+                ->leftjoin('m_dmcs_phi_relation as ph', 'ph.id', '=', 'p.phi')
+                ->whereIn('enrolls.status_id', ['5'])
+                ->Where('enrolls.label', 'LIKE', '%'.$searchValue.'%')
+                ->orWhere('s.sample_label', 'LIKE', '%'.$searchValue.'%')
+                ->orWhere('enrolls.label', 'LIKE', '%'.$searchByEnrollmentNo.'%')
+                ->whereNotNull('enrolls.nikshay_id')             
+                ->orderBy('enrolls.id', 'desc')      
+                ->get();
+
+            } elseif($searchValue == "" && $searchByEnrollmentNo != "" )
+            {
+                $empQuery= Enroll::select('enrolls.id as enrollId', 'enrolls.label as enlabel', 'enrolls.nikshay_id', 's.id as sampleID', 's.sample_label as sample_label', 's.name as s_name', 's.receive_date as receive_date',  'p.firstname as firstname', 'p.surname as lastname', 'p.gender as gender', 'p.age as age', 'ph.DMC_PHI_Name as DMC_PHI_Name')
+                ->leftjoin('patient as p', 'p.id' ,'=', 'enrolls.patient_id')
+                ->leftjoin('sample as s', 's.enroll_id' ,'=', 'enrolls.id')
+                ->leftjoin('m_dmcs_phi_relation as ph', 'ph.id', '=', 'p.phi')
+                ->whereIn('enrolls.status_id', ['5'])                
+                ->Where('enrolls.label', 'LIKE', '%'.$searchByEnrollmentNo.'%')
+                ->whereNotNull('enrolls.nikshay_id')             
+                ->orderBy('enrolls.id', 'desc')      
+                ->get();
+
+                $totalRecordwithFilter = $sel->count();
+
+                $empQuery= Enroll::select('enrolls.id as enrollId', 'enrolls.label as enlabel', 'enrolls.nikshay_id', 's.id as sampleID', 's.sample_label as sample_label', 's.name as s_name', 's.receive_date as receive_date',  'p.firstname as firstname', 'p.surname as lastname', 'p.gender as gender', 'p.age as age', 'ph.DMC_PHI_Name as DMC_PHI_Name')
+                ->leftjoin('patient as p', 'p.id' ,'=', 'enrolls.patient_id')
+                ->leftjoin('sample as s', 's.enroll_id' ,'=', 'enrolls.id')
+                ->leftjoin('m_dmcs_phi_relation as ph', 'ph.id', '=', 'p.phi')
+                ->whereIn('enrolls.status_id', ['5'])             
+                ->whereNotNull('enrolls.nikshay_id') 
+                ->Where('enrolls.label', 'LIKE', '%'.$searchByEnrollmentNo.'%')            
+                ->orderBy('enrolls.id', 'desc')            
+                ->skip($row)
+                ->take($rowperpage)                  
+                ->get();
+
+            } elseif ($searchValue != "" && $searchByEnrollmentNo == "" )
+            {
+                $sel= Enroll::select('enrolls.id as enrollId', 'enrolls.label as enlabel', 'enrolls.nikshay_id', 's.id as sampleID', 's.sample_label as sample_label', 's.name as s_name', 's.receive_date as receive_date',  'p.firstname as firstname', 'p.surname as lastname', 'p.gender as gender', 'p.age as age', 'ph.DMC_PHI_Name as DMC_PHI_Name')
+                ->leftjoin('patient as p', 'p.id' ,'=', 'enrolls.patient_id')
+                ->leftjoin('sample as s', 's.enroll_id' ,'=', 'enrolls.id')
+                ->leftjoin('m_dmcs_phi_relation as ph', 'ph.id', '=', 'p.phi')
+                ->whereIn('enrolls.status_id', ['5'])
+                ->Where('enrolls.label', 'LIKE', '%'.$searchValue.'%')
+                ->orWhere('s.sample_label', 'LIKE', '%'.$searchValue.'%')               
+                ->whereNotNull('enrolls.nikshay_id')             
+                ->orderBy('enrolls.id', 'desc')      
+                ->get();
+
+                $totalRecordwithFilter = $sel->count();
+
+                $empQuery= Enroll::select('enrolls.id as enrollId', 'enrolls.label as enlabel', 'enrolls.nikshay_id', 's.id as sampleID', 's.sample_label as sample_label', 's.name as s_name', 's.receive_date as receive_date',  'p.firstname as firstname', 'p.surname as lastname', 'p.gender as gender', 'p.age as age', 'ph.DMC_PHI_Name as DMC_PHI_Name')
+                ->leftjoin('patient as p', 'p.id' ,'=', 'enrolls.patient_id')
+                ->leftjoin('sample as s', 's.enroll_id' ,'=', 'enrolls.id')
+                ->leftjoin('m_dmcs_phi_relation as ph', 'ph.id', '=', 'p.phi')
+                ->whereIn('enrolls.status_id', ['5'])             
+                ->whereNotNull('enrolls.nikshay_id') 
+                ->Where('enrolls.label', 'LIKE', '%'.$searchValue.'%')
+                ->orWhere('s.sample_label', 'LIKE', '%'.$searchValue.'%')            
+                ->orderBy('enrolls.id', 'desc')            
+                ->skip($row)
+                ->take($rowperpage)                  
+                ->get();
+
+            } else {
+
+                $totalRecordwithFilter = $totalRecords;
+
+                $empQuery= Enroll::select('enrolls.id as enrollId', 'enrolls.label as enlabel', 'enrolls.nikshay_id as nikshay_id', 's.id as sampleID', 's.sample_label as sample_label', 's.name as s_name', 's.receive_date as receive_date',  'p.id as patient_id', 'p.firstname as firstname', 'p.surname as lastname', 'p.gender as gender', 'p.age as age', 'ph.DMC_PHI_Name as DMC_PHI_Name')
+                ->leftjoin('patient as p', 'p.id' ,'=', 'enrolls.patient_id')
+                ->leftjoin('sample as s', 's.enroll_id' ,'=', 'enrolls.id')
+                ->leftjoin('m_dmcs_phi_relation as ph', 'ph.id', '=', 'p.phi')
+                ->whereIn('enrolls.status_id', ['5'])             
+                ->whereNotNull('enrolls.nikshay_id')             
+                ->orderBy('enrolls.id', 'desc')            
+                ->skip($row)
+                ->take($rowperpage)                  
+                ->get();
+
+            }            
+
+            $data = array();
+            $editBtn="";
+			$actionBtn="";
+            $input = "";
+            $submit="";
+            $errorlink="";
+            foreach($empQuery as $key=>$samples){
+
+
+                $submit="";
+                $errorlink="";
+                $editBtn="";
+
+                if($samples->s_name == $samples->firstname)
+                {
+                    
+                    $input = '<input class="bulk-selected" type="checkbox" value="'.$samples->enrollId.'">';
+
+                    $editBtn="<button type='button' onclick=\"openStatusChange('".$samples->enrollId."');\" class='btn btn-info btn-sm resultbtn bmwoff'>Submit</button><br>";
+                    $editBtn .="<button class='btn btn-link' onclick=\"window.open('".url('/enroll/patient/'.$samples->patient_id.'/edit')."');"
+                    ." $('#exampl tr.bg-selected').removeClass('bg-selected');$(this).parents('tr').addClass('bg-selected') \"> "
+                     ."Error Links</button><br>";
+                    $editBtn .="<a href='javascript: void(0)' class='btn btn-link' onclick=\"openNikshayIdEntryForm('".$samples->enrollId."', '".$samples->sample_label."','".$samples->enlabel."', '".$samples->nikshay_id."')\">Change Nikshay ID</a>";
+
+                } else {
+
+                $input = "";   
+                $editBtn="";
+                    $editBtn ="<button class='btn btn-link' onclick=\"window.open('".url('/enroll/patient/'.$samples->patient_id.'/edit')."');"
+                    ." $('#exampl tr.bg-selected').removeClass('bg-selected');$(this).parents('tr').addClass('bg-selected') \"> "
+                     ."Error Links</button><br>";
+                    $editBtn .="<a href='javascript: void(0)' class='btn btn-link' onclick=\"openNikshayIdEntryForm('".$samples->enrollId."', '".$samples->sample_label."','".$samples->enlabel."', '".$samples->nikshay_id."')\">Change Nikshay ID</a>";
+
+                }
+                
+                
+                $data[] = array(
+                    "enroll_id"=>$samples->enrollId,
+                    "inputs" => $input,
+                    "enroll_label"=>$samples->enlabel,
+                    "sample_label"=>$samples->sample_label,
+                    "p_name"=>$samples->s_name,
+                    "firstname" => $samples->firstname,
+                    "lastname" => $samples->lastname,
+                    "gender" => $samples->gender,
+                    "age" => $samples->age,
+                    "DMC_PHI_Name" => $samples->DMC_PHI_Name,
+                    "receive_date"=>date('d-m-Y h:i:s',strtotime($samples->receive_date)),              
+                    "submitaction" => $editBtn
+                  );
+            }
+
+            $response = array(
+                "draw" => intval($draw),
+                "iTotalRecords" => $totalRecords,
+                "iTotalDisplayRecords" => $totalRecordwithFilter,
+                "aaData" => $data
+              );
+
+              echo json_encode($response);       
+
+    }
+
+    public function updateEnrollmentStatus(Request $request)
+    {
+        $enr = Enroll::find($request->enrollid);
+        //$enr->nikshay_id = trim($request->nikshayid);
+			$enr->status_id = 1;
+			$enr->is_moved = 0;
+			$enr->save();
+
+        echo  "<script type='text/javascript'>";
+		echo "window.close();";
+		echo "</script>";
+        return redirect('/nikshay-verification-list');
+    }
+
+    public function updateBulkEnrollmentStatus(Request $request)
+    {
+        $enroll_ids = trim( $request->input('enroll_ids') );
+        $enroll_ids = explode(',', $enroll_ids);        
+        $data = array();
+         foreach($enroll_ids as $enroll_id){
+
+            $enr = Enroll::find($enroll_id);
+            //$enr->nikshay_id = trim($request->nikshayid);
+			$enr->status_id = 1;
+			$enr->is_moved = 0;
+			$enr->save();
+
+         }
+
+         echo  "<script type='text/javascript'>";
+         echo "window.close();";
+         echo "</script>";
+         return redirect('/nikshay-verification-list');
+
+    }
+
+    public function updateWithNikshayIdChange(Request $request)
+    {
+      
+        //dd($request->all());
+		if(!empty($request->nikshayid)){
+			$enr = Enroll::find($request->enrollid);
+			//dd($enr->nikshay_id);
+			//Insert in to EnrollsNikshayLog(Old Data)
+			$enrl_log_data_old= new EnrollsNikshayLog([
+				'enroll_id' =>$enr->id,
+				'label' => $enr->label,
+				'nikshay_id' => trim($enr->nikshay_id)
+			]);
+			$enrl_log_data_old->saveOrFail();
+			
+			//Insert in to EnrollsNikshayLog(New Data)
+			$enrl_log_data_new = new EnrollsNikshayLog([
+				'enroll_id' =>$enr->id,
+				'label' => $enr->label,
+				'nikshay_id' => trim($request->nikshayid)
+			]);
+			$enrl_log_data_new->saveOrFail();
+			
+			//Update Enrolls table
+			$enr->nikshay_id = trim($request->nikshayid);
+			$enr->status_id = 2;
+			$enr->is_moved = 0;
+			$enr->save();
+			
+			//Update patient table
+			$pat = Patient::find($request->enrollid);			
+			$pat->is_moved = 0;
+			$pat->nikshay_id = NULL;
+			$pat->is_nikshay = NULL;
+			$pat->save();
+		}
+		
+		echo  "<script type='text/javascript'>";
+		echo "window.close();";
+		echo "</script>";
+        return redirect('/nikshay-verification-list');
+      
     }
 }

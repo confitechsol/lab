@@ -168,7 +168,7 @@
                 </div>
 
             </div>
-            <footer class="footer"> © Copyright Reserved 2017-2018, LIMS </footer>
+            <footer class="footer">  </footer>
         </div>
 
 
@@ -203,17 +203,8 @@
                             <div class="col-md-12">
                                <!-- <textarea rows="5" name="test_reason[]" class="form-control form-control-line" required></textarea> -->
                                <select name="service_id" id="service_id" class="form-control form-control-line test_reason" required>
-                                 <option value="">--Select--</option>
-                                 <option value="1">DNA Extraction LPA 1st line</option>
-                                 <option value="2">DNA Extraction LPA 2nd line</option>
-                                 <!--<option value="3">DNA Extraction LPA 1st line and LPA 2nd line</option>---->
-                       <option value="4">LJ - DST Inoculation</option>
-                                 <!--<option value="4">LJ - DST 1st Line</option>
-                                 <option value="5">LJ - DST 2nd Line</option>
-                       <option value="7">LJ - DST 1st & 2nd Line</option>-->
-                                 <!--<option value="6">Microbiologist for further review</option>-->
-                                 <option value="19">Result finalization</option>
-                                 <!-- <option value="">MB for further review </option> -->
+                                 <option value="">--Select--</option>                                 
+                                 <option value="19">Result finalization</option>                                 
                                </select>
                            </div>
                         </div>

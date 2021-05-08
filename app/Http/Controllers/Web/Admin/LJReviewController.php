@@ -191,7 +191,7 @@ class LJReviewController extends Controller
               'service_id' => 8,
               'status' => 1,
               'tag' => $tag,
-			  'rec_flag' =>$request->rec_flag+1,
+			        'rec_flag' =>$request->rec_flag+1,
               'reported_dt'=>date('Y-m-d'),
               'created_by' => $request->user()->id,
               'updated_by' => $request->user()->id,
@@ -213,7 +213,9 @@ class LJReviewController extends Controller
 			   'report_type'=>'End Of Report',
 			   'result_date' => $request->hid_result_date,
 			   'created_by' => $request->user()->id,
-			   'updated_by' => $request->user()->id
+			   'updated_by' => $request->user()->id,
+         'tag' => $tag,
+         'sample_label' => $service->sample_label,
 			 ]);
 			 
 			//Delete from LPA Series if exist
@@ -225,7 +227,9 @@ class LJReviewController extends Controller
 			SecondLineLpa::where('enroll_id',$service->enroll_id)->where('tag','like',$tag)->delete();
 			Microbio::where('enroll_id',$service->enroll_id)->where('tag','like',$tag)->delete();
         }
+
       }elseif($request->service_id == 4 || $request->service_id == 5){
+
         $service = ServiceLog::find($request->service_log_id);
         $service->comments=$request->comments;
         $service->tested_by=$request->user()->name;
@@ -233,42 +237,166 @@ class LJReviewController extends Controller
         $service->status = 0;
         $service->updated_by = $request->user()->id;
         $service->save();
+
         if($request->service_id == 4){
           $s_id = 22;
-		  $tag = $request->tagId;
-        }else{
-          $s_id = 23;
-		  $tag = $request->tagId;
-        }
-        $new_service = [
-          'enroll_id' => $service->enroll_id,
-          'sample_id' => $service->sample_id,
-          'service_id' => $s_id,
-          'status' => 1,
-          'tag' => $tag,
-          'reported_dt'=>date('Y-m-d'),
-          'created_by' => $request->user()->id,
-          'updated_by' => $request->user()->id,
-          'enroll_label' => $service->enroll_label,
-          'sample_label' => $service->sample_label,
-        ];
+          $tag = $request->tagId;
+            }else{
+              $s_id = 23;
+          $tag = $request->tagId;
+            }
 
-        $nwService = ServiceLog::create($new_service);
-        //return $nwService;
-		//Insert into microbiologist
-		if($request->service_id == 4){
-		 $microbio = Microbio::create([
-            'enroll_id' => $service->enroll_id,
-            'sample_id' => $service->sample_id,
-            'service_id' => 20,
-            'next_step' => '',
-            'detail' => '',
-            'remark' => '',
-            'status' => 0,
-            'created_by' => $request->user()->id,
-             'updated_by' => $request->user()->id
-          ]);
-		}  
+        $get_old_sample_id = Microbio::select('sample_id')
+									          ->where('enroll_id', $request->enrollId)
+									          ->first();
+
+        if( !empty($get_old_sample_id) )
+        { 
+          
+            if( $get_old_sample_id->sample_id == $request->sampleID )
+            {
+
+              $new_service = [
+                'enroll_id' => $service->enroll_id,
+                'sample_id' => $service->sample_id,
+                'service_id' => $s_id,
+                'status' => 1,
+                'tag' => $tag,
+                'reported_dt'=>date('Y-m-d'),
+                'created_by' => $request->user()->id,
+                'updated_by' => $request->user()->id,
+                'enroll_label' => $service->enroll_label,
+                'sample_label' => $service->sample_label,
+              ];
+      
+              $nwService = ServiceLog::create($new_service);
+      
+              $microbio = Microbio::create([
+                      'enroll_id' => $service->enroll_id,
+                      'sample_id' => $service->sample_id,
+                      'service_id' => 20,
+                      'next_step' => '',
+                      'detail' => '',
+                      'remark' => '',
+                      'status' => 0,
+                      'created_by' => $request->user()->id,
+                      'updated_by' => $request->user()->id,
+                      'tag' => $tag,
+                      'sample_label' => $service->sample_label,
+                    ]);
+
+            } else {
+
+              $get_enroll_record = Microbio::select(DB::raw('COUNT(*) AS tot_record'))
+											->where('enroll_id', $request->enrollId)
+											->where('service_id', '20')
+											->where('tag', 'LJ')											
+											->first();
+
+              if( $get_enroll_record->tot_record != 0 )
+              {
+
+                $new_service = [
+                  'enroll_id' => $service->enroll_id,
+                  'sample_id' => $service->sample_id,
+                  'service_id' => 22,
+                  'status' => 1,
+                  'tag' => 'LJ',
+                  'reported_dt'=>date('Y-m-d'),
+                  'created_by' => $request->user()->id,
+                  'updated_by' => $request->user()->id,
+                  'enroll_label' => $service->enroll_label,
+                  'sample_label' => $service->sample_label,
+                  'rec_flag' => $service->rec_flag,
+                ];
+        
+                $nwService = ServiceLog::create($new_service);                
+
+                $microbio = Microbio::create([
+
+                  'enroll_id' => $request->enrollId,
+							    'sample_id' => $request->sampleID,
+                  'service_id' => 20,
+                  'next_step' => '',
+                  'detail' => '',
+                  'remark' => '',
+                  'status' => 0,
+                  'created_by' => $request->user()->id,
+                  'updated_by' => $request->user()->id,
+                  'tag' => 'LJ',
+                  'sample_label' => $service->sample_label,
+                  'rec_flag' => $service->rec_flag,
+                  'bmw_flag'  => '1'
+
+                ]);
+
+              } else {
+
+                $new_service = [
+                  'enroll_id' => $service->enroll_id,
+                  'sample_id' => $service->sample_id,
+                  'service_id' => $s_id,
+                  'status' => 1,
+                  'tag' => $tag,
+                  'reported_dt'=>date('Y-m-d'),
+                  'created_by' => $request->user()->id,
+                  'updated_by' => $request->user()->id,
+                  'enroll_label' => $service->enroll_label,
+                  'sample_label' => $service->sample_label,
+                ];
+        
+                $nwService = ServiceLog::create($new_service);
+        
+                $microbio = Microbio::create([
+                        'enroll_id' => $service->enroll_id,
+                        'sample_id' => $service->sample_id,
+                        'service_id' => 20,
+                        'next_step' => '',
+                        'detail' => '',
+                        'remark' => '',
+                        'status' => 0,
+                        'created_by' => $request->user()->id,
+                        'updated_by' => $request->user()->id,
+                        'tag' => $tag,
+                        'sample_label' => $service->sample_label,
+                      ]);
+              }
+
+            }
+
+        } else {
+
+            $new_service = [
+              'enroll_id' => $service->enroll_id,
+              'sample_id' => $service->sample_id,
+              'service_id' => $s_id,
+              'status' => 1,
+              'tag' => $tag,
+              'reported_dt'=>date('Y-m-d'),
+              'created_by' => $request->user()->id,
+              'updated_by' => $request->user()->id,
+              'enroll_label' => $service->enroll_label,
+              'sample_label' => $service->sample_label,
+            ];
+    
+            $nwService = ServiceLog::create($new_service);
+    
+            $microbio = Microbio::create([
+                    'enroll_id' => $service->enroll_id,
+                    'sample_id' => $service->sample_id,
+                    'service_id' => 20,
+                    'next_step' => '',
+                    'detail' => '',
+                    'remark' => '',
+                    'status' => 0,
+                    'created_by' => $request->user()->id,
+                    'updated_by' => $request->user()->id,
+                    'tag' => $tag,
+                    'sample_label' => $service->sample_label,
+                  ]);
+
+        }
+	  
       }
 	  elseif($request->service_id == 7){
         $service = ServiceLog::find($request->service_log_id);
@@ -313,14 +441,96 @@ class LJReviewController extends Controller
         //return $nwService;
       }
       elseif($request->service_id == 6 || $request->service_id == 19){
+
         $service = ServiceLog::find($request->service_log_id);
+
         $service->comments=$request->comments;
         $service->tested_by=$request->user()->name;
         $service->released_dt=date('Y-m-d');
         $service->status = 0;
         $service->updated_by = $request->user()->id;
         $service->save();
-        $microbio = Microbio::create([
+
+        $get_old_sample_id = Microbio::select('sample_id')
+        ->where('enroll_id', $request->enrollId)
+        ->first();
+
+        if( !empty($get_old_sample_id) )
+        { 
+
+            if( $get_old_sample_id->sample_id == $request->sampleID )
+            {
+
+                $microbio = Microbio::create([
+                  'enroll_id' => $service->enroll_id,
+                  'sample_id' => $service->sample_id,
+                  'service_id' => 20,
+                  'next_step' => '',
+                  'detail' => '',
+                  'remark' => '',
+                  'status' => 0,
+                  'created_by' => $request->user()->id,
+                  'updated_by' => $request->user()->id,
+                  'tag' => $service->tag,
+                  'sample_label' => $service->sample_label,
+                ]);
+
+
+            } else {
+
+              $get_enroll_record = Microbio::select(DB::raw('COUNT(*) AS tot_record'))
+											->where('enroll_id', $request->enrollId)
+											->where('service_id', '20')
+											->where('tag', 'LJ')											
+											->first();
+
+              if( $get_enroll_record->tot_record != 0 )
+              {
+
+               
+
+                $microbio = Microbio::create([
+
+                  'enroll_id' => $request->enrollId,
+							    'sample_id' => $request->sampleID,
+                  'service_id' => 20,
+                  'next_step' => '',
+                  'detail' => '',
+                  'remark' => '',
+                  'status' => 0,
+                  'created_by' => $request->user()->id,
+                  'updated_by' => $request->user()->id,
+                  'tag' => 'LJ',
+                  'sample_label' => $service->sample_label,
+                  'rec_flag' => $service->rec_flag,
+                  'bmw_flag'  => '1'
+
+                ]);
+
+
+              } else {
+
+                  $microbio = Microbio::create([
+                    'enroll_id' => $service->enroll_id,
+                    'sample_id' => $service->sample_id,
+                    'service_id' => 20,
+                    'next_step' => '',
+                    'detail' => '',
+                    'remark' => '',
+                    'status' => 0,
+                    'created_by' => $request->user()->id,
+                    'updated_by' => $request->user()->id,
+                    'tag' => $service->tag,
+                    'sample_label' => $service->sample_label,
+                  ]);
+
+              }
+
+            }
+
+        } else {
+
+          $microbio = Microbio::create([
             'enroll_id' => $service->enroll_id,
             'sample_id' => $service->sample_id,
             'service_id' => 20,
@@ -329,8 +539,13 @@ class LJReviewController extends Controller
             'remark' => '',
             'status' => 0,
             'created_by' => $request->user()->id,
-             'updated_by' => $request->user()->id
+             'updated_by' => $request->user()->id,
+             'tag' => $service->tag,
+             'sample_label' => $service->sample_label,
           ]);
+
+
+        }       
 
         //return $microbio;
       }
@@ -461,15 +676,20 @@ class LJReviewController extends Controller
         $this->validate( $request, [
           'sample_ids' => 'required'            
         ] );
+
         DB::beginTransaction();
+
         try{
           $sample_ids = trim( $request->input('sample_ids') );
           $sample_ids = explode(',', $sample_ids);
           $data = array();
+
           foreach($sample_ids as $sample_id){             
 
             if($request->service_id == 1 || $request->service_id == 2 || $request->service_id == 3){
+              
               if(isset( $sample_id )){
+
                 $service = ServiceLog::find( $sample_id);
                 $service->comments=$request->comments;
                 $service->tested_by=$request->user()->name;
@@ -520,7 +740,9 @@ class LJReviewController extends Controller
                    'report_type'=>'End Of Report',
                    'result_date' => $request->hid_result_date,
                    'created_by' => $request->user()->id,
-                   'updated_by' => $request->user()->id
+                   'updated_by' => $request->user()->id,
+                   'tag' => $tag,
+                   'sample_label' => $service->sample_label,
                  ]);           
                 //Delete from LPA Series if exist
                 DNAextraction::where('enroll_id',$service->enroll_id)->delete();
@@ -531,14 +753,18 @@ class LJReviewController extends Controller
                 SecondLineLpa::where('enroll_id',$service->enroll_id)->where('tag','like',$tag)->delete();
                 Microbio::where('enroll_id',$service->enroll_id)->where('tag','like',$tag)->delete();
             }
+
           }elseif($request->service_id == 4 || $request->service_id == 5){
+
             $service = ServiceLog::find( $sample_id);
+
             $service->comments=$request->comments;
             $service->tested_by=$request->user()->name;
             $service->released_dt=date('Y-m-d');
             $service->status = 0;
             $service->updated_by = $request->user()->id;
             $service->save();
+
             if($request->service_id == 4){
               $s_id = 22;
               $tag = $request->tagId;
@@ -572,11 +798,14 @@ class LJReviewController extends Controller
                 'remark' => '',
                 'status' => 0,
                 'created_by' => $request->user()->id,
-                 'updated_by' => $request->user()->id
+                 'updated_by' => $request->user()->id,
+                 'tag' => $tag,
+                 'sample_label' => $service->sample_label,
               ]);
         }  
           }
         elseif($request->service_id == 7){
+
             $service = ServiceLog::find( $sample_id);
             $service->comments=$request->comments;
             $service->tested_by=$request->user()->name;
@@ -619,6 +848,7 @@ class LJReviewController extends Controller
             //return $nwService;
           }
           elseif($request->service_id == 6 || $request->service_id == 19){
+
             $service = ServiceLog::find($sample_id);
             $service->comments=$request->comments;
             $service->tested_by=$request->user()->name;
@@ -626,7 +856,80 @@ class LJReviewController extends Controller
             $service->status = 0;
             $service->updated_by = $request->user()->id;
             $service->save();
-            $microbio = Microbio::create([
+
+            $get_old_sample_id = Microbio::select('sample_id')
+												->where('enroll_id', $service->enroll_id)
+												->first();
+    
+            if( !empty($get_old_sample_id) )
+            {
+              if( $get_old_sample_id->sample_id == $service->sample_id )
+							{
+
+                $microbio = Microbio::create([
+                  'enroll_id' => $service->enroll_id,
+                  'sample_id' => $service->sample_id,
+                  'service_id' => 20,
+                  'next_step' => '',
+                  'detail' => '',
+                  'remark' => '',
+                  'status' => 0,
+                  'created_by' => $request->user()->id,
+                   'updated_by' => $request->user()->id,
+                   'tag' => $service->tag,
+                   'sample_label' => $service->sample_label,
+                ]);
+
+              } else {
+
+                  $get_enroll_record = Microbio::select(DB::raw('COUNT(*) AS tot_record'))
+                  ->where('enroll_id', $service->enroll_id)
+                  ->where('service_id', '20')
+                  ->where('tag', 'LJ')
+                  ->first();
+
+                  if( $get_enroll_record->tot_record != 0 )
+                  {
+                    $microbio = Microbio::create([
+                      'enroll_id' => $service->enroll_id,
+                      'sample_id' => $service->sample_id,
+                      'service_id' => 20,
+                      'next_step' => '',
+                      'detail' => '',
+                      'remark' => '',
+                      'status' => 0,
+                      'report_type'=>'End Of Report',
+                      'result_date' => $request->hid_result_date,
+                      'created_by' => $request->user()->id,
+                      'updated_by' => $request->user()->id,
+                      'tag' => $service->tag,
+                      'sample_label' => $service->sample_label,
+                      'rec_flag' => $service->rec_flag,
+                      'bmw_flag'	=> 1
+                    ]);
+
+                  } else {
+
+                    $microbio = Microbio::create([
+                      'enroll_id' => $service->enroll_id,
+                      'sample_id' => $service->sample_id,
+                      'service_id' => 20,
+                      'next_step' => '',
+                      'detail' => '',
+                      'remark' => '',
+                      'status' => 0,
+                      'created_by' => $request->user()->id,
+                       'updated_by' => $request->user()->id,
+                       'tag' => $service->tag,
+                       'sample_label' => $service->sample_label,
+                    ]);
+
+                  }
+              }
+
+            } else {
+
+              $microbio = Microbio::create([
                 'enroll_id' => $service->enroll_id,
                 'sample_id' => $service->sample_id,
                 'service_id' => 20,
@@ -635,8 +938,12 @@ class LJReviewController extends Controller
                 'remark' => '',
                 'status' => 0,
                 'created_by' => $request->user()->id,
-                 'updated_by' => $request->user()->id
+                 'updated_by' => $request->user()->id,
+                 'tag' => $service->tag,
+                 'sample_label' => $service->sample_label,
               ]);
+
+            }					           
 
             //return $microbio;
           }
@@ -652,4 +959,42 @@ class LJReviewController extends Controller
       }  
      return back(); // Return back from where the request has come.
   }
+
+  public function checkForSampleLjReview(Request $request)
+	{
+		//dd($request->all());
+
+		$result = false;
+		$response = [];
+
+		$get_sample_id = Microbio::select('sample_id')
+						->where('enroll_id', $request->enroll_id)
+						->first();
+
+		if( !empty($get_sample_id) )
+		{
+			if( $get_sample_id->sample_id != $request->sample_id )
+			{
+				$get_lpa_data = Microbio::select(DB::raw('COUNT(*) as tot_record'))
+								->where('enroll_id', $request->enroll_id)
+								->where('tag', $request->tag)
+								->where('service_id', '15')
+								->first();
+
+				if( $get_lpa_data->tot_record != 0 )
+				{
+					$result = true;
+
+				} else {
+
+					$result = false;
+				}
+			}
+		}
+
+		$response = array( 'result'	=> $result);
+
+		echo json_encode($response);
+		
+	}
 }

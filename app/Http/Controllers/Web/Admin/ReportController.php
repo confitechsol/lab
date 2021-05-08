@@ -20,6 +20,7 @@ use DateTime;
 use Illuminate\Support\Facades\DB;
 use App\Model\ResultEdit;
 use App\Model\Cbnaat_lab_details;
+use App\Model\Annexurel;
 use App\Model\Cbnaat;
 use Illuminate\Support\Facades\Event;
 use PDF;
@@ -37,7 +38,7 @@ class ReportController extends Controller
 	 // Change done by Vidhi
     public function index()
     {
-
+        
         $data = Service::select('id', 'workloadReportName')->whereIn('id', [1, 2, 4, 17, 20, 21, 22, 4, 15])->get();
 
         //dd($data);
@@ -862,10 +863,401 @@ class ReportController extends Controller
 		$lab_details=Config::select('*')->where('status',1)->first();
         return view('admin.report.cbnaat_monthly_new', compact('cbnaat_mnth_rpt_data','currentyear','serial_no_drp','lab_details'));
     }
+
+    public function sLpaProbe()
+    {
+        $get_quarter = DB::connection('mysql2')->table("rpt_quarter")->get();        
+        $data['quarter'] = $get_quarter;
+        return view('admin.report.slpaproble', compact('data'));
+    }
+
+    public function ajaxsLpa(Request $request)
+    {
+
+        $data = [];
+        $months = [];
+        $html = "";
+
+        if( $request->quarter_wise_month != "" )
+        {
+            $months = explode(',', $request->quarter_wise_month);
+        }
+
+        $get_sl_lpa =  DB::connection('mysql2')->table("rpt_2ndlineprobe")
+                        ->where('sample_received_year', $request->year)
+                        ->where('quarter_no', $request->quarter_no)
+                        ->whereIn('sample_received_month', $months) 
+                        ->get();
+        
+        if( !empty($get_sl_lpa) )
+        {
+            foreach($get_sl_lpa as $slpa)
+            {
+                $html .= '<tr id="dataRow">';
+                $html .= '<td>'.$slpa->enroll_label.'</td>';
+                $html .= '<td>'.$slpa->sample_label.'</td>';
+                $html .= '<td>'.$slpa->nikshay_id.'</td>';
+                $html .= '<td>'.$slpa->state_name.'</td>';
+                $html .= '<td colspan="2">'.$slpa->district_name.'</td>';
+                $html .= '<td>'.$slpa->fllpa_done.'</td>';
+                $html .= '<td>'.$slpa->fllpa_mtb_result.'</td>';
+                $html .= '<td width="120">'.$slpa->fllpa_rif.'</td>';
+                $html .= '<td width="120">'.$slpa->fllpa_kat_g.'</td>';
+                $html .= '<td width="81">'.$slpa->fllpa_inh.'</td>';
+                $html .= '<td width="98">'.$slpa->sllpa_type.'</td>';
+                $html .= '<td width="72">'.$slpa->sllpa_tub_band.'</td>';
+                $html .= '<td>'.$slpa->sllpa_gyra.'</td>';
+                $html .= '<td width="78">'.$slpa->sllpa_wt18590.'</td>';
+                $html .= '<td>'.$slpa->sllpa_wt28993.'</td>';
+                $html .= '<td width="81">'.$slpa->sllpa_wt39297.'</td>';
+                $html .= '<td width="94">'.$slpa->sllpa_mut1A90V.'</td>';
+                $html .= '<td width="83">'.$slpa->sllpa_mut2S91P.'</td>';
+                $html .= '<td width="96">'.$slpa->sllpa_mut3aD94A.'</td>';
+                $html .= '<td width="110">'.$slpa->sllpa_mut3bD94N.'</td>';
+                $html .= '<td width="96">'.$slpa->sllpa_mut3cD94G.'</td>';
+                $html .= '<td width="94">'.$slpa->sllpa_mut3dD94H.'</td>';
+                $html .= '<td width="94">'.$slpa->sllpa_gyrb.'</td>';
+                $html .= '<td width="105">'.$slpa->sllpa_wt1536541.'</td>';
+                $html .= '<td width="102">'.$slpa->sllpa_mut1N538D.'</td>';
+                $html .= '<td width="110">'.$slpa->sllpa_mut2E540V.'</td>';
+                $html .= '<td width="110">'.$slpa->sllpa_rrs.'</td>';
+                $html .= '<td width="107">'.$slpa->sllpa_wt1140102.'</td>';
+                $html .= '<td width="107">'.$slpa->sllpa_wt21484.'</td>';
+                $html .= '<td width="97">'.$slpa->sllpa_mut1A1401G.'</td>';
+                $html .= '<td width="102">'.$slpa->sllpa_mut2G1484T.'</td>';
+                $html .= '<td width="102">'.$slpa->sllpa_eis.'</td>';
+                $html .= '<td width="92">'.$slpa->sllpa_wt137.'</td>';
+                $html .= '<td width="96">'.$slpa->sllpa_wt2141210.'</td>';
+                $html .= '<td width="97">'.$slpa->sllpa_wt32.'</td>';
+                $html .= '<td width="97">'.$slpa->sllpa_mut1c14t.'</td>';
+                $html .= '<td width="150">'.$slpa->sllpa_mtb_result.'</td>';
+                $html .= '<td width="143">'.$slpa->sllpa_slid.'</td>';
+                $html .= '<td width="156">'.$slpa->sllpa_slid_eis.'</td>';
+                $html .= '<td width="155">'.$slpa->sllpa_quinolone.'</td>';
+                $html .= '<td width="411">'.$slpa->sllpa_finalterpretation.'</td>';
+                $html .= '<td width="401">'.$slpa->sllpa_clinical_interpretation.'</td>';
+                $html .= '<td width="182">'.$slpa->sllpa_sample_collection_date.'</td>';
+                $html .= '<td width="192">'.$slpa->sample_received_datec.'</td>';
+                $html .= '<td width="139">'.$slpa->sllpa_result_date.'</td>';
+                $html .= '<td>'.$slpa->sllpa_nikshay_date.'</td>';
+                $html .= '</tr>';
+            }
+            
+
+        } else {
+
+            $html .= "";
+        }
+
+        return $html;
+    }
+
+    public function fLpaProbe()
+    {
+        $get_quarter = DB::connection('mysql2')->table("rpt_quarter")->get();        
+        $data['quarter'] = $get_quarter;
+        return view('admin.report.flpaproble', compact('data'));
+    }
+
+    public function ajaxfLpa(Request $request)
+    {
+
+        $data = [];
+        $months = [];
+        $html = "";
+
+        if( $request->quarter_wise_month != "" )
+        {
+            $months = explode(',', $request->quarter_wise_month);
+        }
+
+        $get_fl_lpa =  DB::connection('mysql2')->table("rpt_1stlineprobe")
+                        ->where('sample_received_year', $request->year)
+                        ->where('quarter_no', $request->quarter_no)
+                        ->whereIn('sample_received_month', $months) 
+                        ->get();
+        
+        if( !empty($get_fl_lpa) )
+        {
+            foreach($get_fl_lpa as $flpa)
+            {
+                $html .= '<tr id="dataRow">';
+                $html .= '<td>'.$flpa->enroll_label.'</td>';
+                $html .= '<td>'.$flpa->sample_label.'</td>';
+                $html .= '<td>'.$flpa->nikshay_id.'</td>';
+                $html .= '<td>'.$flpa->state_name.'</td>';
+                $html .= '<td colspan="2">'.$flpa->district_name.'</td>';
+                $html .= '<td>'.$flpa->fllpa_type.'</td>';
+                $html .= '<td>'.$flpa->fllpa_tub_band.'</td>';
+                $html .= '<td width="144">'.$flpa->fllpa_locus_control.'</td>';
+                $html .= '<td width="64">'.$flpa->fllpa_wt1.'</td>';
+                $html .= '<td width="64">'.$flpa->fllpa_wt2.'</td>';
+                $html .= '<td width="64">'.$flpa->fllpa_wt3.'</td>';
+                $html .= '<td>'.$flpa->fllpa_wt4.'</td>';
+                $html .= '<td width="64">'.$flpa->fllpa_wt5.'</td>';
+                $html .= '<td>'.$flpa->fllpa_wt6.'</td>';
+                $html .= '<td width="64">'.$flpa->fllpa_wt7.'</td>';
+                $html .= '<td>'.$flpa->fllpa_wt8.'</td>';
+                $html .= '<td>'.$flpa->fllpa_mut1DS16V.'</td>';
+                $html .= '<td>'.$flpa->fllpa_mut2aH526Y.'</td>';
+                $html .= '<td>'.$flpa->fllpa_mut2bH526D.'</td>';
+                $html .= '<td>'.$flpa->fllpa_mut3S531L.'</td>';
+                $html .= '<td>'.$flpa->fllpa_katg.'</td>';
+                $html .= '<td>'.$flpa->fllpa_wt1315.'</td>';
+                $html .= '<td>'.$flpa->fllpa_mut1S315T1.'</td>';
+                $html .= '<td>'.$flpa->fllpa_mut2S315T2.'</td>';
+                $html .= '<td>'.$flpa->fllpa_inha.'</td>';
+                $html .= '<td>'.$flpa->fllpa_wt1516.'</td>';
+                $html .= '<td>'.$flpa->fllpa_wt28.'</td>';
+                $html .= '<td>'.$flpa->fllpa_mut1C15T.'</td>';
+                $html .= '<td>'.$flpa->fllpa_mut2A16G.'</td>';
+                $html .= '<td>'.$flpa->fllpa_mut3aT8C.'</td>';
+                $html .= '<td>'.$flpa->fllpa_mut3bT8A.'</td>';
+                $html .= '<td>'.$flpa->fllpa_mtb_result.'</td>';
+                $html .= '<td>'.$flpa->fllpa_rif.'</td>';
+                $html .= '<td>'.$flpa->fllpa_kat_g.'</td>';
+                $html .= '<td>'.$flpa->fllpa_inh.'</td>';
+                $html .= '<td>'.$flpa->fllpa_finalterpretation.'</td>';
+                $html .= '<td>'.$flpa->fllpa_clinical_interpretation.'</td>';
+                $html .= '<td>'.$flpa->sample_received_date.'</td>';
+                $html .= '<td>'.$flpa->sample_received_datec.'</td>';
+                $html .= '<td>'.$flpa->fllpa_result_date.'</td>';
+                $html .= '<td>'.$flpa->fllpa_nikshay_date.'</td>';
+                $html .= '</tr>';
+            }
+            
+
+        } else {
+
+            $html .= "";
+        }
+
+        return $html;
+    }
+
+    public function ajaxAnnexure15l(Request $request)
+    {
+        //dd( $request->all() );
+
+        $data = [];
+        $months = [];
+        $html = "";
+
+        if( $request->quarter_wise_month != "" )
+        {
+            $months = explode(',', $request->quarter_wise_month);
+        }
+
+       $get_annexure15l =  DB::connection('mysql2')->table("rpt_annexure15l")
+                                ->where('sample_received_year', $request->year)
+                                ->where('quarter_no', $request->quarter_no)
+                                ->whereIn('sample_received_month', $months) 
+                                ->get();
+        
+        if( !empty($get_annexure15l) )
+        {
+            foreach($get_annexure15l as $annexure)
+            {
+                $html .= '<tr id="dataRow">';
+                $html .= '<td width="111">'.$annexure->enroll_label.'</td>';
+                $html .= '<td width="98">'.$annexure->sample_label.'</td>';
+                $html .= '<td width="98">'.$annexure->nikshay_id.'</td>';
+                $html .= '<td width="176">'.$annexure->patient_name.'</td>';
+                $html .= '<td width="118">'.$annexure->patient_tu.'</td>';
+                $html .= '<td width="95">'.$annexure->patient_taluk.'</td>';
+                $html .= '<td width="111">'.$annexure->patient_district.'</td>';
+                $html .= '<td width="88">'.$annexure->patient_state.'</td>';
+                $html .= '<td width="477">'.$annexure->patient_address.'</td>';
+                $html .= '<td width="85">'.$annexure->patient_age.'</td>';
+                $html .= '<td width="102">'.$annexure->patient_gender.'</td>';
+                $html .= '<td width="167">'.$annexure->patient_keypopulation.'</td>';
+                $html .= '<td width="296">'.$annexure->refering_facility.'</td>';
+                $html .= '<td width="117">'.$annexure->regimen_new_pt.'</td>';
+                $html .= '<td width="155">'.$annexure->presumptive_mdrtb.'</td>';
+                $html .= '<td width="155">'.$annexure->predominant_symptom.'</td>';
+                $html .= '<td width="90">'.$annexure->duration.'</td>';
+                $html .= '<td width="100">'.$annexure->pmdt_tb_no.'</td>';
+                $html .= '<td width="74">'.$annexure->month_fu.'</td>';
+                $html .= '<td width="92">'.$annexure->sample_collection_date.'</td>';
+                $html .= '<td width="94">'.$annexure->sample_receive_datec.'</td>';
+                $html .= '<td width="98">'.$annexure->sample_type.'</td>';
+                $html .= '<td width="103">'.$annexure->specimen_condition.'</td>';
+                $html .= '<td width="97">'.$annexure->microscopy_result.'</td>';
+                $html .= '<td width="123">'.$annexure->microscopy_method.'</td>';
+                $html .= '<td width="97">'.$annexure->microscopy_result_date.'</td>';
+                $html .= '<td width="261">'.$annexure->test_request.'</td>';
+                $html .= '<td width="150">'.$annexure->cbnaat_resultdate.'</td>';
+                $html .= '<td width="150">'.$annexure->cbnaat_valid.'</td>';
+                $html .= '<td width="142">'.$annexure->cbnaat_mtbresult.'</td>';
+                $html .= '<td width="134">'.$annexure->cbnaat_rifresult.'</td>';
+                $html .= '<td width="93">'.$annexure->cbnaat_nikshay_date.'</td>';
+                $html .= '<td width="240">'.$annexure->cbnaat_microbio_comments.'</td>';
+                $html .= '<td width="83">'.$annexure->fllpa_direct_indrect.'</td>';
+                $html .= '<td width="97">'.$annexure->fllpa_decontamination_date.'</td>';
+                $html .= '<td width="101">'.$annexure->fllpa_dna_date.'</td>';
+                $html .= '<td width="101">'.$annexure->fllpa_pcr_date.'</td>';
+                $html .= '<td width="101">'.$annexure->fllpa_hybirdization_date.'</td>';
+                $html .= '<td width="111">'.$annexure->fllpa_hybirdization_valid.'</td>';
+                $html .= '<td width="115">'.$annexure->fllpa_mtb_result.'</td>';
+                $html .= '<td width="104">'.$annexure->fllpa_rif_result.'</td>';
+                $html .= '<td width="113">'.$annexure->fllpa_inha_result.'</td>';
+                $html .= '<td width="116">'.$annexure->fllpa_katg_result.'</td>';
+                $html .= '<td width="219">'.$annexure->fllpa_final_interpretation.'</td>';
+                $html .= '<td width="243">'.$annexure->fllpa_clinical_interpretation.'</td>';
+                $html .= '<td width="97">'.$annexure->fllpa_nikshay_date.'</td>';
+                $html .= '<td width="227">'.$annexure->fllpa_microbio_comments.'</td>';
+                $html .= '<td width="87">'.$annexure->sllpa_direct_indrect.'</td>';
+                $html .= '<td width="121">'.$annexure->sllpa_decontamination_date.'</td>';
+                $html .= '<td width="111">'.$annexure->sllpa_dna_date.'</td>';
+                $html .= '<td width="101">'.$annexure->sllpa_pcr_date.'</td>';
+                $html .= '<td width="116">'.$annexure->sllpa_hybirdization_date.'</td>';
+                $html .= '<td width="99">'.$annexure->sllpa_hybirdization_valid.'</td>';
+                $html .= '<td width="114">'.$annexure->sllpa_mtb_result.'</td>';
+                $html .= '<td width="109">'.$annexure->sllpa_fq_result.'</td>';
+                $html .= '<td width="118">'.$annexure->sllpa_slid_result.'</td>';
+                $html .= '<td width="161">'.$annexure->sllpa_slid_eis_result.'</td>';
+                $html .= '<td width="222">'.$annexure->sllpa_final_interpretation.'</td>';
+                $html .= '<td width="196">'.$annexure->sllpa_clinical_interpretation.'</td>';
+                $html .= '<td width="120">'.$annexure->sllpa_nikshay_date.'</td>';
+                $html .= '<td width="325">'.$annexure->sllpa_microbio_comments.'</td>';
+                $html .= '<td width="83">'.$annexure->lc_type.'</td>';
+                $html .= '<td width="70">'.$annexure->lc_inoculation_date.'</td>';
+                $html .= '<td width="88">'.$annexure->lc_mgit_flag_date.'</td>';
+                $html .= '<td width="70">'.$annexure->lc_gu.'</td>';
+                $html .= '<td colspan="2" width="110">'.$annexure->lc_culture_smear.'</td>';
+                $html .= '<td colspan="2" width="90">'.$annexure->lc_bhi.'</td>';
+                $html .= '<td colspan="2" width="109">'.$annexure->lc_ict.'</td>';
+                $html .= '<td width="80">'.$annexure->lc_final_result_date.'</td>';
+                $html .= '<td width="91">'.$annexure->lc_final_result.'</td>';
+                $html .= '<td width="102">'.$annexure->lc_nikshay_date.'</td>';
+                $html .= '<td width="198">'.$annexure->lc_microbio_comments.'</td>';
+                $html .= '<td width="70">'.$annexure->lj_type.'</td>';
+                $html .= '<td width="131">'.$annexure->lj_inoculation_date.'</td>';
+                $html .= '<td colspan="2" width="140">'.$annexure->lj_wk1_result.'</td>';
+                $html .= '<td colspan="2" width="140">'.$annexure->lj_wk2_result.'</td>';
+                $html .= '<td colspan="2" width="140">'.$annexure->lj_wk3_result.'</td>';
+                $html .= '<td colspan="2" width="140">'.$annexure->lj_wk4_result.'</td>';
+                $html .= '<td colspan="2" width="140">'.$annexure->lj_wk5_result.'</td>';
+                $html .= '<td colspan="2" width="140">'.$annexure->lj_wk6_result.'</td>';
+                $html .= '<td colspan="2" width="140">'.$annexure->lj_wk7_result.'</td>';
+                $html .= '<td colspan="2" width="140">'.$annexure->lj_wk8_result.'</td>';
+                $html .= '<td colspan="2" width="170">'.$annexure->lj_culture_smear_result.'</td>';
+                $html .= '<td colspan="2" width="135">'.$annexure->lj_test_id_result.'</td>';
+                $html .= '<td width="112">'.$annexure->lj_final_result.'</td>';
+                $html .= '<td width="107">'.$annexure->lj_final_result_date.'</td>';
+                $html .= '<td width="103">'.$annexure->lj_nikshay_date.'</td>';
+                $html .= '<td width="298">'.$annexure->lj_microbio_comments.'</td>';
+                $html .= '<td width="85">'.$annexure->dst1_inoculation_date.'</td>';
+                $html .= '<td width="148">'.$annexure->dst1_drugs.'</td>';
+                $html .= '<td width="76">'.$annexure->dst1_result_R.'</td>';
+                $html .= '<td width="82">'.$annexure->dst1_result_H.'</td>';
+                $html .= '<td width="90">'.$annexure->dst1_result_S.'</td>';
+                $html .= '<td width="79">'.$annexure->dst1_result_E.'</td>';
+                $html .= '<td width="74">'.$annexure->dst1_result_Km.'</td>';
+                $html .= '<td width="88">'.$annexure->dst1_result_Cm.'</td>';
+                $html .= '<td width="63">'.$annexure->dst1_result_Am.'</td>';
+                $html .= '<td width="85">'.$annexure->dst1_result_Lfx.'</td>';
+                $html .= '<td width="118">'.$annexure->dst1_result_Mfx.'</td>';
+                $html .= '<td width="86">'.$annexure->dst1_result_Eto.'</td>';
+                $html .= '<td width="134">'.$annexure->dst1_result_PAS.'</td>';
+                $html .= '<td width="97">'.$annexure->dst1_result_Lzd.'</td>';
+                $html .= '<td width="81">'.$annexure->dst1_result_Cfz.'</td>';
+                $html .= '<td width="82">'.$annexure->dst1_result_BDQ.'</td>';
+                $html .= '<td width="74">'.$annexure->dst1_result_Dim.'</td>';
+                $html .= '<td width="80">'.$annexure->dst1_nikshay_date.'</td>';
+                $html .= '<td width="276">'.$annexure->dst1_microbio_comments.'</td>';
+                $html .= '<td width="159">'.$annexure->dstz_inoculation_date.'</td>';
+                $html .= '<td width="80">'.$annexure->dstz_result.'</td>';
+                $html .= '<td width="141">'.$annexure->dstz_nikshay_date.'</td>';
+                $html .= '<td width="282">'.$annexure->dstz_microbio_comments.'</td>';
+                $html .= '<td width="85">'.$annexure->dst2_inoculation_date.'</td>';
+                $html .= '<td width="85">'.$annexure->dst2_drugs.'</td>';
+                $html .= '<td width="73">'.$annexure->dst2_result_R.'</td>';
+                $html .= '<td width="62">'.$annexure->dst2_result_H.'</td>';
+                $html .= '<td width="90">'.$annexure->dst2_result_S.'</td>';
+                $html .= '<td width="79">'.$annexure->dst2_result_E.'</td>';
+                $html .= '<td width="74">'.$annexure->dst2_result_Km.'</td>';
+                $html .= '<td width="107">'.$annexure->dst2_result_Cm.'</td>';
+                $html .= '<td width="102">'.$annexure->dst2_result_Am.'</td>';
+                $html .= '<td width="85">'.$annexure->dst2_result_Lfx.'</td>';
+                $html .= '<td width="118">'.$annexure->dst2_result_Mfx.'</td>';
+                $html .= '<td width="86">'.$annexure->dst2_result_Eto.'</td>';
+                $html .= '<td width="66">'.$annexure->dst2_result_PAS.'</td>';
+                $html .= '<td width="63">'.$annexure->dst2_result_Lzd.'</td>';
+                $html .= '<td width="81">'.$annexure->dst2_result_Cfz.'</td>';
+                $html .= '<td width="82">'.$annexure->dst2_result_BDQ.'</td>';
+                $html .= '<td width="74">'.$annexure->dst2_result_Dim.'</td>';
+                $html .= '<td width="80">'.$annexure->dst2_nikshay_date.'</td>';
+                $html .= '<td width="298">'.$annexure->dst2_microbio_comments.'</td>';
+                $html .= '<td width="64">'.$annexure->naat_result_type.'</td>';
+                $html .= '<td width="101">'.$annexure->naat_mtb_result.'</td>';
+                $html .= '<td width="105">'.$annexure->naat_rif_result.'</td>';
+                $html .= '<td width="144">'.$annexure->naat_result_date.'</td>';
+                $html .= '</tr>';
+            }
+            
+
+        } else {
+
+            $html .= "";
+        }
+
+        return $html;
+    }
+
+    public function getQuarterWiseMonth($quarter_id)
+    {
+        $html = "";
+
+        if($quarter_id != "")
+        {
+            $get_quarter = DB::connection('mysql2')->table("rpt_quarter_month")
+                            ->select('month_code', 'month_name')
+                            ->where('quarter_no', $quarter_id)
+                            ->orderBy('month_code', "ASC")
+                            ->get();
+
+            if(!empty( $get_quarter ))
+            {
+
+                //$html .= '<option value="">--Select Month--</option>';
+                foreach( $get_quarter as $month_quarter )
+                {
+                    $html .= '<option value="'.$month_quarter->month_code.'">'.$month_quarter->month_name.'</option>';
+                }
+
+            } else {
+
+                $html = "";
+            }           
+
+        } else {
+
+            $html = "";
+
+        }
+
+        return $html;
+        
+    }
     public function annexure15L(Request $request)
     {
 		//echo $request->from_date."-----".$request->to_date; die;
-		$data['to_date'] = $request->to_date;
+
+        /* $new_annexure = new Annexurel();
+        $new_annexure->setConnection('mysql2');
+        $new_data = $new_annexure->find('1'); */
+
+        //$new_data = DB::connection('mysql2')->table("rpt_annexure15l")->get();
+
+        $get_quarter = DB::connection('mysql2')->table("rpt_quarter")->get();  
+        
+        $data['quarter'] = $get_quarter;
+
+        //dd($get_quarter);
+
+
+		/* $data['to_date'] = $request->to_date;
         $data['from_date'] = $request->from_date;
         if ($request->has('from_date') && $request->has('to_date')) {
 			$from_date=date("Y-m-d",strtotime($request->from_date));
@@ -880,7 +1272,9 @@ class ReportController extends Controller
             $data['annexure_data']= DB::select('call rpt_annexture15l(?, ?)',array($fromdate, $todaydate));
             $data['to_date'] = Carbon::today()->format("d-m-Y");
             $data['from_date'] = Carbon::today()->subDays(5)->format("d-m-Y");
-        }		
+        } */	
+        
+        
         //dd($data['annexure_data']);
         return view('admin.report.annexure_15l', compact('data'));
     }

@@ -180,7 +180,7 @@
                 </div>
 
             </div>
-            <footer class="footer"> © Copyright Reserved 2017-2018, LIMS </footer>
+            <footer class="footer">  </footer>
         </div>
 
 
@@ -253,14 +253,23 @@
                         <label class="col-md-12">Result<span class="red">*</span></label>
                         <div class="col-md-12">
                            <!-- <input type="text" name="sample_quality[]" class="form-control form-control-line" required> -->
-                           <select name="result" id="allresults" class="form-control form-control-line" required="">
-                             <!-- <option value="">--Select--</option>
-                             <option value="Negative">Negative</option>
-                             <option value="Scanty">Scanty</option>
-                             <option value="1+positive">1+positive</option>
-                             <option value="2+positive">2+positive</option>
-                             <option value="3+positive">3+positive</option> -->
-                           <option value="">--Select--</option><option value="Negative/Not Seen">Negative/Not Seen</option><option value="Positive">Positive</option><option value="1+positive">1+positive</option><option value="2+positive">2+positive</option><option value="3+positive">3+positive</option><option value="Sc 1">Sc 1</option><option value="Sc 2">Sc 2</option><option value="Sc 3">Sc 3</option><option value="Sc 4">Sc 4</option><option value="Sc 5">Sc 5</option><option value="Sc 6">Sc 6</option><option value="Sc 7">Sc 7</option><option value="Sc 8">Sc 8</option><option value="Sc 9">Sc 9</option></select>
+                           <select name="result" id="allresults1" class="form-control form-control-line" required="">                             
+                           <option value="">--Select--</option>
+                           <option value="Negative/Not Seen">Negative/Not Seen</option>
+                           <option value="Positive">Positive</option>
+                           <option value="1+positive">1+positive</option>
+                           <option value="2+positive">2+positive</option>
+                           <option value="3+positive">3+positive</option>
+                           <option value="Sc 1">Sc 1</option>
+                           <option value="Sc 2">Sc 2</option>
+                           <option value="Sc 3">Sc 3</option>
+                           <option value="Sc 4">Sc 4</option>
+                           <option value="Sc 5">Sc 5</option>
+                           <option value="Sc 6">Sc 6</option>
+                           <option value="Sc 7">Sc 7</option>
+                           <option value="Sc 8">Sc 8</option>
+                           <option value="Sc 9">Sc 9</option>
+                          </select>
                        </div>
                     </div>       
                   </div>
@@ -317,6 +326,7 @@ $(function(){
   // });
 });
 function openResultForm(sample_label, log_id, result, serviceID,service_id,enroll_id,sample_id,tag,rec_flag){
+  
   $('#sample_id').val(sample_label);
   $('#result_log_id').val(log_id);
   $('#result').val(result);

@@ -24,6 +24,74 @@ class SearchformController extends Controller
         return view('admin.search1.searchpage')->with( compact('services') );
     }
 
+    public function checkSampleLogExists($sample_id, $enroll_id, $service_log_id)
+    {
+        $service_id = "";
+        $tag = "";
+        $searchQuery = "";
+
+        $sent_service_arr = explode('-', $service_log_id);
+
+        if( count( $sent_service_arr ) > 1 ){
+
+            $service_id = $sent_service_arr[0];
+            $tag = $sent_service_arr[1];
+
+            if( ($service_id == '8' || $service_id == '12' || $service_id == '14' || $service_id == '15')  && $tag == 'LPA1' )
+            {                
+                //$tag="LPA 1st Line"; 
+                $searchQuery = "sample_id=".$sample_id." AND enroll_id=".$enroll_id." AND service_id=".$service_id." AND tag='LPA 1st Line' OR tag='1st line LPA'";
+
+            } elseif( ($service_id == '8' || $service_id == '12' || $service_id == '14' || $service_id == '15')  && $tag == 'LPA2' )
+            {                
+                //$tag="LPA 1st Line"; 
+                $searchQuery = "sample_id=".$sample_id." AND enroll_id=".$enroll_id." AND service_id=".$service_id." AND tag='LPA 2nd Line' OR tag='1st line LPA'";
+
+            } elseif( $service_id == '16' && $tag == 'LC' )
+            {                
+                //$tag="LPA 1st Line"; 
+                $searchQuery = "sample_id=".$sample_id." AND enroll_id=".$enroll_id." AND service_id=".$service_id." AND tag='LC'";
+
+            } elseif( $service_id == '16' && $tag == 'LJ' )
+            {                
+                //$tag="LPA 1st Line"; 
+                $searchQuery = "sample_id=".$sample_id." AND enroll_id=".$enroll_id." AND service_id=".$service_id." AND tag='LJ'";
+            }
+
+
+        } else {
+
+            $service_id = $service_log_id;
+
+            if( $service_id == '1')
+            {
+                $searchQuery = "sample_id=".$sample_id." AND enroll_id=".$enroll_id." AND service_id=".$service_id." AND tag IN ('ZN Microscopy', 'MICROSCOPY')";
+
+            } elseif( $service_id == '2')
+            {
+                $searchQuery = "sample_id=".$sample_id." AND enroll_id=".$enroll_id." AND service_id=".$service_id." AND tag IN ('FM Microscopy', 'MICROSCOPY')";
+
+            } elseif( $service_id == '3')
+            {
+                $searchQuery = "sample_id=".$sample_id." AND enroll_id=".$enroll_id." AND service_id=".$service_id." AND tag='DECONTAMINATION'";
+
+            } elseif( $service_id == '4')
+            {
+                $searchQuery = "sample_id=".$sample_id." AND enroll_id=".$enroll_id." AND service_id=".$service_id." AND tag='CBNAAT'";
+
+            }
+        }
+
+        //dd( 'select COUNT( * ) AS tot_count from t_service_log where '.$searchQuery );
+
+        $getData = DB::select('select COUNT( * ) AS tot_count from t_service_log where '.$searchQuery);  
+        
+        //dd( $getData );
+
+        return $getData[0]->tot_count;      
+
+    }
+
     public function getenquiry(Request $request) {
 
         $search_param = escape_like( $request->search_val );

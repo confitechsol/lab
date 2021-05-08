@@ -230,17 +230,31 @@ border-color: #5cb85c;
                                                   </div>  
                                               </div>
                                               <div class="row">
-                                                  <div class="col">
+                                                @if($value['sample_type']  != 'Sputum')
+                                                  <div class="col sampleType">
                                                       <label class="col-md-12">Sample type <span class="red">*</span> </label>
-                                                      <div class="col-md-12">
+                                                      <div class="col-md-12">                                                          
                                                         <select name="sample_type[]" class="form-control form-control-line sample_type" id="sample_typeA" required>
                                                           <option value="">--Select--</option>
-                                                          <option value="Sputum" @if($value['sample_type'] =='Sputum') selected="selected" @endif>Sputum</option>
-                                                          <option value="Other" @if($value['sample_type'] =='Others') selected="selected" @endif >Other</option>
+                                                          <option value="Sputum">Sputum</option>
+                                                          <option value="Other" selected="selected">Other</option>
                                                         </select>
                                                      </div>
                                                   </div>
-                                                  @if($value['sample_type']  == 'Others')
+                                                  @else
+                                                  <div class="col">
+                                                    <label class="col-md-12">Sample type <span class="red">*</span> </label>
+                                                    <div class="col-md-12">                                                          
+                                                      <select name="sample_type[]" class="form-control form-control-line sample_type" id="sample_typeA" required>
+                                                        <option value="">--Select--</option>
+                                                        <option value="Sputum" selected="selected">Sputum</option>
+                                                        <option value="Other" >Other</option>
+                                                      </select>
+                                                   </div>
+                                                </div>
+                                                  @endif
+
+                                                  @if($value['sample_type']  != 'Sputum' || $value['others_type'] != "")
                                                   <div class="col {{-- @if($value['sample_type']  != 'Others') hide @endif; --}} other_sample_type" id="other_sample_typeA">
                                                       <label class="col-md-12">Other sample type <span class="red">*</span> </label>
                                                       <div class="col-md-12">
@@ -262,10 +276,9 @@ border-color: #5cb85c;
                                                      </div>
                                                   </div>
                                                   @else
-                                                  <div class="col @if($value['sample_type']  != 'Others') hide @endif;  other_sample_type" id="other_sample_typeA">
+                                                  <div class="col hide other_sample_type" id="other_sample_typeA">
                                                     <label class="col-md-12">Other sample type <span class="red">*</span> </label>
-                                                    <div class="col-md-12">
-                                                      {{-- {{ dd($data['other_sample_type']) }} --}}
+                                                    <div class="col-md-12">                                                      
                                                       <select id="other_sample_type" name="other_sample_type[]" class="form-control form-control-line ed_other_sample_type">
                                                         <option value="">--Select--</option>
                                                         <option value="BAL" @if($value['sample_type'] == 'BAL') selected="selected" @endif >BAL</option>
@@ -382,11 +395,11 @@ border-color: #5cb85c;
                                       
                                                         <select name="sample_quality[]" class="form-control form-control-line sample_quality" id="sample_qualityA" required>
                                                            <option value="" selected>--Select--</option>
-                                                           <option value="Blood-stained purulent" @if($value['sample_quality'] =='Blood-stained purulent') selected="selected" @endif>Blood-stained purulent</option>
-                                                           <option value="Thick mucoid" @if($value['sample_quality'] =='Thick mucoid') selected="selected" @endif >Thick mucoid</option>
+                                                           <option value="Blood-stained" @if($value['sample_quality'] =='Blood-stained') selected="selected" @endif>Blood-stained</option>
+                                                           {{-- <option value="Thick mucoid" @if($value['sample_quality'] =='Thick mucoid') selected="selected" @endif >Thick mucoid</option> --}}
                                                            <option value="Mucopurulent"@if($value['sample_quality'] =='Mucopurulent') selected="selected" @endif >Mucopurulent</option>
                                                            <option value="Saliva" @if($value['sample_quality'] =='Saliva') selected="selected" @endif >Saliva</option>
-                                                           <option value="Food particles" @if($value['sample_quality'] =='Food particles') selected="selected" @endif >Food particles</option>
+                                                           {{-- <option value="Food particles" @if($value['sample_quality'] =='Food particles') selected="selected" @endif >Food particles</option> --}}
                                                            <option value="other" @if($value['sample_quality'] =='other') selected="selected" @endif >Other</option>
                                                          </select>
 
@@ -525,7 +538,7 @@ border-color: #5cb85c;
             <!-- ============================================================== -->
             <!-- footer -->
             <!-- ============================================================== -->
-            <footer class="footer"> © Copyright Reserved 2017-2018, LIMS </footer>
+            <footer class="footer">  </footer>
             <!-- ============================================================== -->
             <!-- End footer -->
             <!-- ============================================================== -->
@@ -632,8 +645,9 @@ var alpha = ["A","B","C","D","E"];
             if(_noOfSample > 1)
             {
               $("#sampIDB").val('0');
-              $('#next_testB > option').removeAttr('selected');
-              document.getElementById('next_testB').selectedIndex = 8;
+              //$('#next_testB > option').removeAttr('selected');
+              document.getElementById('next_testB').selectedIndex = 0;
+              $('#next_testB').removeAttr('disabled');
               //$( "#next_testB option:selected" ).text('st');
                 
             }
@@ -654,6 +668,12 @@ var alpha = ["A","B","C","D","E"];
             });
 
             $('#other_sample_type').val('').trigger('change');
+
+            $('.other_sample_type').removeClass('hide');
+            $('.other_sample_type').hide();
+
+            
+            
             $('#others_typeA').val('');
 
         });
@@ -669,18 +689,28 @@ var alpha = ["A","B","C","D","E"];
         });
 
         $("#other_sample_type").change(function(){
+
             var _sample = $(this).find(":selected").val();
+            var _text = $(this).find(":selected").text();
+            //alert(_sample);
+            $('.ed_other_sample_type option:selected').val( _sample);
+            $('.ed_other_sample_type option:selected').text( _text);
+                //$(this).option
+
             if(_sample=='Others'){
               $("#othersA").removeClass("hide");
               $("#othersB").removeClass("hide");
               $("#othersC").removeClass("hide");
               $("#othersD").removeClass("hide");
+              $('.others').show();
               // document.getElementById("others_typeA").setAttribute("required","required");
             }else{
               $("#othersA").addClass("hide");
               $("#othersB").addClass("hide");
               $("#othersC").addClass("hide");
               $("#othersD").addClass("hide");
+              $('.others').val("");
+              $('.others').hide();
             }
 
             $('#others_typeA').val('');
@@ -690,6 +720,7 @@ var alpha = ["A","B","C","D","E"];
         $("#sample_typeA").change(function(){
             var _sample = $("#sample_typeA").val();
             if(_sample=='Other'){
+              $('.other_sample_type').show();
               $("#other_sample_typeA").removeClass("hide");
               $("#other_sample_typeB").removeClass("hide");
               $("#other_sample_typeC").removeClass("hide");
@@ -697,6 +728,9 @@ var alpha = ["A","B","C","D","E"];
               document.getElementById("other_sample_type").setAttribute("required","required");
             }else{
               $("#other_sample_typeA").addClass("hide");
+              
+              $('.other_sample_type').hide();
+
               $("#other_sample_typeB").addClass("hide");
               $("#other_sample_typeC").addClass("hide");
               $("#other_sample_typeD").addClass("hide");
@@ -739,9 +773,10 @@ var alpha = ["A","B","C","D","E"];
         $("#test_reasonA").change(function(){
             var _sample = $(this).val();
             var _noOfSample = $(this).val();
-            $(".sampleForm").each(function(i){
+            $('.fu_month').show();
+            /* $(".sampleForm").each(function(i){
               $(this).find(".test_reason").val(_sample);
-            })
+            }) */
 
         });
         $("#sample_qualityA").change(function(){
@@ -786,6 +821,7 @@ var alpha = ["A","B","C","D","E"];
               document.getElementById("fu_month_valueA").setAttribute("required","required");
 			  if(noOfSample>1){
 				  $("#fu_monthB").removeClass("hide");
+          //$('.followup-other').show();
 				  document.getElementById("fu_month_valueB").setAttribute("required","required");
 				  //$("#fu_monthC").removeClass("hide");
 				  //document.getElementById("fu_month_valueC").setAttribute("required","required");
@@ -846,7 +882,7 @@ var alpha = ["A","B","C","D","E"];
 		}
         $("#followup_otherA").change(function(){
             var _sample = $("#followup_otherA").val();
-            // alert(_sample);
+             alert(_sample);
 			var noOfSample=$("#noOfSample").val();
 			if(noOfSample>1){
               document.getElementById("followup_otherB").value = _sample;
@@ -871,7 +907,7 @@ var alpha = ["A","B","C","D","E"];
             var _sample = $("#sample_statusA").val();
             if(_sample=='Rejected'){
                 $('#sample_qualityA').val('').trigger('change');
-              $('#next_testA').append($("<option></option>").attr("value",24).text('BWM'));
+              $('#next_testA').append($("<option></option>").attr("value",24).text('BMW'));
               $("#rejectA").removeClass("hide");
               document.getElementById("test_reasonA").value = "";
               document.getElementById("sample_qualityA").value = "";
@@ -910,7 +946,7 @@ var alpha = ["A","B","C","D","E"];
           if(_sample=='Rejected'){
           $('#sample_qualityB').val('').trigger('change');
             $("#rejectB").removeClass("hide");
-            $('#next_testB').append($("<option></option>").attr("value",24).text('BWM'));
+            $('#next_testB').append($("<option></option>").attr("value",24).text('BMW'));
             document.getElementById("test_reasonB").value = "";
             document.getElementById("sample_qualityB").value = "";
             document.getElementById("test_reasonB").setAttribute("disabled","disabled");
@@ -947,7 +983,7 @@ var alpha = ["A","B","C","D","E"];
           var _sample = $(this).val();
           if(_sample=='Rejected'){
             $("#rejectC").removeClass("hide");
-            $('#next_testC').append($("<option></option>").attr("value",24).text('BWM'));
+            $('#next_testC').append($("<option></option>").attr("value",24).text('BMW'));
             document.getElementById("test_reasonC").value = "";
             document.getElementById("sample_qualityC").value = "";
             document.getElementById("test_reasonC").setAttribute("disabled","disabled");
@@ -988,7 +1024,7 @@ var alpha = ["A","B","C","D","E"];
           if(_sample=='Rejected'){
             $("#rejectD").removeClass("hide");
             document.getElementById("test_reasonD").value = "";
-            $('#next_testD').append($("<option></option>").attr("value",24).text('BWM'));
+            $('#next_testD').append($("<option></option>").attr("value",24).text('BMW'));
             document.getElementById("sample_qualityD").value = "";
             document.getElementById("test_reasonD").setAttribute("disabled","disabled");
             document.getElementById("next_testD").value = "24";
@@ -1098,7 +1134,7 @@ var alpha = ["A","B","C","D","E"];
           //==
 		  if(noOfSample>1){
 			  document.getElementById("test_reasonB").removeAttribute("disabled","disabled");
-			  document.getElementById("next_testB").removeAttribute("disabled","disabled");
+			  //document.getElementById("next_testB").removeAttribute("disabled","disabled");
 			  document.getElementById("sample_qualityB").removeAttribute("disabled","disabled");
 			  //document.getElementById("test_reasonC").removeAttribute("disabled","disabled");
 			  //document.getElementById("next_testC").removeAttribute("disabled","disabled");
@@ -1377,6 +1413,22 @@ $(document).ready(function(){
 		
 		$('.submit_date').val(this.value);
 	});
+});
+
+$('.fu_month_value').on('change', function() {
+  var others_val = $(this).find(":selected").val();
+  var others_text = $(this).find(":selected").text();
+
+  $('.fu_month_value option:selected').val( others_val);
+  $('.fu_month_value option:selected').text( others_text);
+            
+
+  if(others_val == 'Other')
+  {
+    $('.followup-other').show();
+  } else {
+    $('.followup-other').hide();
+  }
 });
 </script>
 @endsection

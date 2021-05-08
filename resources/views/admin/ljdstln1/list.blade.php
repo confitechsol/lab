@@ -93,7 +93,7 @@
                 </div>
 
             </div>
-            <footer class="footer"> © Copyright Reserved 2017-2018, LIMS </footer>
+            <footer class="footer">  </footer>
         </div>
 
         <div class="modal fade" id="myModal" role="dialog"  id="confirmDelete">

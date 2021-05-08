@@ -43,9 +43,9 @@
           <div class="row">
 
             <div class="col">
-            <label class="col-md-12">Reason for Edit: <span class="red">*</span></label>
+            <label class="col-md-12">Comments: <span class="red">*</span></label>
                <div class="col-md-12">
-                   <input type="text" name="reason_edit" class="form-control form-control-line"  id="reason_editljdst1" required >
+                   <input type="text" name="reason_edit" class="form-control form-control-line edit_reason_ljdst_1"  id="reason_editljdst1" required >
                </div>
             </div>
           </div>
@@ -73,7 +73,8 @@ $('#resultpopupDiv').on('show.bs.modal', function (e) {
    $(".drug_names_ljdst").each(function( index ) {
      var element = {
        name: $(this).find('[name="drugname[]"]').val(),
-       value:$(this).find('[name="drugvalue[]"]').val()
+       value:$(this).find('[name="drugvalue[]"]').val(),
+       ids:$(this).find('[name="ids[]"]').val()
      };
      drug_names_ljdst.push(element);
 
@@ -95,7 +96,7 @@ $('#resultpopupDiv').on('show.bs.modal', function (e) {
      },
      success: function(data){
        console.log(data)
-       if(data == true){
+       if(data == 1){
          window.location.reload(true);
        }
      },

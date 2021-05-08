@@ -95,7 +95,7 @@ class EditResultController extends Controller
     }
     public function edit_result_micro($sample)
     {
-        $microscopy = Microscopy::select('id','result')->where('sample_id',$sample)->first();
+        $microscopy = Microscopy::select('id','result', 'reason_edit')->where('sample_id',$sample)->first();
         $obj = Microscopy::find($microscopy->id);
         $obj->edit_microbiologist = $obj->edit_microbiologist+1;
         $obj->save();
@@ -113,7 +113,7 @@ class EditResultController extends Controller
     }
     public function edit_result_lc($sample)
     {
-        $lc=LCFlaggedMGITFurther::select('id','ict','culture_smear','bhi','species','other_result','result')->where('sample_id',$sample)->first();
+        $lc=LCFlaggedMGITFurther::select('id','ict','culture_smear','bhi','species','other_result','result', 'comments')->where('sample_id',$sample)->first();
         if($lc){
             $obj = LCFlaggedMGITFurther::find($lc->id);
             $obj->edit_microbiologist = $obj->edit_microbiologist+1;
@@ -123,7 +123,7 @@ class EditResultController extends Controller
     }
     public function edit_result_lj($sample)
     {
-        $lj = LJDetail::select('id','test_id','culture_smear','species','other_result','final_result')->where('sample_id',$sample)->first();
+        $lj = LJDetail::select('id','test_id','culture_smear','species','other_result','final_result', 'comments')->where('sample_id',$sample)->first();
         if($lj){
             $obj = LJDetail::find($lj->id);
             $obj->edit_microbiologist = $obj->edit_microbiologist+1;
@@ -131,16 +131,22 @@ class EditResultController extends Controller
         }
         return($lj);
     }
-    public function edit_result_lj_dst1($sample,$serviceid=0)
+    public function edit_result_lj_dst1($sample,$serviceid=0, $drug_list)
     {
 		//$logid=$serviceid==22?4:5; 
 		// ->where('service_log_id',$logid)
-        $ljdst1 = LjDstReading::select('id','drug_reading')
+
+        $drug_list_arr = explode(',', $drug_list);
+
+        //dd( $drug_list_arr );
+
+        $ljdst1 = LjDstReading::select('id','drug_reading', 'drug_name', 'comments')
 		          ->where('week_no',4)
 				  ->where('status',1)
-                  ->where('sample_id',$sample)				 
+                  ->where('sample_id',$sample)	
+                  ->whereIn('drug_name', $drug_list_arr)			 
 				  ->orderBy('id','desc')
-				  ->first();
+				  ->get();
 				 // ->toSql();
                   // select * from `t_lj_dst_reading`
         //dd($ljdst1);
@@ -167,7 +173,7 @@ class EditResultController extends Controller
              $obj = LCDST::find($lcdst->id);
             // $obj->edit_microbiologist = $obj->edit_microbiologist+1;
             // $obj->save();
-            $lcdstdata = LCDST::select('drug_name','result')->where('sample_id',$sample)->get();
+            $lcdstdata = LCDST::select('drug_name','result', 'comments')->where('sample_id',$sample)->get();
             LCDST::where('sample_id',$sample)->update(['edit_microbiologist' => $obj->edit_microbiologist+1]);
         }
 		//echo "<pre>"; print_r($lcdstdata); //die();
@@ -185,30 +191,30 @@ class EditResultController extends Controller
 			//dd($lpa);*/
 		if($tag=='1st line LPA')
 		{	
-        $lpa = FinalInterpretation::leftjoin('t_1stlinelpa as lpa1','lpa1.sample_id','t_lpa_final.sample_id')           
+       /*  $lpa = FinalInterpretation::leftjoin('t_1stlinelpa as lpa1','lpa1.sample_id','t_lpa_final.sample_id')           
             ->where('t_lpa_final.sample_id',$sample)
 			->where('t_lpa_final.tag',$tag)
-			->first();
-			//->get();
-			//->toSql();
-			//dd($lpa);
+			->first(); */
+
+            $lpa = FirstLineLpa::all()
+                    ->where('sample_id', $sample)
+                    ->where('tag', $tag)
+                    ->first();
+			
 		}	
 		if($tag=='2nd line LPA')
 		{	
-        $lpa = FinalInterpretation::leftjoin('t_2stlinelpa as lpa2','lpa2.sample_id','t_lpa_final.sample_id')
-            ->where('t_lpa_final.sample_id',$sample)
-			->where('t_lpa_final.tag',$tag)
-			->first();
-			//->get();
-			//->toSql();
-			//dd($lpa);	
+            $lpa = SecondLineLpa::all()
+            ->where('sample_id', $sample)
+            ->where('tag', $tag)
+            ->first();
         }		
         if($lpa){
-          $lpafinal = FinalInterpretation::select('id')->where('sample_id',$sample)->where('tag',$tag)->first();
+          /* $lpafinal = FinalInterpretation::select('id')->where('sample_id',$sample)->where('tag',$tag)->first();
          //dd($lpafinal);
 		  $obj = FinalInterpretation::find($lpafinal->id);
           $obj->edit_microbiologist = $obj->edit_microbiologist+1;
-          $obj->save();
+          $obj->save(); */
         }
         return ($lpa);
 		//echo json_encode($lpa);

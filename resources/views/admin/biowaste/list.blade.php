@@ -40,8 +40,7 @@
     <th rowspan="2">Unit of Measurement</th>
     <th colspan="4" style="text-align: center;">Quantity of Waste Generated</th>
     <th rowspan="2">Date of collection of disposal</th>
-    <th rowspan="2">Edit</th>
-    <th rowspan="2">Action</th>
+    <th rowspan="2">Edit</th>    
   </tr>
   <tr>
     <th class="yellow" style="background-color: #ffff00; color:#000;">Yellow</th>
@@ -66,10 +65,13 @@
 </tr> --}}
 </thead>
 <tbody>
-@foreach ($data['sample'] as $key=> $samples)
+  {{-- {{ dd($data['sample']) }}  --}}
+
+ @foreach ($data['sample'] as $key=> $samples)
 <tr>
 <td class="hide">{{$samples->id}}</td>
-<td>{{$samples->generated_date}}</td>
+<td class="hide">{{$samples->status}}</td>
+<td>{{date('d-m-Y', strtotime($samples->generated_date))}}</td>
 @if($samples->quantity!=null)
 <td>KG</td>
 @elseif($samples->packets==2)
@@ -117,12 +119,12 @@
 
 @if($samples->status==0)
 <button type="button" onclick="openCbnaatForm({{$samples->id}},{{ $quantity }},{{$packets}} ,{{$samples->yellow}},{{$samples->red}},{{$samples->white}},{{$samples->blue}},{{$c_date}})"  class="btn btn-info btn-sm resultbtn" >Edit</button>
-@elseif($samples->status==1)
+@else
 submitted
 @endif
 
 </td>
-<td>
+{{-- <td>
 @if(($samples->quantity!=null) ||  ($samples->packets!=null) )
   @if($samples->collected_date!=null  && $samples->status==0)
   <a href="{{ url('/bioWaste/'.$samples->id.'/edit') }}">Submit</a>
@@ -130,10 +132,9 @@ submitted
   submitted
   @elseif($samples->collected_date==null  && $samples->status==0)
   @endif
-@else
-  <!-- Enter the quantity in kg -->
+@else  
 @endif 
-</td>
+</td> --}}
 </tr>
 @endforeach
 </tbody>
@@ -147,7 +148,7 @@ submitted
 </div>
 
 </div>
-<footer class="footer"> © Copyright Reserved 2017-2018, LIMS </footer>
+<footer class="footer">  </footer>
 </div>
 
 <div class="modal fade" id="myModal" role="dialog"  id="confirmDelete">
@@ -243,7 +244,7 @@ submitted
 <div class="modal-footer">
 <!-- <button type="submit" class="btn btn-default" data-dismiss="modal">Save</button> -->
 <button type="button" class="btn btn-default add-button cancel btn-md" data-dismiss="modal">Cancel</button>
-<button type="submit" class="pull-right btn btn-primary btn-md" id="confirm">Ok</button>
+<button type="submit" class="pull-right btn btn-primary btn-md" id="confirm">Submit</button>
 </div>
 
 </form>
@@ -433,12 +434,17 @@ pageLength:25,
 buttons: [
 {
 extend: 'excelHtml5',
-title: 'LIMS_'+labname+'_'+labcity+'_BWM_'+today+'',
+title: 'LIMS_'+labname+'_'+labcity+'_BWM',
 exportOptions: {
-   columns: [  1, 2, 3,4,5,6,7 ]
+   columns: [  1, 2, 3,4,5,6 ]
 }
 }
-]
+],
+columnDefs: [
+    { orderable: false }
+  ],
+                    
+        "order": [[ 1, "asc" ], [ 2, "desc" ]],
 });
 } );
 </script>

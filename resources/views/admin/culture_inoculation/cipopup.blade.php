@@ -86,7 +86,7 @@
                  </div>
               </div>
           </div>
-          <div class="row">
+          <div class="row" style="display: none;">
             <div class="col">
             <label class="col-md-12">Microscopy Result</label>
             <div class="col-md-12">     

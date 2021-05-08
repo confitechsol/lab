@@ -33,24 +33,36 @@ class CultureInoculationController extends Controller
         $data = [];
           $year = Barcodes::distinct()->get(['year'])->last();
 
-          //DB::enableQueryLog();
+         // DB::enableQueryLog();
           $data['sample'] = ServiceLog::select('t_service_log.updated_at as ID','m.enroll_id','m.id as sample_id', 'm.receive_date as receive',
 		  'm.test_reason as reason','is_accepted','s.result','t_service_log.sample_label as samples','t_service_log.enroll_label as enroll_label',
 		  't_service_log.service_id','t_service_log.id as log_id', 't_service_log.status','m.no_of_samples','t.status as dna_status',
 		  't.created_at as date_of_extraction','t_service_log.mgit','t_service_log.tube_id_lj','t_service_log.tube_id_lc','ci.inoculation_date',
 		  't_service_log.tag', 't_service_log.tag as lpa_type','m.fu_month','t_service_log.enroll_id AS enrollID','t_service_log.sample_id AS sampleID',
-		  't_service_log.rec_flag')
-        ->leftjoin('sample as m','m.id','=','t_service_log.sample_id')
+		  't_service_log.rec_flag')  
+
+        ->leftjoin('sample as m', function ($join) {
+          $join->on('m.id','=','t_service_log.sample_id')
+          ->on('m.enroll_id', '=','t_service_log.enroll_id');          
+      })
+
         ->leftjoin('t_dnaextraction as t', function ($join) {
-              $join->on('t.sample_id','=','t_service_log.sample_id');
-			  $join->on('t.tag', '=','t_service_log.tag')			      
-                   ->where('t.status', 1);
+              $join->on('t.sample_id','=','t_service_log.sample_id')
+              ->on('t.enroll_id', '=','t_service_log.enroll_id')
+			        ->on('t.tag', '=','t_service_log.tag')			      
+              ->where('t.status', 1);
           })
+
         ->leftjoin('t_microscopy as s', function ($join) {
               $join->on('s.sample_id','=','t_service_log.sample_id')
+                    ->on('s.enroll_id', '=', 't_service_log.enroll_id')
                    ->where('s.status', 1);
           })
-        ->leftjoin('t_culture_inoculation as ci','ci.sample_id','=','t_service_log.sample_id')
+
+          ->leftjoin('t_culture_inoculation as ci', function ($join) {
+            $join->on('ci.sample_id','=','t_service_log.sample_id')
+                  ->on('ci.enroll_id', '=', 't_service_log.enroll_id');                 
+        })        
         ->where('t_service_log.service_id',16)
         ->whereIn('t_service_log.status',[1]) //        ->whereIn('t_service_log.status',[0,1,2])
         ->orderBy('enroll_id','desc')
@@ -166,9 +178,25 @@ class CultureInoculationController extends Controller
         //CultureInoculation::where('enroll_id',$logdata->enroll_id)->delete();
         /* End */
        //DB::enableQueryLog();
+        $s_tag = "";
+
+       if( $request->service_id == 1 ){
+
+         $s_tag = 'LC';
+
+       } elseif( $request->service_id == 2 )
+       {
+          $s_tag = 'LJ';
+
+       } elseif( $request->service_id == 3 )
+      {
+          $s_tag = 'LC & LJ Both';
+      }
+
       $data = CultureInoculation::create([
         'sample_id' => $logdata->sample_id,
         'enroll_id' => $logdata->enroll_id,
+        'tag'       => $s_tag,
         'mgit_id' => $request->mgit_id,
         'tube_id_lj' => $request->tube_id_lj,
         'tube_id_lc' => $request->tube_id_lc,

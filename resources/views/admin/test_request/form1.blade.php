@@ -142,6 +142,16 @@
 <h6>Name and type of referring facility</h6>
 <input type="hidden" name="_token" value="{{ csrf_token() }}">
 <input type="hidden" name="enroll_id" value="{{$data['enroll_id']}}">
+<input type="hidden" name="sample_id" value="{{$data['sample_id']}}">
+<input type="hidden" name="enroll_label" value="{{$data['enroll_label']}}">
+<input type="hidden" name="lab_code" value="{{$data['lab_code']}}">
+<input type="hidden" name="nikshay_id" value="{{$data['nikshay_id']}}">
+<input type="hidden" name="state_name" id="state_name3" value="">
+<input type="hidden" name="district_name" id="district_name3" value="">
+<input type="hidden" name="tbu_name" id="tbu_name3" value="">
+<input type="hidden" name="facility_name" id="facility_name3" value="">
+
+
 <div class="row">
 <div class="col ">
 <label class="col-sm-12">Facility Type <span class="red">*</span> </label>
@@ -185,7 +195,7 @@ selected
 <div class="col ">
 <label class="col-sm-12">State  <span class="red">*</span> </label>
 <div class="col-sm-12">
-<select class="form-control form-control-line" name="state" id="state3" required>
+<select class="form-control form-control-line state" name="state" id="state3" required>
 <option value="">--Select--</option>
 @foreach ($data['state'] as $key=> $state)
 <option
@@ -206,7 +216,7 @@ selected
 <div class="col ">
 <label class="col-sm-12">District  <span class="red">*</span>  </label>
 <div class="col-sm-12">
-<select class="form-control form-control-line" name="district" id="district3" required>
+<select class="form-control form-control-line district" name="district" id="district3" required>
 <option value="">--Select--</option>
 @foreach ($data['district'] as $key=> $district)
 <option
@@ -225,7 +235,7 @@ selected
 <div class="col ">
 <label class="col-sm-12">TBU  <span class="red">*</span> </label>
 <div class="col-sm-12">
-<select class="form-control form-control-line" name="tbu" id="tbu3"required>
+<select class="form-control form-control-line tbu" name="tbu" id="tbu3"required>
 
 <option value="">--Select--</option>
 @foreach ($data['tbunit'] as $key=> $tbunit)
@@ -247,7 +257,7 @@ selected
 <div class="col ">
 <label class="col-sm-12">Name of Facility  <span class="red">*</span></label>
 <div class="col-sm-12">
-<select class="form-control form-control-line" name="facility_id" id="facility_id3"required>
+<select class="form-control form-control-line facility_id" name="facility_id" id="facility_id3"required>
 <option value="">--Select--</option>
 @foreach ($data['facility'] as $key=> $facility)
 <option
@@ -380,7 +390,7 @@ selected
           if($data['testrequestservices']->visual_appearance_sputum == 'Blood Stained'){
             echo "selected";
           }
-        }*/ echo $data['sample_quality']=="Blood Stained"?"selected":""; ?>>Blood Stained</option>
+        }*/ echo $data['sample_quality']=="Blood-stained"?"selected":""; ?>>Blood-stained</option>
           <option value="Saliva" <?php /*if(!empty($data['testrequestservices']->visual_appearance_sputum)){
             if($data['testrequestservices']->visual_appearance_sputum == 'Saliva'){
               echo "selected";
@@ -562,6 +572,14 @@ selected
 <h6>Name and type of referring facility</h6>
 <input type="hidden" name="_token" value="{{ csrf_token() }}">
 <input type="hidden" name="enroll_id" value="{{$data['enroll_id']}}">
+<input type="hidden" name="sample_id" value="{{$data['sample_id']}}">
+<input type="hidden" name="enroll_label" value="{{$data['enroll_label']}}">
+<input type="hidden" name="lab_code" value="{{$data['lab_code']}}">
+<input type="hidden" name="nikshay_id" value="{{$data['nikshay_id']}}">
+<input type="hidden" name="state_name" id="state_name2" value="">
+<input type="hidden" name="tbu_name" id="tbu_name2" value="">
+<input type="hidden" name="district_name" id="district_name2" value="">
+<input type="hidden" name="facility_name" id="facility_name2" value="">
 <div class="row">
 <div class="col ">
 <label class="col-sm-12">Facility Type <span class="red">*</span></label>
@@ -604,7 +622,7 @@ selected
 <div class="col ">
 <label class="col-sm-12">State <span class="red">*</span></label>
 <div class="col-sm-12">
-<select class="form-control form-control-line" name="state" id="state2" required>
+<select class="form-control form-control-line state" name="state" id="state2" required>
 <option value="">--Select--</option>
 @foreach ($data['state'] as $key=> $state)
 <option
@@ -625,7 +643,7 @@ selected
 <div class="col ">
 <label class="col-sm-12">District <span class="red">*</span></label>
 <div class="col-sm-12">
-<select class="form-control form-control-line" name="district" id="district2" required>
+<select class="form-control form-control-line district" name="district" id="district2" required>
 <option value="">--Select--</option>
 @foreach ($data['district'] as $key=> $district)
 <option
@@ -644,7 +662,7 @@ selected
 <div class="col ">
 <label class="col-sm-12">TBU <span class="red">*</span></label>
 <div class="col-sm-12">
-<select class="form-control form-control-line" name="tbu" id="tbu2"required>
+<select class="form-control form-control-line tbu" name="tbu" id="tbu2"required>
 
 <option value="">--Select--</option>
 @foreach ($data['tbunit'] as $key=> $tbunit)
@@ -667,7 +685,7 @@ selected
 <div class="col ">
 <label class="col-sm-12">Name of Facility <span class="red">*</span></label>
 <div class="col-sm-12">
-<select class="form-control form-control-line" name="facility_id" id="facility_id2"required>
+<select class="form-control form-control-line facility_id" name="facility_id" id="facility_id2"required>
 <option value="">--Select--</option>
 @foreach ($data['facility'] as $key=> $facility)
 <option
@@ -752,7 +770,7 @@ selected
           if($data['testrequestservices']->visual_appearance_sputum == 'Blood Stained'){
             echo "selected";
           }
-        }*/ echo $data['sample_quality']=="Saliva"?"selected":"";  echo $data['sample_quality']=="Blood Stained"?"selected":""; ?>>Blood Stained</option>
+        }*/ echo $data['sample_quality']=="Saliva"?"selected":"";  echo $data['sample_quality']=="Blood-stained"?"selected":""; ?>>Blood-stained</option>
           <option value="Saliva" <?php /*if(!empty($data['testrequestservices']->visual_appearance_sputum)){
             if($data['testrequestservices']->visual_appearance_sputum == 'Saliva'){
               echo "selected";
@@ -974,6 +992,14 @@ selected
 <h6>Name and type of referring facility</h6>
 <input type="hidden" name="_token" value="{{ csrf_token() }}">
 <input type="hidden" name="enroll_id" value="{{$data['enroll_id']}}">
+<input type="hidden" name="sample_id" value="{{$data['sample_id']}}">
+<input type="hidden" name="enroll_label" value="{{$data['enroll_label']}}">
+<input type="hidden" name="lab_code" value="{{$data['lab_code']}}">
+<input type="hidden" name="nikshay_id" value="{{$data['nikshay_id']}}">
+<input type="hidden" name="state_name" id="state_name" value="">
+<input type="hidden" name="district_name" id="district_name" value="">
+<input type="hidden" name="tbu_name" id="tbu_name" value="">
+<input type="hidden" name="facility_name" id="facility_name" value="">
 <div class="row">
 <div class="col ">
 <label class="col-sm-12">Facility Type  <span class="red">*</span> </label>
@@ -1015,7 +1041,7 @@ selected
 <div class="col ">
 <label class="col-sm-12">State  <span class="red">*</span> </label>
 <div class="col-sm-12">
-<select class="form-control form-control-line" name="state" id="state" required>
+<select class="form-control form-control-line state" name="state" id="state" required>
 <option value="">--Select--</option>
 @foreach ($data['state'] as $key=> $state)
 <option
@@ -1036,7 +1062,7 @@ selected
 <div class="col ">
 <label class="col-sm-12">District  <span class="red">*</span> </label>
 <div class="col-sm-12">
-<select class="form-control form-control-line" name="district" id="district" required>
+<select class="form-control form-control-line district" name="district" id="district" required>
 <option value="">--Select--</option>
 @foreach ($data['district'] as $key=> $district)
 <option
@@ -1055,7 +1081,7 @@ selected
 <div class="col ">
 <label class="col-sm-12">TBU  <span class="red">*</span></label>
 <div class="col-sm-12">
-<select class="form-control form-control-line" name="tbu" id="tbu" required>
+<select class="form-control form-control-line tbu" name="tbu" id="tbu" required>
 
 <option value="">--Select--</option>
 @foreach ($data['tbunit'] as $key=> $tbunit)
@@ -1078,7 +1104,7 @@ selected
 <div class="col ">
 <label class="col-sm-12">Name of Facility  <span class="red">*</span></label>
 <div class="col-sm-12">
-<select class="form-control form-control-line" id="facility_id" name="facility_id"required>
+<select class="form-control form-control-line facility_id" id="facility_id" name="facility_id"required>
 <option value="">--Select--</option>
 @foreach ($data['facility'] as $key=> $facility)
 <option
@@ -1310,6 +1336,15 @@ selected
 <h6>Name and type of referring facility</h6>
 <input type="hidden" name="_token" value="{{ csrf_token() }}">
 <input type="hidden" name="enroll_id" value="{{$data['enroll_id']}}">
+<input type="hidden" name="sample_id" value="{{$data['sample_id']}}">
+<input type="hidden" name="enroll_label" value="{{$data['enroll_label']}}">
+<input type="hidden" name="lab_code" value="{{$data['lab_code']}}">
+<input type="hidden" name="nikshay_id" value="{{$data['nikshay_id']}}">
+<input type="hidden" name="state_name" id="state_name4" value="">
+<input type="hidden" name="district_name" id="district_name4" value="">
+<input type="hidden" name="tbu_name" id="tbu_name4" value="">
+<input type="hidden" name="facility_name" id="facility_name4" value="">
+
 <div class="row">
 <div class="col ">
 <label class="col-sm-12">Facility Type <span class="red">*</span></label>
@@ -1351,7 +1386,7 @@ selected
 <div class="col ">
 <label class="col-sm-12">State <span class="red">*</span></label>
 <div class="col-sm-12">
-<select class="form-control form-control-line" name="state" id="state4" required>
+<select class="form-control form-control-line state" name="state" id="state4" required>
 <option value="">--Select--</option>
 @foreach ($data['state'] as $key=> $state)
 <option
@@ -1372,7 +1407,7 @@ selected
 <div class="col ">
 <label class="col-sm-12">District <span class="red">*</span></label>
 <div class="col-sm-12">
-<select class="form-control form-control-line" name="district" id="district4" required>
+<select class="form-control form-control-line district" name="district" id="district4" required>
 <option value="">--Select--</option>
 @foreach ($data['district'] as $key=> $district)
 <option
@@ -1391,7 +1426,7 @@ selected
 <div class="col ">
 <label class="col-sm-12">TBU <span class="red">*</span></label>
 <div class="col-sm-12">
-<select class="form-control form-control-line" name="tbu" id="tbu4"required>
+<select class="form-control form-control-line tbu" name="tbu" id="tbu4"required>
 
 <option value="">--Select--</option>
 @foreach ($data['tbunit'] as $key=> $tbunit)
@@ -1413,7 +1448,7 @@ selected
 <div class="col ">
 <label class="col-sm-12">Name of Facility <span class="red">*</span></label>
 <div class="col-sm-12">
-<select class="form-control form-control-line" name="facility_id" id="facility_id4"required>
+<select class="form-control form-control-line facility_id" name="facility_id" id="facility_id4"required>
 <option value="">--Select--</option>
 @foreach ($data['facility'] as $key=> $facility)
 <option
@@ -1692,7 +1727,7 @@ selected
 <!-- ============================================================== -->
 <!-- footer -->
 <!-- ============================================================== -->
-<footer class="footer"> © Copyright Reserved 2017-2018, LIMS </footer>
+<footer class="footer">  </footer>
 <!-- ============================================================== -->
 <!-- End footer -->
 <!-- ============================================================== -->
@@ -1991,9 +2026,18 @@ $(".dst_drugs_lj").hide();
 
 $('.service_array').each(function () {
 	if(this.checked){ //alert($(this).val());
-		if($(this).val()==21||$(this).val()==22){
+		if($(this).val()==21)
+		{
 			$(".dst_drugs_lc").show();
+            $(".dst_drugs_lj").hide();
+			$('.seperator').hide();
+
+		} else if($(this).val()==22)
+		{
+			$(".dst_drugs_lc").hide();
             $(".dst_drugs_lj").show();
+			$('.seperator').hide();			
+			
 		}else{
 			//Tab click hide
 				$('a[data-toggle=tab]').click(function(){
@@ -2065,7 +2109,10 @@ document.getElementById("other_post_treatment").removeAttribute("required",false
 });
 
 $("#state").change( function() {
+
 var state = $(this).val();
+
+$('#state_name').val( $.trim( $('#state option:selected').text() ) );
 
 $.ajax({
 url: "{{url('district')}}"+'/'+state,
@@ -2095,7 +2142,8 @@ console.log("err")
 });
 $("#district3").change( function() {
 var district = $(this).val();
-var state = $('#state3').val();"facility_type"
+$('#district_name3').val($('#district3 option:selected').text());
+var state = $('#state3').val();/* "facility_type" */
 // $.ajax({
 //     url: "{{url('phi')}}"+'/'+state+'/'+district,
 //     type:"GET",
@@ -2151,6 +2199,7 @@ console.log("err")
 
 $("#tbu3").change( function() {
 var tbu = $(this).val();
+$('#tbu_name3').val($('#tbu3 option:selected').text());
 var state = $('#state3').val();
 var district = $('#district3').val();
 
@@ -2183,8 +2232,17 @@ console.log("err")
 });
 });
 
+$('#facility_id3').on('change', function() {
+
+	$('#facility_name3').val( $('#facility_id3 option:selected').text() );
+});
+
 $("#district").change( function() {
+
 var district = $(this).val();
+
+$('#district_name').val( $('#district option:selected').text() );
+
 var state = $('#state').val();
 // $.ajax({
 //     url: "{{url('phi')}}"+'/'+state+'/'+district,
@@ -2239,8 +2297,18 @@ console.log("err")
 });
 });
 
+$('#facility_id').on('change', function() {
+
+	$('#facility_name').val( $('#facility_id option:selected').text() );
+
+});
+
 $("#tbu").change( function() {
+
 var tbu = $(this).val();
+
+$('#tbu_name').val( $('#tbu option:selected').text() );
+
 var state = $('#state').val();
 var district = $('#district').val();
 //alert(district,state);
@@ -2273,7 +2341,11 @@ console.log("err")
 });
 
 $("#district4").change( function() {
+
 var district = $(this).val();
+
+$('#district_name4').val( $('#district4 option:selected').text() );
+
 var state = $('#state4').val();
 // $.ajax({
 //     url: "{{url('phi')}}"+'/'+state+'/'+district,
@@ -2328,8 +2400,18 @@ console.log("err")
 });
 });
 
+$('#facility_id4').on('change', function() {
+
+	$('#facility_name4').val( $('#facility_id4 option:selected').text() );
+
+});
+
 $("#tbu4").change( function() {
+
 var tbu = $(this).val();
+
+$('#tbu_name4').val( $('#tbu4 option:selected').text() );
+
 var state = $('#state4').val();
 var district = $('#district4').val();
 
@@ -2364,7 +2446,11 @@ console.log("err")
 
 
 $("#district2").change( function() {
+
 var district = $(this).val();
+
+$('#district_name2').val( $('#district2 option:selected').text() );
+
 var state = $('#state2').val();
 // $.ajax({
 //     url: "{{url('phi')}}"+'/'+state+'/'+district,
@@ -2419,9 +2505,18 @@ console.log("err")
 });
 });
 
+$('#facility_id2').on('change', function() {
+
+	$('#facility_name2').val( $('#facility_id2 option:selected').text() );
+
+});
+
 
 $("#tbu2").change( function() {
 var tbu = $(this).val();
+
+$('#tbu_name2').val( $('#tbu2 option:selected').text() );
+
 var state = $('#state2').val();
 var district = $('#district2').val();
 //alert(district,state);
@@ -2455,7 +2550,10 @@ console.log("err")
 
 
 $("#state4").change( function() {
+
 var state = $(this).val();
+
+$('#state_name4').val( $.trim( $('#state4 option:selected').text() ) );
 
 $.ajax({
 url: "{{url('district')}}"+'/'+state,
@@ -2484,7 +2582,10 @@ console.log("err")
 });
 });
 $("#state2").change( function() {
+
 var state = $(this).val();
+
+$('#state_name2').val( $.trim($('#state2 option:selected').text()) );
 
 $.ajax({
 url: "{{url('district')}}"+'/'+state,
@@ -2513,7 +2614,10 @@ console.log("err")
 });
 });
 $("#state3").change( function() {
+
 var state = $(this).val();
+
+$('#state_name3').val( $.trim( $('#state3 option:selected').text() ) );
 
 $.ajax({
 url: "{{url('district')}}"+'/'+state,
@@ -2540,6 +2644,7 @@ error: function() {
 console.log("err")
 }
 });
+
 });
 
 });
@@ -2743,6 +2848,59 @@ $(document).ready(function(){
     sample_type_fields1();
     $("#specimen_type_test1").change(sample_type_fields1);
 
+	/* updated on 29-03-2021 */
+
+	$('.facility_type').prop('selectedIndex', '1');
+
+	$.ajax({
+			url: "{{url('get_dis_tu_st_fac')}}",
+			type:"GET",
+			processData: false,
+			contentType: false,
+			dataType : "json",
+			success: function(data) {
+				console.log(data.get_state_data.name);
+				$('.state').val(data.get_state_data.STOCode);
+				$('#state_name').val(data.get_state_data.name);
+				$('#state_name2').val(data.get_state_data.name);
+				$('#state_name3').val(data.get_state_data.name);
+				$('#state_name4').val(data.get_state_data.name);
+
+				$('.district').append(new Option(data.get_district_data.name, data.get_district_data.DTOCode)); 
+				$('.district').val(data.get_district_data.DTOCode);
+
+				$('#district_name').val(data.get_district_data.name);
+				$('#district_name2').val(data.get_district_data.name);
+				$('#district_name3').val(data.get_district_data.name);
+				$('#district_name4').val(data.get_district_data.name);
+
+				$('.tbu').append(new Option(data.get_tub_data.TBUnitName, data.get_tub_data.TBUnitCode)); 
+				$('.tbu').val(data.get_tub_data.TBUnitCode);
+
+				$('#tbu_name').val(data.get_tub_data.TBUnitName);
+				$('#tbu_name2').val(data.get_tub_data.TBUnitName);
+				$('#tbu_name3').val(data.get_tub_data.TBUnitName);
+				$('#tbu_name4').val(data.get_tub_data.TBUnitName);
+
+				$('.facility_id').append(new Option(data.dmcs_phi_relation.DMC_PHI_Name, data.dmcs_phi_relation.id)); 
+				$('.facility_id').val(data.dmcs_phi_relation.id);
+
+				$('#facility_name').val(data.dmcs_phi_relation.DMC_PHI_Name);
+				$('#facility_name2').val(data.dmcs_phi_relation.DMC_PHI_Name);
+				$('#facility_name3').val(data.dmcs_phi_relation.DMC_PHI_Name);
+				$('#facility_name4').val(data.dmcs_phi_relation.DMC_PHI_Name);
+
+
+				},
+				error: function() {
+				console.log("err")
+			}
+			});
+
+
+
 });
+
+
 </script>
 @endsection

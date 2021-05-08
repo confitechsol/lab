@@ -10,6 +10,8 @@ use App\Model\Hybridization;
 use App\Model\DNAextraction;
 use App\Model\Pcr;
 use App\Model\Service;
+use App\Model\FirstLineLpa;
+use App\Model\SecondLineLpa;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
@@ -25,16 +27,19 @@ class HybridizationController extends Controller
     {
       try{
         $data = [];
-          $data['sample'] = ServiceLog::select('t_service_log.updated_at as ID','m.enroll_id','m.id as sample_id',
+          /* $data['sample'] = ServiceLog::select('t_service_log.updated_at as ID','m.enroll_id','m.id as sample_id',
                   'm.receive_date as receive','m.test_reason as reason','is_accepted','s.result',
                   't_service_log.sample_label as samples','t_service_log.service_id','t_service_log.id as log_id',
                    't_service_log.status','m.no_of_samples','t.status as dna_status','t.created_at as date_of_extraction',
                    'p.completed as pcr_completed','t_service_log.tag','d.test_date as decontamination_date','t_service_log.status as STATUS','t_service_log.sample_id','t_service_log.service_id','t_service_log.rec_flag')
         ->leftjoin('sample as m','m.id','=','t_service_log.sample_id')
-        ->leftjoin('t_dnaextraction as t', function ($join) {
-              $join->on('t.sample_id','=','t_service_log.sample_id')
-                   ->where('t.status', 1);
-          })
+
+        ->leftjoin('t_1stlinelpa as t', function ($join) {
+          $join->on('t.sample_id','=','t_service_log.sample_id')
+                ->on('t.enroll_id', '=', 't_service_log.enroll_id')
+              ->where('t.status', 1);
+      })
+      
         ->leftjoin('t_decontamination as d', function ($join) {
               $join->on('d.sample_id','=','t_service_log.sample_id')
                    ->where('d.status', 1);
@@ -62,7 +67,7 @@ class HybridizationController extends Controller
           }else{
             $value->lpa_type = "NA";
           }
-        }
+        } */
 		//dd($data['sample']);
 		//dd($data['sample'][1]['no_sample']);
         $data['services'] = ["Valid","Invalid","Repeat DNA Extraction from same sample","Repeat DNA Extraction from standby sample", "Repeat Hybridization from same DNA extract"];
@@ -71,6 +76,334 @@ class HybridizationController extends Controller
           $error = $e->getMessage();
           return view('admin.layout.error',$error);   // insert query
       }
+    }
+
+
+    public function lpaMethod_count($searchValue, $req_tag)
+    {
+
+      $data = [];
+      $tags = []; 
+      $table_name = "";    
+      
+      if( $req_tag == '1st line LPA' )
+      {
+        $tags = array('LPA1', 'LPA 1st Line', '1st line LPA');
+        $table_name = 't_1stlinelpa';
+
+      } elseif( $req_tag == '2nd line LPA' )
+      {
+        $tags = array('LPA2', 'LPA 2nd Line', '2nd line LPA');
+        $table_name = 't_2stlinelpa';
+
+      } 
+            
+            if(  $searchValue != "" )
+            {
+              $data = ServiceLog::select('t_service_log.updated_at as ID','m.enroll_id','m.id as sample_id',
+              'm.receive_date as receive','m.test_reason as reason','is_accepted','s.result',
+              't_service_log.sample_label as samples','t_service_log.service_id','t_service_log.id as log_id',
+               't_service_log.status','m.no_of_samples','t.status as dna_status','t.created_at as date_of_extraction',
+               'p.completed as pcr_completed','t_service_log.tag','d.test_date as decontamination_date','t_service_log.status as STATUS','t_service_log.sample_id','t_service_log.service_id','t_service_log.rec_flag')
+                ->leftjoin('sample as m','m.id','=','t_service_log.sample_id')
+
+                ->leftjoin($table_name.' as t', function ($join) {
+                  $join->on('t.sample_id','=','t_service_log.sample_id')
+                        ->on('t.enroll_id', '=', 't_service_log.enroll_id')
+                      ->where('t.status', 1);
+              })
+              /*  ->leftjoin('t_dnaextraction as t', function ($join) {
+                      $join->on('t.sample_id','=','t_service_log.sample_id')
+                          ->where('t.status', 1);
+                  }) */
+                ->leftjoin('t_decontamination as d', function ($join) {
+                      $join->on('d.sample_id','=','t_service_log.sample_id')
+                          ->where('d.status', 1);
+                  })
+                ->leftjoin('t_pcr as p','p.sample_id','=','t_service_log.sample_id')
+                ->leftjoin('t_microscopy as s','s.sample_id','=','t_service_log.sample_id')
+                ->where('t_service_log.service_id',14)
+                ->whereIn('t_service_log.status',[1]) //  ->whereIn('t_service_log.status',[0,1,2])
+                ->whereIn('t_service_log.tag', $tags)
+                ->Where('t_service_log.enroll_label', 'LIKE', '%'.$searchValue.'%')
+                ->orWhere('t_service_log.sample_label', 'LIKE', '%'.$searchValue.'%')
+                ->orderBy('enroll_id','desc')
+                ->groupBy('log_id') // made changes for multiple records displaying in Hybridisation
+                ->groupBy('samples')                
+                ->get();
+
+            } else {
+
+              $data = ServiceLog::select('t_service_log.updated_at as ID','m.enroll_id','m.id as sample_id',
+              'm.receive_date as receive','m.test_reason as reason','is_accepted','s.result',
+              't_service_log.sample_label as samples','t_service_log.service_id','t_service_log.id as log_id',
+               't_service_log.status','m.no_of_samples','t.status as dna_status','t.created_at as date_of_extraction',
+               'p.completed as pcr_completed','t_service_log.tag','d.test_date as decontamination_date','t_service_log.status as STATUS','t_service_log.sample_id','t_service_log.service_id','t_service_log.rec_flag')
+                ->leftjoin('sample as m','m.id','=','t_service_log.sample_id')
+
+                ->leftjoin($table_name.' as t', function ($join) {
+                  $join->on('t.sample_id','=','t_service_log.sample_id')
+                        ->on('t.enroll_id', '=', 't_service_log.enroll_id')
+                      ->where('t.status', 1);
+              })
+              /*  ->leftjoin('t_dnaextraction as t', function ($join) {
+                      $join->on('t.sample_id','=','t_service_log.sample_id')
+                          ->where('t.status', 1);
+                  }) */
+                ->leftjoin('t_decontamination as d', function ($join) {
+                      $join->on('d.sample_id','=','t_service_log.sample_id')
+                          ->where('d.status', 1);
+                  })
+                ->leftjoin('t_pcr as p','p.sample_id','=','t_service_log.sample_id')
+                ->leftjoin('t_microscopy as s','s.sample_id','=','t_service_log.sample_id')
+                ->where('t_service_log.service_id',14)
+                ->whereIn('t_service_log.status',[1]) //  ->whereIn('t_service_log.status',[0,1,2])
+                ->whereIn('t_service_log.tag', $tags)                
+                ->orderBy('enroll_id','desc')
+                ->groupBy('log_id') // made changes for multiple records displaying in Hybridisation
+                ->groupBy('samples')                
+                ->get();
+        }
+
+        $response = array('rec_count' => count($data));
+        return $response;
+
+    }
+
+    public function lpaMethod($searchValue, $row, $rowperpage, $req_tag)
+    {
+
+      $data = [];
+      $tags = []; 
+      $table_name = "";    
+      
+      if( $req_tag == '1st line LPA' )
+      {
+        $tags = array('LPA1', 'LPA 1st Line', '1st line LPA');
+        $table_name = 't_1stlinelpa';
+
+      } elseif( $req_tag == '2nd line LPA' )
+      {
+        $tags = array('LPA2', 'LPA 2nd Line', '2nd line LPA');
+        $table_name = 't_2stlinelpa';
+
+      } 
+            
+            if(  $searchValue != "" )
+            {
+              $data = ServiceLog::select('t_service_log.updated_at as ID','m.enroll_id','m.id as sample_id',
+              'm.receive_date as receive','m.test_reason as reason','is_accepted','s.result',
+              't_service_log.sample_label as samples','t_service_log.service_id','t_service_log.id as log_id',
+               't_service_log.status','m.no_of_samples','t.status as dna_status','t.created_at as date_of_extraction',
+               'p.completed as pcr_completed','t_service_log.tag','d.test_date as decontamination_date','t_service_log.status as STATUS','t_service_log.sample_id','t_service_log.service_id','t_service_log.rec_flag')
+                ->leftjoin('sample as m','m.id','=','t_service_log.sample_id')
+
+                ->leftjoin($table_name.' as t', function ($join) {
+                  $join->on('t.sample_id','=','t_service_log.sample_id')
+                        ->on('t.enroll_id', '=', 't_service_log.enroll_id')
+                      ->where('t.status', 1);
+              })
+              /*  ->leftjoin('t_dnaextraction as t', function ($join) {
+                      $join->on('t.sample_id','=','t_service_log.sample_id')
+                          ->where('t.status', 1);
+                  }) */
+                ->leftjoin('t_decontamination as d', function ($join) {
+                      $join->on('d.sample_id','=','t_service_log.sample_id')
+                          ->where('d.status', 1);
+                  })
+                ->leftjoin('t_pcr as p','p.sample_id','=','t_service_log.sample_id')
+                ->leftjoin('t_microscopy as s','s.sample_id','=','t_service_log.sample_id')
+                ->where('t_service_log.service_id',14)
+                ->whereIn('t_service_log.status',[1]) //  ->whereIn('t_service_log.status',[0,1,2])
+                ->whereIn('t_service_log.tag', $tags)
+                ->Where('t_service_log.enroll_label', 'LIKE', '%'.$searchValue.'%')
+                ->orWhere('t_service_log.sample_label', 'LIKE', '%'.$searchValue.'%')
+                ->orderBy('enroll_id','desc')
+                ->groupBy('log_id') // made changes for multiple records displaying in Hybridisation
+                ->groupBy('samples')
+                ->skip($row)
+                ->take($rowperpage)
+                ->get();
+
+            } else {
+
+              $data = ServiceLog::select('t_service_log.updated_at as ID','m.enroll_id','m.id as sample_id',
+              'm.receive_date as receive','m.test_reason as reason','is_accepted','s.result',
+              't_service_log.sample_label as samples','t_service_log.service_id','t_service_log.id as log_id',
+               't_service_log.status','m.no_of_samples','t.status as dna_status','t.created_at as date_of_extraction',
+               'p.completed as pcr_completed','t_service_log.tag','d.test_date as decontamination_date','t_service_log.status as STATUS','t_service_log.sample_id','t_service_log.service_id','t_service_log.rec_flag')
+                ->leftjoin('sample as m','m.id','=','t_service_log.sample_id')
+
+                ->leftjoin($table_name.' as t', function ($join) {
+                  $join->on('t.sample_id','=','t_service_log.sample_id')
+                        ->on('t.enroll_id', '=', 't_service_log.enroll_id')
+                      ->where('t.status', 1);
+              })
+              /*  ->leftjoin('t_dnaextraction as t', function ($join) {
+                      $join->on('t.sample_id','=','t_service_log.sample_id')
+                          ->where('t.status', 1);
+                  }) */
+                ->leftjoin('t_decontamination as d', function ($join) {
+                      $join->on('d.sample_id','=','t_service_log.sample_id')
+                          ->where('d.status', 1);
+                  })
+                ->leftjoin('t_pcr as p','p.sample_id','=','t_service_log.sample_id')
+                ->leftjoin('t_microscopy as s','s.sample_id','=','t_service_log.sample_id')
+                ->where('t_service_log.service_id',14)
+                ->whereIn('t_service_log.status',[1]) //  ->whereIn('t_service_log.status',[0,1,2])
+                ->whereIn('t_service_log.tag', $tags)                
+                ->orderBy('enroll_id','desc')
+                ->groupBy('log_id') // made changes for multiple records displaying in Hybridisation
+                ->groupBy('samples')
+                ->skip($row)
+                ->take($rowperpage)
+                ->get();
+        } 
+        
+        $response = array('data' => $data);
+
+      return $response;
+
+    }
+
+
+    public function ajaxHybridizationList(Request $request)
+    {
+      $searchValue = "";
+
+      $draw = $_POST['draw'];
+      $row = $_POST['start'];
+      $rowperpage = $_POST['length']; // Rows display per page
+      $columnIndex = $_POST['order'][0]['column']; // Column index
+      $columnName = $_POST['columns'][$columnIndex]['data']; // Column name
+      $columnSortOrder = $_POST['order'][0]['dir']; // asc or desc
+      $searchValue = $_POST['search']['value']; // Search value 
+
+      //dd($searchValue);
+
+      $lpa1stline = 0;
+      $lpa2stline = 0;
+      $lpa1st2stline = 0;
+      $lpa1sor2ndtline = 0;
+      $count = 0;
+
+      $req_tag = $request->tag;      
+
+      $data[] = array();   
+      
+      if($req_tag == '1st line LPA')
+       {
+           $result = $this->lpaMethod($searchValue, $row, $rowperpage, $req_tag);           
+           $data['sample'] = $result['data'];          
+
+       } elseif( $req_tag == '2nd line LPA' ) {
+
+         $result = $this->lpaMethod($searchValue, $row, $rowperpage, $req_tag);
+         $data['sample'] = $result['data'];         
+
+       }
+
+        $result_count_1st = $this->lpaMethod_count($searchValue, '1st line LPA');
+        $lpa1stline =  $result_count_1st['rec_count'];
+        $count = $lpa1stline;  
+        
+        $result_count_1st = $this->lpaMethod_count($searchValue, '2nd line LPA');
+        $lpa2stline =  $result_count_1st['rec_count'];
+        $count = $lpa2stline;
+
+        if($req_tag == '1st line LPA')
+        {
+
+        $result_count_1st = $this->lpaMethod_count($searchValue, '1st line LPA');
+        $count =  $result_count_1st['rec_count'];        
+
+        } elseif( $req_tag == '2nd line LPA' ) {
+
+        $result_count_1st = $this->lpaMethod_count($searchValue, '2nd line LPA');
+        $count =  $result_count_1st['rec_count'];
+
+        }
+
+        $input = "";
+        $hide = "";
+        $sample_id = "";
+        $sample_submitted = "";
+        $date_of_deconta = "";
+        $next_result = "";
+        $action = "";
+        $m_result = "";
+        $date_of_extraction = "";
+        $lpa_test = "";
+        $pcr_completed = "";
+        $hydra_data = [];
+
+        foreach ($data['sample'] as $key => $samples) {
+          //DB::enableQueryLog(); 		
+          $samples->no_sample = ServiceLog::where('enroll_id',$samples->enroll_id)->where('service_id',11)->count();
+      //dd(DB::getQueryLog());	
+         $lpa = ServiceLog::select('service_id')->where('enroll_id',$samples->enroll_id)->where('sample_id',$samples->sample_id)->first();
+         if($lpa->service_id==6){
+           $samples->lpa_type = "LPA 1st line";
+         }elseif($lpa->service_id==7){
+           $samples->lpa_type = "LPA 2nd line";
+         }elseif($lpa->service_id==13){
+           $samples->lpa_type = "LPA Both Line";
+         }else{
+           $samples->lpa_type = "NA";
+         }
+
+         if($samples->status && $samples->status==1)
+         {
+          $input = '<input class="bulk-selected" type="checkbox" value="'.$samples->log_id.'">';
+         }
+
+         $hide = $samples->ID;
+         $sample_id = $samples->samples;
+         $sample_submitted = $samples->no_of_samples;
+         $date_of_deconta = $samples->decontamination_date != "" ? date('d-m-Y', strtotime($samples->decontamination_date)) : "";
+         $action = $samples->STATUS == 0 ? 'Done' : "<button onclick=\"openNextForm('".$samples->samples."', ".$samples->log_id.", ".$samples->enroll_id.",'".$samples->tag."','".$samples->no_sample."', ".$samples->sample_id.", ".$samples->service_id.", ".$samples->rec_flag.")\" type='button' class = 'btn btn-info btn-sm  nextbtn'>Submit</button>";
+         $next_result = $samples->result;        
+         $date_of_extraction = $samples->date_of_extraction != "" ? date('d-m-Y', strtotime($samples->date_of_extraction)) : "";
+         $lpa_test = $samples->tag;
+         $pcr_completed = $samples->pcr_completed==1 ? 'Yes' : 'No';
+
+         $hydra_data[] = array(
+
+          "DT_RowId"=> $key,
+          "DT_RowClass"=>'sel',
+          "ID"=>$hide,
+          "inputs" => $input,
+          "sample_id" => $sample_id,          
+          "sample_submitted" => $sample_submitted, 
+          "date_of_deconta" => $date_of_deconta,
+          "action" => $action,                       
+          "next_result" => $next_result,
+          "date_of_extraction" => $date_of_extraction,          
+          "lpa_test" => $lpa_test,
+          "pcr_completed" => $pcr_completed,                
+
+        ); 
+
+       }
+
+       $hydra_data = array_values(array_filter($hydra_data));
+
+        //dd($dna_extraction_data);
+   
+        $response = array(
+          "draw" => intval($draw),
+          "iTotalRecords" => $count,
+          "iTotalDisplayRecords" => $count,
+          "aaData" => $hydra_data,
+          "no_1st_lpa" => $lpa1stline,
+          "no_2st_lpa" => $lpa2stline,
+                            
+        );
+   
+        //dd($response);
+   
+        echo json_encode($response);
+
     }
 
     /**
@@ -92,6 +425,7 @@ class HybridizationController extends Controller
     public function store(Request $request)
     {
        //dd($request->all());
+
      DB::beginTransaction();
      try{
 		 //echo "hi";
@@ -117,25 +451,97 @@ class HybridizationController extends Controller
         //$update=Hybridization::where('sample_id',$log->sample_id)->update(['status'=>0]);
 		
 		if(($request->service_id == 0)||($request->service_id == 1)){//VALID & INVALID
-		    Hybridization::where('enroll_id', $log->enroll_id)->where('tag',$request->tag)->delete();
-			$hybridization = Hybridization::create([
-			   'enroll_id' => $log->enroll_id,
-			   'sample_id' => $log->sample_id,
-			   'result' => $result,
-			   'status' => 1 ,
-			   'tag' => $request->tag		   
-			 ]);
+
+      /* Updated on 11-03-2021 */
+
+		    /* Hybridization::where('enroll_id', $log->enroll_id)->where('tag',$request->tag)->delete();
+
+          $hybridization = Hybridization::create([
+            'enroll_id' => $log->enroll_id,
+            'sample_id' => $log->sample_id,
+            'result' => $result,
+            'status' => 1 ,
+            'tag' => $request->tag		   
+          ]); */
+
+                       if( $request->tag == '1st line LPA')
+                        {   
+                            $find_lpa1st_data = FirstLineLpa::where('sample_id', $request->sampleID)
+                                                ->where('enroll_id', $request->enroll_id)
+                                                ->where('tag', '1st line LPA')
+                                                ->count();
+                            //dd($find_lpa1st_data);
+              
+                            if($find_lpa1st_data >= 1)
+                            {
+                                
+                                $updated = FirstLineLpa::where('sample_id', $request->sampleID)
+                                ->where('enroll_id', $request->enroll_id)
+                                ->where('tag', '1st line LPA')
+                                ->update(['hybridization_date' => date('Y-m-d'), 'hybridization_result'  => $result]);   
+                                
+                                //dd($updated);
+
+                            } else {
+
+                                $new_1st_lpa = FirstLineLpa::create([
+                                    'enroll_id'             => $request->enroll_id,
+                                    'sample_id'             => $request->sampleID,
+                                    'tag'                   => '1st line LPA',
+                                    'hybridization_date'    => date('Y-m-d'),
+                                    'hybridization_result'  => $result,
+                                    ]);
+                            } 
+                           
+                        }
+
+                        if( $request->tag == '2nd line LPA')
+                        {   
+                            $find_lpa2st_data = SecondLineLpa::where('sample_id', $request->sampleID)
+                                                ->where('enroll_id', $request->enroll_id)
+                                                ->where('tag', '2nd line LPA')
+                                                ->count();
+
+                            //dd($find_lpa1st_data);
+              
+                            if($find_lpa2st_data >= 1)
+                            {                                
+                                SecondLineLpa::where('sample_id', $request->sampleID)
+                                ->where('enroll_id', $request->enroll_id)
+                                ->where('tag', '2nd line LPA')
+                                ->update(['hybridization_date' => date('Y-m-d'), 'hybridization_result'  => $result]);                                 
+
+                            } else {
+
+                              $new_1st_lpa = SecondLineLpa::create([
+                                'enroll_id'             => $request->enroll_id,
+                                'sample_id'             => $request->sampleID,
+                                'tag'                   => '1st line LPA',
+                                'hybridization_date'    => date('Y-m-d'),
+                                'hybridization_result'  => $result,
+                                ]);
+
+                            }
+                            
+                        }
 		}
 		 //dd(DB::getQueryLog());
          //dd($hybridization);
         if($request->service_id == 0){//VALID
           $log = ServiceLog::find($request->service_log_id);
-          $log->released_dt=date('Y-m-d');
+
+           /* Updated on 11-03-2021 */
+
+           ServiceLog::where('id', $log->id)                           
+           ->firstorfail()
+           ->delete();
+
+          /* $log->released_dt=date('Y-m-d');
           $log->comments=$request->comments;
           $log->tested_by=$request->user()->name;
           $log->status = 0;
           $log->updated_by = $request->user()->id;
-          $log->save();
+          $log->save(); */
 		  
           $new_service = [
             'enroll_id' => $log->enroll_id,
@@ -144,7 +550,7 @@ class HybridizationController extends Controller
             'status' => 1,
             'reported_dt'=>date('Y-m-d'),
             'tag' => $request->tag,
-			'rec_flag' => $request->rec_flag,
+			      'rec_flag' => $request->rec_flag,
             'created_by' => $request->user()->id,
             'updated_by' => $request->user()->id,
             'enroll_label' => $log->enroll_label,
@@ -156,13 +562,22 @@ class HybridizationController extends Controller
 		  DB::commit();
           return $nwService;
         }elseif($request->service_id == 1){//INVALID
+
+          /* Updated on 11-03-2021 */
+
           $log = ServiceLog::find($request->service_log_id);
-          $log->released_dt=date('Y-m-d');
+
+          /* $log->released_dt=date('Y-m-d');
           $log->comments=$request->comments;
           $log->tested_by=$request->user()->name;
           $log->status = 0;
           $log->updated_by = $request->user()->id;
-          $log->save();
+          $log->save(); */
+
+          ServiceLog::where('id', $log->id)                           
+          ->firstorfail()
+          ->delete();
+
           /*$microbio = Microbio::create([
                 'enroll_id' => $log->enroll_id,
                 'sample_id' => $log->sample_id,
@@ -216,8 +631,8 @@ class HybridizationController extends Controller
             'service_id' => 8,
             'status' => 1,
             'reported_dt'=>date('Y-m-d'),
-			'tag' => $request->tag,
-			'rec_flag' => $request->rec_flag+1,
+            'tag' => $request->tag,
+            'rec_flag' => $request->rec_flag+1,
             'created_by' => $request->user()->id,
             'updated_by' => $request->user()->id,
             'enroll_label' => $log->enroll_label,
@@ -486,7 +901,8 @@ class HybridizationController extends Controller
 
 
           if(($request->service_id == 0)||($request->service_id == 1)){//VALID & INVALID
-              Hybridization::where('enroll_id', $data['sample'][0]->enroll_id)->where('tag',$data['sample'][0]->tag)->delete();
+             
+            Hybridization::where('enroll_id', $data['sample'][0]->enroll_id)->where('tag',$data['sample'][0]->tag)->delete();
               $hybridization = Hybridization::create([
                'enroll_id' => $data['sample'][0]->enroll_id,
                'sample_id' => $data['sample'][0]->sample_id,
@@ -495,9 +911,71 @@ class HybridizationController extends Controller
                'tag' => $data['sample'][0]->tag   
              ]);
 
+                        if( $data['sample'][0]->tag == '1st line LPA')
+                        {   
+                            $find_lpa1st_data = FirstLineLpa::where('sample_id', $data['sample'][0]->sample_id)
+                                                ->where('enroll_id', $data['sample'][0]->enroll_id)
+                                                ->where('tag', '1st line LPA')
+                                                ->count();
+                            //dd($find_lpa1st_data);
+              
+                            if($find_lpa1st_data >= 1)
+                            {
+                                
+                                $updated = FirstLineLpa::where('sample_id', $data['sample'][0]->sample_id)
+                                ->where('enroll_id', $data['sample'][0]->enroll_id)
+                                ->where('tag', '1st line LPA')
+                                ->update(['hybridization_date' => date('Y-m-d'), 'hybridization_result'  => $result]);   
+                                
+                                //dd($updated);
+
+                            } else {
+
+                                $new_1st_lpa = FirstLineLpa::create([
+                                    'enroll_id'             => $data['sample'][0]->enroll_id,
+                                    'sample_id'             => $data['sample'][0]->sample_id,
+                                    'tag'                   => '1st line LPA',
+                                    'hybridization_date'    => date('Y-m-d'),
+                                    'hybridization_result'  => $result,
+                                    ]);
+                            } 
+                           
+                        }
+
+                        if( $data['sample'][0]->tag == '2nd line LPA')
+                        {   
+                            $find_lpa2st_data = SecondLineLpa::where('sample_id', $data['sample'][0]->sample_id)
+                                                ->where('enroll_id', $data['sample'][0]->enroll_id)
+                                                ->where('tag', '2nd line LPA')
+                                                ->count();
+
+                            //dd($find_lpa1st_data);
+              
+                            if($find_lpa2st_data >= 1)
+                            {                                
+                                SecondLineLpa::where('sample_id', $data['sample'][0]->sample_id)
+                                ->where('enroll_id', $data['sample'][0]->enroll_id)
+                                ->where('tag', '2nd line LPA')
+                                ->update(['hybridization_date' => date('Y-m-d'), 'hybridization_result'  => $result]);                                 
+
+                            } else {
+
+                              $new_1st_lpa = SecondLineLpa::create([
+                                'enroll_id'             => $data['sample'][0]->enroll_id,
+                                'sample_id'             => $data['sample'][0]->sample_id,
+                                'tag'                   => '1st line LPA',
+                                'hybridization_date'    => date('Y-m-d'),
+                                'hybridization_result'  => $result,
+                                ]);
+
+                            }
+                            
+                        }
+
           } 
           if($request->service_id == 0){//VALID
-              $log = ServiceLog::find($data['sample'][0]->log_id);
+
+              /* $log = ServiceLog::find($data['sample'][0]->log_id);
               //dd($data['sample'][0]->id );
               $log->released_dt=date('Y-m-d');
               $log->comments=$request->comments;
@@ -505,7 +983,11 @@ class HybridizationController extends Controller
               //$log->tested_by = 'Administrator';
               $log->status = 0;             
               $log->updated_by = $request->user()->id;
-              $log->save();
+              $log->save(); */
+              $log = ServiceLog::find($data['sample'][0]->log_id);
+              ServiceLog::where('id', $log->id)                           
+          ->firstorfail()
+          ->delete();
       
             $new_service = [
               'enroll_id' => $data['sample'][0]->enroll_id,
@@ -525,13 +1007,18 @@ class HybridizationController extends Controller
             //return $nwService;          
           }elseif($request->service_id == 1){//INVALID
 
-            $log = ServiceLog::find($data['sample'][0]->log_id);
+            /* $log = ServiceLog::find($data['sample'][0]->log_id);
             $log->released_dt=date('Y-m-d');
             $log->comments=$request->comments;
             $log->tested_by=$request->user()->name;
             $log->status = 0;
             $log->updated_by = $request->user()->id;
-            $log->save();
+            $log->save(); */
+
+            $log = ServiceLog::find($data['sample'][0]->log_id);
+              ServiceLog::where('id', $log->id)                           
+          ->firstorfail()
+          ->delete();
 
             /*$microbio = Microbio::create([
               'enroll_id' => $data['sample'][0]->enroll_id,

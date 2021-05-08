@@ -447,18 +447,18 @@ input[type=number]::-webkit-outer-spin-button {
                                     </div>
                                     <div class="row">
 									     <div class="col">
-                                           <label class="col-sm-12">TU <span class="red">*</span></label>
+                                           <label class="col-sm-12">TU </label>
                                                 <div class="col-sm-12">
-                                                    <select name="landmark_tu_id" id="landmark_tu_id" class="form-control form-control-line" required >
+                                                    <select name="landmark_tu_id" id="landmark_tu_id" class="form-control form-control-line" >
                                                         <option>--Select--</option>                                                         
                                                         @foreach ($data['landmark_tu'] as $key=> $facility)
                                                           <option
-                                                            value="{{$facility['TBUnitCode']}}"
-                                                            @if(isset($data['patient']->landmark_tu_id) && $data['patient']->landmark_tu_id == $facility['TBUnitCode'])
-                                                              selected
+                                                            value="{{$facility['id']}}"
+                                                            @if($data['patient']->landmark_tu_id == $facility['id'])
+                                                              selected='selected'
                                                             @endif
                                                           >
-                                                          {{$facility['TBUnitName']}}
+                                                          {{$facility['tuname']}}
                                                           </option>
 
                                                         @endforeach
@@ -466,10 +466,9 @@ input[type=number]::-webkit-outer-spin-button {
                                                 </div>
                                         </div>
                                         <div class="col" id="Pincode">
-                                            <label class="col-md-12" id="caterralert">Pincode <span class="red">*</span> </label>
+                                            <label class="col-md-12" id="caterralert">Pincode </label>
                                             <div class="col-md-12">
-                                               <input type="number"  id="pincode" name="pincode"  onKeyPress="if(this.value.length==6) return false;"  value="{{ old('pincode', $data['patient']->pincode) }}" class="form-control form-control-line" min="100000" max="999999" oninvalid="setCustomValidity('Plz enter valid pincode')"
-                                              onchange="try{setCustomValidity('')}catch(e){}" required>
+                                               <input type="number"  id="pincode" name="pincode"  onKeyPress="if(this.value.length==6) return false;"  value="{{ old('pincode', $data['patient']->pincode) }}" class="form-control form-control-line" min="100000" max="999999">
                                            </div>
                                         </div>
                                     </div>
@@ -720,7 +719,7 @@ input[type=number]::-webkit-outer-spin-button {
             <!-- footer -->
             <!-- ============================================================== -->
 			
-            <footer class="footer"> © Copyright Reserved 2017-2018, LIMS </footer>
+            <footer class="footer">  </footer>
             <!-- ============================================================== -->
             <!-- End footer -->
             <!-- ============================================================== -->
@@ -1083,7 +1082,7 @@ input[type=number]::-webkit-outer-spin-button {
             var district = $(this).val();
             var state = $('#landmark_state').val();
             $.ajax({
-                url: "{{url('tbunit')}}"+'/'+state+'/'+district,
+                url: "{{url('newtbunit')}}"+'/'+state+'/'+district,
                 type:"GET",
                 processData: false,
                 contentType: false,
@@ -1098,8 +1097,8 @@ input[type=number]::-webkit-outer-spin-button {
                     }))
                     $.each(items.tbunit, function (i, item) {
                         $('#landmark_tu_id').append($('<option>', {
-                            value: item.TBUnitCode,
-                            text : item.TBUnitName
+                            value: item.id,
+                            text : item.tuname
                         }));
                     });
                 },
@@ -1116,11 +1115,11 @@ input[type=number]::-webkit-outer-spin-button {
 $(window).bind("load", function() {
 //$( document ).ajaxComplete(function() {
 	//if district has value
-	    if($('#district').val()!=''){
+	   /*  if($('#district').val()!=''){
 			var district=$('#district').val();
-		}else{	
+		}else{	 */
 		   var district='<?php echo !empty($data["patient"]->district)?$data["patient"]->district:$data["login_user_phi_rln"]->DTOCode; ?>';
-		}   
+		/* } */   
 		
 		//alert(district);
 		if(district!=''){

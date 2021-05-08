@@ -169,7 +169,7 @@ input[type="checkbox"][readonly] {
                 </div>
 
             </div>
-            <footer class="footer"> © Copyright Reserved 2017-2018, LIMS </footer>
+            <footer class="footer">  </footer>
         </div>
 
 <script>

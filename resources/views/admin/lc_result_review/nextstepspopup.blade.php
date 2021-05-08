@@ -46,7 +46,7 @@
                        <option value="2">DNA Extraction LPA 2nd line</option>
                        <!---<option value="3">DNA Extraction LPA 1st line and LPA 2nd line</option>----->
                        <option value="4">LC- DST- Inoculation</option>
-                      <option value="6">Do LC with standby sample</option>
+                      {{-- <option value="6">Do LC with standby sample</option> --}}
                       <option value="7">Result finalization</option>
                       <!-- <option value="5">MB for further review </option>-->
 
@@ -78,6 +78,31 @@ $(function(){
       alert("standby sample not available");
       $("#service_id").val('');
     }
+
+    if( service== 1 || service==2 )
+    {
+      $.ajax({
+								  type: "POST",
+								  url: "{{url('check-for-sample-lc-review')}}",
+								  data: {
+									_token:"{{ csrf_token() }}",
+									sample_id: $("#sampleID").val(),
+									enroll_id: $("#enrollId").val(),
+									tag_id: $("#tagId").val(),									
+								  },
+								  success: function(data){
+									//console.log(data.result);
+
+                    if( data.result == true )
+                    {
+                      $('div .alert').html('<h4>Data will not be added</h4>');
+                      $('div .alert').show();
+                      $('#nxtconfirm').prop('disabled', true);
+                    }								
+								  },
+								  dataType: "json"
+								});
+      }
 
    });
 

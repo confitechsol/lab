@@ -1,5 +1,85 @@
 @extends('admin.layout.app')
 @section('content')
+
+<style>
+  .bg-selected {
+    background: #ffbdbd !important;
+  }
+  .color-code{
+	font-size:15px;
+	list-style:none;
+	margin:5px 0px;
+	padding:0px;
+	
+}
+.color-code span{
+	font-size:15px;
+	margin-right:5px;
+	border:1px solid #ddd;
+	
+	
+}
+.white-color{
+	color:#fff;
+}
+.yellow-color{
+	color:#FFFF99 !important;
+}
+.pink-color{
+	color:#FEC0C7 !important;
+}
+.brown-color{
+	color:#D0E4CB !important;
+}
+.green-color{
+	color:#CCFFCC !important;
+}
+.purple-color{
+	color:#CCCCFF !important;
+}
+.background-yellow-color{
+	background:#FFFF99 !important;
+}
+.background-pink-color{
+	background:#FEC0C7 !important;
+}
+.background-brown-color{
+	background:#D0E4CB !important;
+}
+.background-green-color{
+	background:#CCFFCC !important;
+}
+.background-purple-color{
+	background:#CCCCFF !important;
+}
+.background-white-color{
+	background:#FFFFFF !important;
+}
+ .hide_column {
+    display : none;
+}
+@keyframes spinner {
+  to {transform: rotate(360deg);}
+}
+ 
+.spinner:before {
+  content: '';
+  box-sizing: border-box;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 20px;
+  height: 20px;
+  margin-top: -10px;
+  margin-left: -10px;
+  border-radius: 50%;
+  border: 2px solid #ccc;
+  border-top-color: #333;
+  animation: spinner .6s linear infinite;
+}
+
+</style>
+
  <div class="page-wrapper">
             <div class="container-fluid">
               <div class="row page-titles">
@@ -19,15 +99,19 @@
 					  <a class="btn pull-right btn-sm btn-info" href="{{url('sample/create')}}">Add New </a>                  
                   </div>
               </div>
-
-
                 <div class="row">
-
                     <div class="col-lg-12 col-xlg-12 col-md-12 col-sm-12" style="margin-top: 16px;">
                         <div class="card" style="border: none;">
                             <div class="card-block">
                                 <div class="col-lg-12 col-xlg-12 col-md-12 col-sm-12 col-sm-12" style="width: auto;overflow-y: scroll;">
-
+                                  <table>
+                                    <tr>
+                                      <td>
+                                      <meta name="csrf-token" content="{{ csrf_token() }}">
+                                      <input type="text" name="enrollment_no" id="enrollment_no"  placeholder="Search enrol. no from db" class="form-control" />
+                                      </td>									  
+                                    </tr>
+                                    </table>
                                     <table id="exampl" class="table table-striped table-bordered responsive col-xlg-12" cellspacing="0" width="100%">
                                         <thead>
                                             <tr>
@@ -47,64 +131,9 @@
                                               <th>View</th>
                                               <!-- <th>Print</th> -->
                                               <!--<th>Result</th> -->
-
                                             </tr>
-                                        </thead>
-                                        <tbody>
-                                          @foreach ($data['sample'] as $key=> $samples)
-                                          <?php $dt= explode("," , $samples->receive);
-
-                                          $counter= count($dt);
-                                          ?>
-                                          <tr>
-                                            <td class="hide">{{$samples->enroll_id}}</td>
-                                            <td>{{$samples->name}}</td>
-                                            <td>{{$samples->label}}</td>
-
-                                            <td>{{$samples->samples}}</td>
-											
-
-                                            <td>  @foreach( $dt as $recvdates) <?php echo $custdt= date('d-m-Y h:i:s', strtotime($recvdates));   ?>  @endforeach</td>
-
-                                            <td>{!! str_replace(',','<br/>', $samples->sample_type) !!}</td>
-                                            <td>
-                                              @if($samples->sample_type=="Other" || $samples->sample_type=="Others")
-                                              {{$samples->others_type}}
-                                              @endif
-                                            </td>
-                                            <td>{!! str_replace(',','<br/>', $samples->sample_quality) !!}</td>
-                                            <td>{!! str_replace(',','<br/>', $samples->is_accepted) !!}</td>
-                                            <td>{!! str_replace(',','<br/>', $samples->reason) !!}</td>
-                                            <td>{!! str_replace(',','<br/>', $samples->fu_month) !!}</td>
-                                            <td>{{ $samples->no_of_samples }}</td>
-                                            <td>{!! str_replace(',','<br/>', $samples->sname) !!}</td>
-                                            <td>
-                                              <a class="btn btn-default btn-sm" target="_blank"
-                                              href="{{url('samplePreview/'.$samples->enroll_id)}}">View Details </a>
-                                              <a  href="{{url('sample/editnew/'.$samples->enroll_id)}}" class="btn btn btn-sm">Edit</a>
-                                            </td>
-                                            <!-- <td>
-                                              <button type="button" class="btn btn-info btn-sm" onclick="openPrintModal($(this))"  data-sample="{{$samples->samples}}">Print</button>
-                                              <a target="_blank" href="{{url('sample/print/'.$samples->samples)}}" class="btn btn btn-sm">PDF</a>
-                                            </td> -->
-
-
-
-                                             <td>
-                                                <!-- <a target="_blank" href="{{url('sample/editnew/'.$samples->enroll_id)}}" class="btn btn btn-sm">Edit</a> -->
-                                                <!-- <a target="_blank" href="{{url('interimview/'.$samples->id)}}" class="btn btn btn-sm">Result</a> -->
-                                              </td>
-<!--
-                                              <td>
-                                                <a target="_blank" href="{{ url('pdfview/'.$samples->id,['download'=>'pdf']) }}" class="btn btn btn-sm">Open PDF Mode</a>
-                                              </td> -->
-
-                                          </tr>
-                                          @endforeach
-
-                                      </tbody>
-                                        </table>
-
+                                        </thead>                                        
+                                      </table>
                                 </div>
                             </div>
                         </div>
@@ -113,7 +142,7 @@
                 </div>
 
             </div>
-            <footer class="footer"> © Copyright Reserved 2017-2018, LIMS </footer>
+            <footer class="footer">  </footer>
         </div>
 
 
@@ -180,9 +209,49 @@ $(document).ready(function() {
   }
 
   today = dd + '-' + mm + '-' + yyyy;
-    $('#exampl').DataTable( {
+  var dataTable = $('#exampl').DataTable( {
         dom: 'Bfrtip',
 		pageLength:25,
+    stateSave: true,
+    processing: true,
+		language: {
+            loadingRecords: '&nbsp;',
+            //processing: 'Loading...'
+            processing: '<div class="spinner"></div>'
+        } , 
+        serverSide: true,
+        serverMethod: 'post',
+        ajax: {
+			   url: "{{url('ajax_sample_list')}}",
+			   data: function(data){
+				     // Read values
+                    var enrollment_no = $('#enrollment_no').val();          
+
+					  // Append to data
+					  data.searchByEnrollmentNo = enrollment_no;
+         
+				},
+				headers: 
+				{
+					'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+				}
+		  },
+		 columns: [
+		   { data: 'ID',className: "hide_column" },
+		   { data: 'created_by' },
+		   { data: 'enroll_id' },
+		   { data: 'sample_id' },
+		   { data: 'date_of_receipt' },
+		   { data: 'sample_type' },
+		   { data: 'other_sample_type' },
+		   { data: 'sample_quality' },
+		   { data: 'sample_accept' },
+       { data: 'reason_for_test' },
+		   { data: 'fum' },
+		   { data: 'sample_submitted' },
+		   { data: 'sample_sent_to' },
+		   { data: 'view' },
+		],
         buttons: [
             {
                 extend: 'excelHtml5',
@@ -191,11 +260,12 @@ $(document).ready(function() {
                     columns: [  1, 2, 3,4,5,6,7,8,9,10,11,12 ]
                 }
             }
-
-
-
         ],
         "order": [[ 2, "desc" ]]
+    });
+
+    $('#enrollment_no').keyup(function () { //alert();
+        dataTable.draw();
     });
 } );
 </script>

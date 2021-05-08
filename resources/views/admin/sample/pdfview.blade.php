@@ -1,4 +1,4 @@
-<?php //dd($data); ?>
+
 <html>
 <head>
 
@@ -7,9 +7,6 @@
     <link href="{{url('/assets/plugins/bootstrap/css/bootstrap.min.css') }}" rel="stylesheet">
 	<script src="{{ url('/assets/plugins/bootstrap/js/bootstrap.min.js') }}"></script>
 <style type="text/css">
-
-
-
    @media print {
 
    	* {
@@ -50,7 +47,7 @@ td, th {
     border: 1px solid black;
 }
 table{ border-left: 0px;}
-<!------Amrita  on  18/05/20202 start------->
+
 .header-area{
 	padding-top:10px;
 }
@@ -63,13 +60,12 @@ table{ border-left: 0px;}
 }
 .dw-enable{
 	padding-top:20px;
-}<!------Amrita  on  18/05/20202 end------->
+}
 
 </style>
 
 </head>
 <body>
-<!------Amrita  on  18/05/20202 start------->
 <div class="header-area">
 	<div class="container-fluid">
 		<div class="row">
@@ -99,7 +95,7 @@ table{ border-left: 0px;}
 			<div class="row">
 				<div class="col-md-2">
 					@if(empty($data['checkflag']))
-						<a id="pdfhide" href="{{ url('pdfview/'.$data['personal']->smp_id, ['download'=>'pdf']) }}?d={{ request('d') }}&remarks={{ request('remarks') }}">Download PDF</a>
+						<a id="pdfhide" href="{{ url('pdfview/'.$data['personal']->smp_id.'/'.$data['serviceId'].'/'.$data['tag'].'/'.$data['rec_flag'].'/'.$data['drug_name'], ['download'=>'pdf']) }}?d={{ request('d') }}&remarks={{ request('remarks') }}">Download PDF</a>
 					@endif
 				</div>
 				
@@ -137,7 +133,7 @@ table{ border-left: 0px;}
 	</div>
 </div>
 	
-<!------Amrita  on  18/05/20202 end------->
+
 
 <div class="my_container">
 <table cellpadding="0" cellspacing="0" width="100%" border="0">
@@ -405,9 +401,9 @@ table{ border-left: 0px;}
 							<input type="checkbox" name="" <?php if($data['req_test']->regimen_fu == 'Other'){ echo "checked"; }?> >Other</br>
 
 							@if($data['req_test']->regimen_fu == "Other")
-								&emsp; Other Regimen : {{$data['pesronal']->fudrtb_regimen_other}}</br>
+								&nbsp; Other Regimen : {{$data['pesronal']->fudrtb_regimen_other}}</br>
 							@endif
-							Treatment <input type="checkbox" name="" @if($data['personal']->month_week == "Month")checked @endif>Month <input type="checkbox" name="" @if($data['personal']->month_week == "Week")checked @endif>Week  &emsp; No.: {{$data['personal']->treatment?$data['personal']->treatment :"__________________"}}
+							Treatment <input type="checkbox" name="" @if($data['personal']->month_week == "Month")checked @endif>Month <input type="checkbox" name="" @if($data['personal']->month_week == "Week")checked @endif>Week  &nbsp; No.: {{$data['personal']->treatment?$data['personal']->treatment :"__________________"}}
 						</td>
                         <?php }else{ ?>
                         <td rowspan="5">
@@ -436,18 +432,11 @@ table{ border-left: 0px;}
 		<input type="checkbox" name="" @if($data['personal']->regimen_fu == "Shorter MDR TB Regimen")checked @endif>Shorter MDR TB Regimen</br>
 							<input type="checkbox" name="" @if($data['personal']->regimen_fu == "Other")checked @endif>Other{{$data['personal']->regimen_fu}}</br>
 
-
-
-
-
 							@if($data['personal']->regimen_fu == "Other")
-								&emsp; Other Regimen : {{$data['pesronal']->fudrtb_regimen_other}}</br>
+								&nbsp; Other Regimen : {{$data['pesronal']->fudrtb_regimen_other}}</br>
 							@endif
 
-
-
-
-							Treatment <input type="checkbox" name="" @if($data['personal']->month_week == "Month")checked @endif>Month <input type="checkbox" name="" @if($data['personal']->month_week == "Week")checked @endif>Week  &emsp; No.: {{$data['personal']->treatment?$data['personal']->treatment :"__________________"}}
+							Treatment <input type="checkbox" name="" @if($data['personal']->month_week == "Month")checked @endif>Month <input type="checkbox" name="" @if($data['personal']->month_week == "Week")checked @endif>Week  &nbsp; No.: {{$data['personal']->treatment?$data['personal']->treatment :"__________________"}}
 						</td>
 
                         <?php 	} ?>
@@ -573,97 +562,115 @@ if(!empty($data['test_requests'])){
 				</table>
 			</td>
 		</tr>
-    <?php if(is_null($data['lpa1']) && is_null($data['lpa2']) && is_null($data['lpaf'])  && is_null($data['culturelj'])  && is_null($data['culturelc']) && $data['cbnaat']->isEmpty() ){ ?>
+
+
+@if( $data['serviceId'] == '1' ||  $data['serviceId'] == '2' )
+<?php if(is_null($data['lpa1']) && is_null($data['lpa2']) && is_null($data['lpaf'])  && is_null($data['culturelj'])  && is_null($data['culturelc']) && $data['cbnaat']->isEmpty()){ ?>
+<?php //dd($data); ?>
 @if(!empty($data['microscopyA']->result) || !empty($data['microscopyB']->result))
-    <tr>
-  <td colspan="2">
-    <table WIDTH=100%>
 
-      <tr>
-        <th colspan="8">Microscopy(<input type="checkbox" name="zn" value="" @if($data['microscopy'] == 1)checked @endif >ZN <input type="checkbox" name="florscent" value="" @if($data['microscopy2'] == 2)checked @endif>Florescent)</th>
-      </tr>
-      <tr>
+        <tr>
+			<td colspan="2">
+				<table WIDTH=100%>
 
-        <td rowspan="2">Sample</td>
-        <td rowspan="2"></td>
-        <td rowspan="2">Visual appearance</td>
-        <td colspan="5" WIDTH=60% align="center">Result</td>
-      </tr>
-      <tr>
-        <td style="text-align:center;">Negative</td>
-        <td style="text-align:center;">Scanty</td>
-        <td style="text-align:center;">1+</td>
-        <td style="text-align:center;">2+</td>
-        <td style="text-align:center;">3+</td>
-      </tr>
+					<tr>
+						<th colspan="8">Microscopy(<input type="checkbox" name="zn" value="" @if($data['microscopy'] == 1)checked @endif >ZN <input type="checkbox" name="florscent" value="" @if($data['microscopy2'] == 2)checked @endif>Florescent)</th>
+					</tr>
+					<tr>
 
-      @if(!empty($data['microscopyA']->result))
-      <tr>
-        <td>Sample A</td>
-        @if($data['microscopyA'])
-        <td style="text-align:center;">{{!empty($data['microscopyA'])?$data['microscopyA']->sample_label:"" }}</td>
-        <td style="text-align:center;">@if($data['microscopyA']->result=='NA'){{ $data['microscopyB']->result }} @else  @endif</td>
+						<td rowspan="2">Sample</td>
+						<td rowspan="2"></td>
+						<td rowspan="2">Visual appearance</td>
+						<td colspan="5" WIDTH=60% align="center">Result</td>
+					</tr>
+					<tr>
+						<td style="text-align:center;">Negative</td>
+						<td style="text-align:center;">Scanty</td>
+						<td style="text-align:center;">1+</td>
+						<td style="text-align:center;">2+</td>
+						<td style="text-align:center;">3+</td>
+					</tr>
 
-        <td style="text-align:center;">@if($data['microscopyA']->result=='Negative/Not Seen'){{ $data['microscopyA']->result }} @else  @endif</td>
-        <td style="text-align:center;">@if($data['microscopyA']->result=='Scanty'|| $data['microscopyA']->result=='Sc 1' || $data['microscopyA']->result=='Sc 2'|| $data['microscopyA']->result=='Sc 3'|| $data['microscopyA']->result=='Sc 4'|| $data['microscopyA']->result=='Sc 5'|| $data['microscopyA']->result=='Sc 6'|| $data['microscopyA']->result=='Sc 7'|| $data['microscopyA']->result=='Sc 8'|| $data['microscopyA']->result=='Sc 9'  || $data['microscopyA']->result=='Sc 10'|| $data['microscopyA']->result=='Sc 11'|| $data['microscopyA']->result=='Sc 12' || $data['microscopyA']->result=='Sc 13'|| $data['microscopyA']->result=='Sc 14'|| $data['microscopyA']->result=='Sc 15' || $data['microscopyA']->result=='Sc 16'|| $data['microscopyA']->result=='Sc 17'|| $data['microscopyA']->result=='Sc 18' || $data['microscopyA']->result=='Sc 19'){{ $data['microscopyA']->result }} @else  @endif</td>
+          @if(!empty($data['microscopyA']->result))
+					<tr>
+						<td>Sample A</td>
+						@if($data['microscopyA'])
+						<td style="text-align:center;">{{$data['microscopyA']->sample_label}}</td>
+						<td style="text-align:center;">@if($data['microscopyA']->result=='NA'){{ $data['microscopyA']->result }} @else  @endif</td>
 
-        <td style="text-align:center;">@if($data['microscopyA']->result=='1+positive'){{ $data['microscopyA']->result }} @else  @endif</td>
-        <td style="text-align:center;">@if($data['microscopyA']->result=='2+positive'){{ $data['microscopyA']->result }} @else  @endif</td>
-        <td style="text-align:center;">@if($data['microscopyA']->result=='3+positive'){{ $data['microscopyA']->result }} @else  @endif</td>
-        <!-- <td style="text-align:center;">Date Result:{{ date('d-m-Y H:i:s',strtotime($data['date_receipt']->receive_date)) }}  &emsp; Date Reported:{{ date('d-m-Y H:i:s',strtotime($data['today']))}} &emsp; Reported by(Name and Signature):{{$data['user']}}</td>-->
-		<td style="text-align:center;">Date Result:{{ date('d-m-Y',strtotime($data['date_receipt']->created_at)) }}  &emsp; Date Reported:{{ date('d-m-Y H:i:s',time())}} &emsp; Reported by(Name and Signature):{{$data['microbio_name']}}</td>
-       	<!-- Pradip Microscopy A -->
-		<!-- Date Result:{{date('d-m-Y', strtotime($data['date_receipt']->created_at))}}  &emsp; Date Reported:{{date('d-m-Y H:i:s', strtotime($data['microscopyA'][0]->sent_to_nikshay_date))}} &emsp; Reported by(Name and Signature):{{ $data['microscopyA'][0]->name}} -->
-							
-        @else
-        <td></td>
-        <td></td>
-        <td></td>
-        <td></td>
-        <td></td>
-        <td></td>
-        <td></td>
-        <td>Date Result:_____________ Date Reported:_____________ Reported by(Name and Signature):__________________</td>
-        @endif
-      </tr>
-      @endif
-<?php if(!empty($data['microscopyB'])){ ?>
+						<td style="text-align:center;">@if($data['microscopyA']->result=='Negative/Not Seen'){{ $data['microscopyA']->result }} @else  @endif</td>
+						<td style="text-align:center;">@if($data['microscopyA']->result=='Scanty'|| $data['microscopyA']->result=='Sc 1' || $data['microscopyA']->result=='Sc 2'|| $data['microscopyA']->result=='Sc 3'|| $data['microscopyA']->result=='Sc 4'|| $data['microscopyA']->result=='Sc 5'|| $data['microscopyA']->result=='Sc 6'|| $data['microscopyA']->result=='Sc 7'|| $data['microscopyA']->result=='Sc 8'|| $data['microscopyA']->result=='Sc 9' || $data['microscopyA']->result=='Sc 10'||
+						$data['microscopyA']->result=='Sc 11'|| $data['microscopyA']->result=='Sc 12' || $data['microscopyA']->result=='Sc 13'||
+						$data['microscopyA']->result=='Sc 14'|| $data['microscopyA']->result=='Sc 15' || $data['microscopyA']->result=='Sc 16'||
+						$data['microscopyA']->result=='Sc 17'|| $data['microscopyA']->result=='Sc 18' || $data['microscopyA']->result=='Sc 19'){{ $data['microscopyA']->result }} @else  @endif</td>
 
-      <tr>
-        <td>Sample B</td>
-        @if($data['microscopyB'])
-        <td style="text-align:center;">{{ !empty($data['microscopyB'])?$data['microscopyB']->sample_label:"" }}</td>
-        <td style="text-align:center;">@if($data['microscopyB']->result=='NA'){{ $data['microscopyB']->result }} @else  @endif</td>
+            <td style="text-align:center;">@if($data['microscopyA']->result=='1+positive'){{ $data['microscopyA']->result }} @else  @endif</td>
+            <td style="text-align:center;">@if($data['microscopyA']->result=='2+positive'){{ $data['microscopyA']->result }} @else  @endif</td>
+						<td style="text-align:center;">@if($data['microscopyA']->result=='3+positive'){{ $data['microscopyA']->result }} @else  @endif</td>
+						<td style="text-align:center;">
+							Date Result:{{ date('d-m-Y', strtotime($data['date_receipt']->receive_date)) }}  &nbsp; Date Reported:{{ date('d-m-Y H:i:s', strtotime($data['microscopyA']->sent_to_nikshay_date)) }} &nbsp; Reported by(Name and Signature):{{Auth::user()->name}}
+							<br /><br />
+							Remarks : {{ $data['microbio_comment'] }}
+						</td>
+						
+						@else
+						<td></td>
+						<td></td>
+						<td></td>
+						<td></td>
+						<td></td>
+						<td></td>
+						<td></td>
+						<td>Date Result:_____________ Date Reported:_____________ Reported by(Name and Signature):__________________</td>
+						@endif
+					</tr>
+          @endif
+		<?php if(!empty($data['microscopyB'])){ ?>
 
-        <td style="text-align:center;">@if($data['microscopyB']->result=='Negative/Not Seen'){{ $data['microscopyB']->result }} @else  @endif</td>
-        <td style="text-align:center;">@if($data['microscopyB']->result=='Scanty'|| $data['microscopyB']->result=='Sc 1' || $data['microscopyB']->result=='Sc 2'|| $data['microscopyB']->result=='Sc 3'|| $data['microscopyB']->result=='Sc 4'|| $data['microscopyB']->result=='Sc 5'|| $data['microscopyB']->result=='Sc 6'|| $data['microscopyB']->result=='Sc 7'|| $data['microscopyB']->result=='Sc 8'|| $data['microscopyB']->result=='Sc 9' || $data['microscopyB']->result=='Sc 10'|| $data['microscopyB']->result=='Sc 11'|| $data['microscopyB']->result=='Sc 12' || $data['microscopyB']->result=='Sc 13'|| $data['microscopyB']->result=='Sc 14'|| $data['microscopyB']->result=='Sc 15' || $data['microscopyB']->result=='Sc 16'|| $data['microscopyB']->result=='Sc 17'|| $data['microscopyB']->result=='Sc 18' || $data['microscopyB']->result=='Sc 19'){{ $data['microscopyB']->result }} @else  @endif</td>
+          <tr>
+            <td>Sample B</td>
+            @if($data['microscopyB'])
+            <td style="text-align:center;">{{$data['microscopyB']->sample_label}}</td>
+            <td style="text-align:center;">@if($data['microscopyB']->result=='NA'){{ $data['microscopyB']->result }} @else  @endif</td>
 
-        <td style="text-align:center;">@if($data['microscopyB']->result=='1+positive'){{ $data['microscopyB']->result }} @else  @endif</td>
-        <td style="text-align:center;">@if($data['microscopyB']->result=='2+positive'){{ $data['microscopyB']->result }} @else  @endif</td>
-        <td style="text-align:center;">@if($data['microscopyB']->result=='3+positive'){{ $data['microscopyB']->result }} @else  @endif</td>
-       <!-- <td style="text-align:center;">Date Result:{{ date('d-m-Y H:i:s',strtotime($data['date_receipt']->receive_date)) }}  &emsp; Date Reported:{{ date('d-m-Y H:i:s',strtotime($data['today']))}} &emsp; Reported by(Name and Signature):{{$data['user']}}</td>-->
-	    <td style="text-align:center;">Date Result:{{ date('d-m-Y',strtotime($data['date_receipt']->created_at)) }}  &emsp; Date Reported:{{ date('d-m-Y H:i:s',time())}} &emsp; Reported by(Name and Signature):{{ $data['microbio_name']}}</td>
-		<!-- Pradip Microscopy B -->
-		<!-- Date Result:{{date('d-m-Y', strtotime($data['date_receipt']->created_at))}}  &emsp; Date Reported:{{date('d-m-Y H:i:s', strtotime($data['microscopyB'][0]->sent_to_nikshay_date))}} &emsp; Reported by(Name and Signature):{{ $data['microscopyB'][0]->name}} -->
-		
-	   @else
-        <td></td>
-        <td></td>
-        <td></td>
-        <td></td>
-        <td></td>
-        <td></td>
-        <td></td>
-        <td>Date Result:_____________ Date Reported:_____________ Reported by(Name and Signature):__________________</td>
-        @endif
-      </tr>
-    <?php } ?>
+            <td style="text-align:center;">@if($data['microscopyB']->result=='Negative/Not Seen'){{ $data['microscopyB']->result }} @else  @endif</td>
+            <td style="text-align:center;">@if($data['microscopyB']->result=='Scanty'|| $data['microscopyB']->result=='Sc 1' || $data['microscopyB']->result=='Sc 2'|| $data['microscopyB']->result=='Sc 3'|| $data['microscopyB']->result=='Sc 4'|| $data['microscopyB']->result=='Sc 5'|| $data['microscopyB']->result=='Sc 6'|| $data['microscopyB']->result=='Sc 7'|| $data['microscopyB']->result=='Sc 8'|| $data['microscopyB']->result=='Sc 9' || $data['microscopyB']->result=='Sc 10'||
+			$data['microscopyB']->result=='Sc 11'|| $data['microscopyB']->result=='Sc 12' || $data['microscopyB']->result=='Sc 13'||
+			$data['microscopyB']->result=='Sc 14'|| $data['microscopyB']->result=='Sc 15' || $data['microscopyB']->result=='Sc 16'||
+			$data['microscopyB']->result=='Sc 17'|| $data['microscopyB']->result=='Sc 18' || $data['microscopyB']->result=='Sc 19'){{ $data['microscopyB']->result }} @else  @endif</td>
 
-    </table>
-  </td>
-</tr>
-@endif
+            <td style="text-align:center;">@if($data['microscopyB']->result=='1+positive'){{ $data['microscopyB']->result }} @else  @endif</td>
+            <td style="text-align:center;">@if($data['microscopyB']->result=='2+positive'){{ $data['microscopyB']->result }} @else  @endif</td>
+            <td style="text-align:center;">@if($data['microscopyB']->result=='3+positive'){{ $data['microscopyB']->result }} @else  @endif</td>
+            <td style="text-align:center;">
+				Date Result:{{ date('d-m-Y',strtotime($data['date_receipt']->created_at)) }}  &nbsp; Date Reported:{{ date('d-m-Y H:i:s', strtotime( $data['microscopyB']->sent_to_nikshay_date)) }} &nbsp; Reported by(Name and Signature):{{Auth::user()->name}}
+				<br /><br />
+							Remarks : {{ $data['microbio_comment'] }}
+			</td>
+			
+            @else
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td>Date Result:_____________ Date Reported:_____________ Reported by(Name and Signature):__________________</td>
+            @endif
+          </tr>
+				<?php } ?>
+
+					
+				</table>
+			</td>
+		</tr>
+  @endif
 <?php } ?>
+@endif
+
+
+@if( $data['serviceId'] == '4')
 	<?php if(!empty($data['cbnaat'])){
 		// dd($data['cbnaat']);
 		if(count($data['cbnaat']) > 0){
@@ -676,19 +683,19 @@ if(!empty($data['test_requests'])){
 					</tr>
 					<tr>
 						@if($data['cbnaat'])
-						<td WIDTH="30%">Sample ID</td><td>{{ !empty($data['cbnaat'][0]->sample_label)?$data['cbnaat'][0]->sample_label:"" }}</td>
+						{{-- <td WIDTH="30%">Sample ID </td><td>{{ $data['cbnaat'][0]->sample_label }}</td> --}}
+						<td WIDTH="30%">Sample ID </td><td>{{ $data['sampleLable'] }}</td>
 						@else
-						<td WIDTH="30%">Sample ID</td><td></td>
+						<td WIDTH="30%">Sample ID </td><td></td>
 						@endif
 					</tr>
-
 					<tr>
 						<td>M. tuberculosis</td>
 						<td>
 							@if($data['cbnaat'])
 							<input type="checkbox" @if($data['cbnaat'][0]->result_MTB == 'MTB Detected')checked @endif>Detected
 							<input type="checkbox" @if($data['cbnaat'][0]->result_MTB == 'MTB Not Detected')checked @endif>Not Detected
-							<input type="checkbox" @if($data['cbnaat'][0]->result_MTB == 'Invalid' || $data['cbnaat'][0]->result_MTB == 'NA' || $data['cbnaat'][0]->result_MTB == 'No Result' ||  $data['cbnaat'][0]->result_MTB == 'Error')checked @endif>N/A
+							<input type="checkbox" @if($data['cbnaat'][0]->result_MTB == 'Invalid' || $data['cbnaat'][0]->result_MTB == 'NA' || $data['cbnaat'][0]->result_MTB == 'No Result' || $data['cbnaat'][0]->result_MTB == 'Error')checked @endif>N/A
 							@else
 							<input type="checkbox" >Detected
 							<input type="checkbox" >Not Detected
@@ -696,6 +703,7 @@ if(!empty($data['test_requests'])){
 							@endif
 						</td>
 					</tr>
+              <?php //dd($data['cbnaat'][0]->result_RIF); ?>
 					<tr><td>Rif Resistance</td>
 						<td>
 							@if($data['cbnaat'])
@@ -712,281 +720,309 @@ if(!empty($data['test_requests'])){
 						</td>
 					</tr>
           <tr>
-            <td>Test</td><td><input type="checkbox" @if($data['cbnaat'][0]->result_MTB == 'No Result')checked @endif>No Result &nbsp; <input type="checkbox" @if($data['cbnaat'][0]->result_MTB == 'Invalid')checked @endif>Invalid &nbsp; <input type="checkbox" @if($data['cbnaat'][0]->error != '')checked @endif>Error (Please arrange for fresh sample) : {{$data['cbnaat'][0]->error}}
+            <td>Test</td><td><input type="checkbox" @if($data['cbnaat'][0]->result_MTB == 'No Result')checked @endif>No Result &nbsp; <input type="checkbox" @if($data['cbnaat'][0]->result_MTB == 'Invalid')checked @endif>Invalid &nbsp; <input type="checkbox" @if($data['cbnaat'][0]->error != '')checked @endif>Error (Please arrange for fresh sample) : @if($data['cbnaat'][0]->error == 0)
+              @else
+              {{ $data['cbnaat'][0]->error}}
+              @endif
             </td>
           </tr>
-					<tr>
-						<td colspan="2">
-							@if($data['cbnaat'])
-							<!--Date Result:{{date('d-m-Y H:i:s', strtotime($data['cbnaat'][0]->test_date))}}  &emsp; Date Reported:{{date('d-m-Y H:i:s', strtotime($data['today']))}} &emsp; Reported by(Name and Signature):{{$data['microbio_name']}} -->
-							<!-- Pradip CBNAAT -->
-							Date Result:{{date('d-m-Y', strtotime($data['cbnaat'][0]->test_date))}}  &emsp; &emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;
-							Date Reported:{{date('d-m-Y H:i:s', strtotime($data['cbnaat'][0]->sent_to_nikshay_date))}} &emsp; &emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;
-							Reported by:{{ $data['cbnaat'][0]->name}} 
-							@else
-							Date Result:_____________ Date Reported:_____________ Reported by:__________________
-							@endif
-						</td>
-					</tr>
+			<tr>
+				<td colspan="2">
+					@if($data['cbnaat'])
+					
+					Date Result:{{date('d-m-Y', strtotime($data['cbnaat'][0]->test_date))}}  &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+					Date Reported:{{date('d-m-Y H:i:s', strtotime($data['cbnaat'][0]->sent_to_nikshay_date))}} &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+					Reported by:{{Auth::user()->name}}
+					<br /><br />
+							Remarks : {{ $data['microbio_comment'] }}
+						
+					@else
+					Date Result:_____________ Date Reported:_____________ Reported by(Name and Signature):__________________
+					@endif 
+				</td>
+			</tr>
+
+					
 
 				</table>
 			</td>
 		</tr>
         <?php }}?>
-        @if($data['culturelj'] || $data['culturelc'])
-            <tr>
-    			<td colspan="2">
-    				<table width="100%">
-    					<tr>
-    						<th colspan="6" style="text-align:center;">Culture (<input type="checkbox"@if(!empty($data['culture-llj'])) @if($data['culture-llj'] == 1)checked @endif @endif >LJ <input type="checkbox" @if(!empty($data['culture'])) @if($data['culture'] == 2)checked @endif @endif >LC)</th>
-    					</tr>
-    					<tr>
-    						<td rowspan="2"; style="text-align:center;">Sample ID</td>
-    						<td colspan="5"; style="text-align:center;">Results</td>
-    					</tr>
-    					<tr>
-    						<td style="text-align:center;">Negative</td>
-    						<td  style="text-align:center;">Positive</td>
-    						<td  style="text-align:center;">NTM(write species)</td>
-    						<td  style="text-align:center;">Contamination</td>
-							<td  style="text-align:center;">Others</td>
-    					</tr>
+	@endif
 
-    					<tr>
-    						@if(!empty($data['culturelj']))
 
-    						<td  style="text-align:center;">{{ !empty($data['culturelj']->sample_label)?$data['culturelj']->sample_label:""	 }}-LJ REPORT</td>
-                <?php //echo $data['culturelj']->final_result; ?>
-    						<td  style="text-align:center;">@if($data['culturelj']->final_result=='Negative'){{ $data['culturelj']->final_result }} @else  @endif</td  style="text-align:center;">
-    						<td  style="text-align:center;">@if($data['culturelj']->final_result=='1+' || $data['culturelj']->final_result=='2+' || $data['culturelj']->final_result=='3+'){{ $data['culturelj']->final_result }} @else  @endif</td>
-    						<td  style="text-align:center;">
-    					    @if($data['culturelj']->final_result=='NTM')@if(!empty($data['culturelj']->species)) {{ $data['culturelj']->species }} @else {{ $data['culturelj']->final_result }}  @endif  @endif</td>
-    						<td  style="text-align:center;">@if($data['culturelj']->final_result=='Contaminated'){{ $data['culturelj']->final_result }} @else  @endif</td>
-    						@else
-    						<td></td>
-    						<td></td>
-    						<td></td>
-    						<td></td>
-    						<td></td>
-    						@endif
-    					</tr>
-              <?php //dd($data['culturelc']->species); ?>
-    					<tr>
-    						@if(!empty($data['culturelc']))
-    						<td  style="text-align:center;">{{ !empty($data['culturelc']->sample_label)?$data['culturelc']->sample_label:""	 }}-LC REPORT</td>
-    						<td  style="text-align:center;">@if($data['culturelc']->result=='Negative'){{ $data['culturelc']->result }} @else  @endif</td>
-    						<td  style="text-align:center;">@if($data['culturelc']->result=='Positive'){{ $data['culturelc']->result }} @else  @endif</td>
-    						<td  style="text-align:center;">@if($data['culturelc']->result=='NTM')@if(!empty($data['culturelc']->species)){{ $data['culturelc']->species }} @else {{ $data['culturelc']->result }} @endif @endif</td>
-    						<td  style="text-align:center;">@if($data['culturelc']->result=='Contaminated'){{ $data['culturelc']->result }} @else  @endif</td>
-						     <td  style="text-align:center;">@if($data['culturelc']->result=='Other Result'){{ $data['culturelc']->other_result }} @else  @endif</td>
-    						@else
-    						<td></td>
-    						<td></td>
-    						<td></td>
-    						<td></td>
-    						<td></td>
-							<td></td>
-    						@endif
-    					</tr>
-
-					<tr>
-						<!-- Block this process by Pradip on 15/05/2020
-						<td colspan="6">Date Result:
-							@if($data['culturelj'])
-								{{ date ('d-m-Y', strtotime($data['culturelj']->lj_result_date)) }}
-							@elseif($data['culturelc'])
-								{{ date ('d-m-Y', strtotime($data['culturelc']->result_date)) }}
-							@endif
-
-							Date Reported:
-							@if($data['culturelj'])
-								{{date('d-m-Y H:i:s', strtotime($data['culturelj']->sent_to_nikshay_date))}}
-							@elseif($data['culturelc'])
-								{{date('d-m-Y H:i:s', strtotime($data['culturelc']->sent_to_nikshay_date))}}
-							@endif
-
-							Reported by(Name and Signature):
-							@if($data['culturelj'])
-								{{ $data['culturelj']->name}}
-							@elseif($data['culturelc'])
-								{{ $data['culturelc']->name}}
-							@endif
-								
-							</td>-->
-							
-							<!-- Added this process by Pradip on 15/05/2020 -->
-							<td colspan="6">
-									@if(!empty($data['culturelj']))
-										LJ - Date Result: {{ date ('d-m-Y', strtotime($data['culturelj']->lj_result_date)) }} &emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;
-										Date Reported: {{date('d-m-Y H:i:s', strtotime($data['culturelj']->sent_to_nikshay_date))}}  &emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;
-										Reported by: {{ $data['culturelj']->name}}
-										<br />
-									@endif
-									
-									@if(!empty($data['culturelc']))
-										LC - Date Result: {{ date ('d-m-Y', strtotime($data['culturelc']->result_date)) }} &emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;
-										Date Reported: {{date('d-m-Y H:i:s', strtotime($data['culturelc']->sent_to_nikshay_date))}}  &emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;
-										Reported by: {{ $data['culturelc']->name}}
-										<br />
-									@endif
-									
-							</td>
-						 </tr>
-
-					@if(!empty($data['culturelc']))
-					<tr>
-						<!-- <td>Final Result: @if($data['culturelc']->result=='NTM'){{$data['culturelc']->species}} @endif </td>
-						<td colspan="4">Remark: <input type="text"></td>-->
-
-					</tr>
-					@endif
-				</table>
-
-			</td>
-		</tr>
-        @endif
-		@if($data['lpa1'] || $data['lpa2'] || $data['lpaf'])
-        <tr>
-			<td colspan="2">
-				<table width="100%" cellspacing="5" cellpadding="5">
-					<tr>
-						<th colspan="4" style="text-align:center;">Line Probe Assay(LPA)</th>
-					</tr>
-					<tr>
-						@if($data['lpaf'])
-						<th colspan="4"><input type="checkbox" name="" value="" <?php if(!empty($data['lpaf'][0]['type_direct'])): echo "checked"; endif; ?> >Direct <input type="checkbox"<?php if(!empty($data['lpaf'][0]['type_indirect'])): echo "checked"; endif; ?> >Indirect   Lab serial :<?php if(!empty($data['lab_serial'])){ echo $data['lab_serial']->type; } ?> </th>
-						@else
-						<th colspan="4"><input type="checkbox" name="" value="">Direct <input type="checkbox">Indirect   Lab serial______________</th>
-						@endif
-					</tr>
-
-					@if($data['lpa1'])
-					
+	@if($data['serviceId'] == '17')
+			@if($data['culturelc'])
+			<tr>
+				<td colspan="2">
+					<table width="100%">
 						<tr>
-							<th colspan="4">First line LPA (Sample ID: {{!empty($data['lpa1']->sample_label)?$data['lpa1']->sample_label:""}} )</th>
+							<th colspan="6" style="text-align:center;">Culture (<input type="checkbox" @if(!empty($data['culture'])) @if($data['culture'] == 2)checked @endif @endif >LC)</th>
+						</tr>
+						<tr>							
+							<td rowspan="2"; style="text-align:center">Sample ID</td>
+							<td colspan="5"; style="text-align:center">Results</td>
 						</tr>
 						<tr>
-							<td colspan="4">
-								<ul>
-									<li>RpoB :- Locus Control :</li>
-									<li>@if($data['lpa1']->RpoB == 1) Present @elseif($data['lpa1']->RpoB == 0)Absent @endif</li>
-								</ul>
-								</br>
-								<ul>
-									<li>
-										WT1: @if($data['lpa1']->wt1 == 1) Present @else Absent @endif &nbsp;
+							<td style="text-align:center;">Negative</td>
+							<td  style="text-align:center;">Positive</td>
+							<td  style="text-align:center;">NTM(write species)</td>
+							<td  style="text-align:center;">Contamination</td>
+							<td  style="text-align:center;">Others</td>
+						</tr>
+						<tr>
+							@if(!empty($data['culturelc']))
+							{{-- <td  style="text-align:center;">{{ $data['culturelc']->sample_label	 }}-LC REPORT</td> --}}
+							<td  style="text-align:center;">{{ $data['sampleLable']	 }}-LC REPORT</td>
+							<td  style="text-align:center;">@if($data['culturelc']->result=='Negative'){{ $data['culturelc']->result }} @else  @endif</td>
+							<td  style="text-align:center;">@if($data['culturelc']->result=='Positive'){{ $data['culturelc']->result }} @else  @endif</td>
+							<td  style="text-align:center;">@if($data['culturelc']->result=='NTM') @if(!empty($data['culturelc']->species)){{ $data['culturelc']->species }} @else {{ $data['culturelc']->result }} @endif @endif</td>
+							<td  style="text-align:center;">@if($data['culturelc']->result=='Contaminated'){{ $data['culturelc']->result }} @else  @endif</td>
+							<td  style="text-align:center;">@if($data['culturelc']->result=='Other Result'){{ $data['culturelc']->other_result }} @else  @endif</td>							
+							@endif
+						</tr>
+						<tr>							
+							<td colspan="6">			
+								@if(!empty($data['culturelc']))
+									LC - Date Result: {{ date ('d-m-Y', strtotime($data['culturelc']->result_date)) }} &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+									Date Reported: {{date('d-m-Y H:i:s', strtotime($data['culturelc']->sent_to_nikshay_date))}}  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+									Reported by: {{Auth::user()->name}}
+									<br /><br />
+							Remarks : {{ $data['microbio_comment'] }}
+								@endif
+							</td>
+						</tr>
+					</table>
+				</td>
+			</tr>
+			@endif
+		@endif
+
+		@if($data['serviceId'] == '20')
+			@if($data['culturelj'])
+			<tr>
+				<td colspan="2">
+					<table width="100%">
+						<tr>
+							<th colspan="6" style="text-align:center;">Culture (<input type="checkbox"@if(!empty($data['culture-llj'])) @if($data['culture-llj'] == 1)checked @endif @endif >LJ )</th>
+						</tr>
+						<tr>
+							<!--<td rowspan="2">Sample : <?php //echo $data['lab_sr']->sample_label; ?></td>-->
+							<td rowspan="2"; style="text-align:center">Sample ID</td>
+							<td colspan="5"; style="text-align:center">Results</td>
+						</tr>
+						<tr>
+							<td style="text-align:center;">Negative</td>
+							<td  style="text-align:center;">Positive</td>
+							<td  style="text-align:center;">NTM(write species)</td>
+							<td  style="text-align:center;">Contamination</td>
+							<td  style="text-align:center;">Others</td>
+						</tr>
+						<tr>
+							@if(!empty($data['culturelj']))
+								{{-- <td  style="text-align:center;">{{ $data['culturelj']->sample_label	 }}-LJ REPORT</td> --}}
+								
+								<td  style="text-align:center;">{{ $data['sampleLable']	 }}-LJ REPORT</td>
+								<td  style="text-align:center;">@if($data['culturelj']->final_result=='Negative'){{ $data['culturelj']->final_result }} @else  @endif</td  style="text-align:center;">
+								<td  style="text-align:center;">@if($data['culturelj']->final_result=='1+' || $data['culturelj']->final_result=='2+' || $data['culturelj']->final_result=='3+'){{ $data['culturelj']->final_result }} @else  @endif</td>
+								<td  style="text-align:center;">@if($data['culturelj']->final_result=='NTM') @if(!empty($data['culturelj']->species)) {{ $data['culturelj']->species }} @else {{ $data['culturelj']->final_result }}  @endif @endif</td>
+								<td  style="text-align:center;">@if($data['culturelj']->final_result=='Contaminated'){{ $data['culturelj']->final_result }} @else  @endif</td>					
+							@endif
+						</tr>
+						<tr>							
+							<td colspan="6">
+								@if(!empty($data['culturelj']))
+									LJ - Date Result: {{ date ('d-m-Y', strtotime($data['culturelj']->lj_result_date)) }} &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+									Date Reported:{{date('d-m-Y H:i:s', strtotime($data['culturelj']->sent_to_nikshay_date))}}  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+									Reported by: {{Auth::user()->name}}
+									<br /><br />
+							Remarks : {{ $data['microbio_comment'] }}
+								@endif					
+							</td>
+						</tr>
+					</table>
+				</td>
+			</tr>
+			@endif
+		@endif
+
+
+		@if($data['serviceId'] == '15' && $data['tag'] == '1st line LPA')
+			
+			@if($data['lpa1'])
+			<tr>
+				<td colspan="2">
+					<table width="100%" cellspacing="5" cellpadding="5">
+						<tr>
+							<th colspan="4" style="text-align:center;">Line Probe Assay(LPA)</th>
+						</tr>
+						<tr>
+							@if($data['lpa1']->type != "")
+							<th colspan="4"><input type="checkbox" name="" value="" <?php if($data['lpa1']->type == 'Direct'): echo "checked"; endif; ?> >Direct <input type="checkbox"<?php if($data['lpa1']->type == 'Indirect'): echo "checked"; endif; ?> >Indirect Lab serial :<?php if(!empty($data['lab_serial'])){ echo $data['lab_serial']->type; } ?> </th>
+							@else
+							<th colspan="4"><input type="checkbox" name="" value="">Direct <input type="checkbox">Indirect   Lab serial______________</th>
+							@endif
+						</tr>
+
+						<tr>
+							{{-- <th colspan="4">First line LPA (Sample ID: {{$data['lpa1']->sample_label}} )</th>  --}}
+							<th colspan="4">First line LPA (Sample ID: {{ $data['sampleLable'] }} )</th> 
+						</tr>
+					<tr>
+						<td colspan="4">
+			
+							<ul>
+								<li>RpoB :- Locus Control :</li>
+								<li> @if($data['lpa1']->RpoB == 1) Present @elseif($data['lpa1']->RpoB == 0)Absent @endif</li>
+							</ul>
+							</br>
+							<ul>
+								<li>	WT1: @if($data['lpa1']->wt1 == 1) Present @else Absent @endif&nbsp;
 										WT2: @if($data['lpa1']->wt2 == 1) Present @else Absent  @endif &nbsp;
 										WT3: @if($data['lpa1']->wt3 == 1) Present @else Absent  @endif &nbsp;
-										WT4: @if($data['lpa1']->wt4 == 1) Present @else Absent  @endif
-									</li>
-									<li>
+										WT4: @if($data['lpa1']->wt4 == 1) Present @else Absent  @endif &nbsp;
+								</li>
+								<li>
 										WT5: @if($data['lpa1']->wt5 == 1) Present @else Absent  @endif &nbsp;
 										WT6: @if($data['lpa1']->wt6 == 1) Present @else Absent  @endif &nbsp;
 										WT7: @if($data['lpa1']->wt7 == 1) Present @else Absent  @endif &nbsp;
 										WT8: @if($data['lpa1']->wt8 == 1) Present @else Absent  @endif
-									</li>
-									<li>
+								</li>
+								<li>
 										MUT1(D516V) :	@if($data['lpa1']->mut1DS16V == 1) Present @else Absent @endif &nbsp;
 										MUT2A(H526Y) :	@if($data['lpa1']->mut2aH526Y == 1) Present @else Absent  @endif &nbsp;
 										MUT2B(H526D) :	@if($data['lpa1']->mut2bH526D == 1) Present @else Absent @endif &nbsp;
 										MUT3(S531L) : @if($data['lpa1']->mut3S531L == 1) Present @else Absent @endif
-									</li>	
-								</ul>
-								
+								</li>
+							</ul>
+							
+						</td>
+					</tr>
+					<tr>
+						<td colspan="2">
+								KatG :- Locus Control : @if($data['lpa1']->katg == 1) Present @else Absent  @endif</br>
+								WT1(315) :	@if($data['lpa1']->wt1315 == 1) Present @else Absent  @endif</br>
+								MUT1(S315T1) : @if($data['lpa1']->mut1S315T1 == 1) Present @else Absent  @endif
+								</br>
+								MUT2(S315T2) : @if($data['lpa1']->mut2S315T2 == 1) Present @else Absent  @endif
+						</td>
+						<td colspan="2">
+								InhA :- Locus Control : @if($data['lpa1']->inha == 1) Present @else Absent  @endif</br>
+								WT1(-15,-16) :	@if($data['lpa1']->wt1516 == 1) Present @else Absent  @endif
+								WT2(-8) :	@if($data['lpa1']->wt28 == 1) Present @else Absent  @endif</br>
+								MUT1(C15T) :	@if($data['lpa1']->mut1C15T == 1) Present @else Absent  @endif
+								MUT2(A16G) : @if($data['lpa1']->mut2A16G == 1) Present @else Absent  @endif</br>
+								MUT3A(T8C) :	@if($data['lpa1']->mut3aT8C == 1) Present @else Absent  @endif
+								MUT3B(T8A) : @if($data['lpa1']->mut3bT8A == 1) Present @else Absent  @endif</br>
+						</td>
+					</tr>
 
-							</td>
-						</tr>
-						<tr>
-							<td colspan="2">
-									KatG :- Locus Control : @if($data['lpa1']->katg == 1) Present @else Absent  @endif</br>
-									WT1(315) :	@if($data['lpa1']->wt1315 == 1) Present @else Absent  @endif</br>
-									MUT1(S315T1) : @if($data['lpa1']->mut1S315T1 == 1) Present @else Absent  @endif</br>
-									MUT2(S315T2) : @if($data['lpa1']->mut2S315T2 == 1) Present @else Absent  @endif</br>
-									</br></br></br>
-							</td>
-							<td colspan="2">
-									InhA :- Locus Control : @if($data['lpa1']->inha == 1) Present @else Absent  @endif</br>
-									WT1(-15,-16) :	@if($data['lpa1']->wt1516 == 1) Present @else Absent  @endif</br>
-									WT2(-8) :	@if($data['lpa1']->wt28 == 1) Present @else Absent  @endif</br>
-									MUT1(C15T) :	@if($data['lpa1']->mut1C15T == 1) Present @else Absent  @endif</br>
-									MUT2(A16G) : @if($data['lpa1']->mut2A16G == 1) Present @else Absent  @endif</br>
-									MUT3A(T8C) :	@if($data['lpa1']->mut3aT8C == 1) Present @else Absent  @endif</br>
-									MUT3B(T8A) : @if($data['lpa1']->mut3bT8A == 1) Present @else Absent  @endif</br>
-									
-							</td>
-						</tr>
-						<tr>
-								<td colspan="4">
-									<table width="100%" cellspacing="5" cellpadding="5">
-										<tr>
-											<td>
-												<!--<strong>Final LPA Interpretation:-</strong>-->
-												<strong>Interpretation:-</strong>
-												<?php //echo "<pre>"; print_r($data['lpaf']); die;?>
-												@if(isset($data['lpaf']) && !empty($data['lpaf']))
-															@foreach($data['lpaf'] as $lpaf)
-														        @if($lpaf['tag']=='1st line LPA')
-																	
-																    @if(!empty($lpaf['mtb_result']))
-																			MTB Result:{{ $lpaf['mtb_result'] }} &nbsp;	&nbsp; &nbsp;	&nbsp;	&nbsp;	&nbsp;	&nbsp; &nbsp;	&nbsp;	&nbsp; &nbsp;	&nbsp; &nbsp;	&nbsp;	&nbsp;	&nbsp;	&nbsp; &nbsp;
-																			&nbsp;
-																	@endif 
-																	
-																	@if(!empty($lpaf['rif']))
-																			RIF Resi:{{$lpaf['rif']}} &nbsp;	&nbsp; &nbsp;	&nbsp;	&nbsp;	&nbsp;	&nbsp; &nbsp;	&nbsp;	&nbsp; &nbsp;	&nbsp; &nbsp;	&nbsp;	&nbsp;	&nbsp;	&nbsp; &nbsp;	&nbsp;	&nbsp;
-																			&nbsp;
-																	@endif
-																	
-															
-															 
-																   @if(!empty($lpaf['inh']))
-																			H Resi:{{$lpaf['inh']}} &nbsp;	&nbsp; &nbsp;	&nbsp;	&nbsp;	&nbsp;	&nbsp; &nbsp;	&nbsp;	&nbsp; &nbsp;	&nbsp; &nbsp;	&nbsp;	&nbsp;	&nbsp;	&nbsp; &nbsp;	&nbsp;	&nbsp;
-																			&nbsp;
-																   @endif
-																   
-																   @if(!empty($lpaf['nikshey_final_interpretation']))
-																			<br>
-																			Final LPA Interpretation:- {{$lpaf['nikshey_final_interpretation']}} 
-																	@endif
-											 
-												  
-																 @endif
-															@endforeach
-															
-												@endif
-											</td>
-										</tr>
-										<tr>
-											<td>
-													@if(isset($data['lpaf']) && !empty($data['lpaf']))
-													   @foreach($data['lpaf'] as $lpaf)
-														 @if($lpaf['tag']=='1st line LPA')
-															
-														<!--Date Result:{{date('d-m-Y', strtotime($data['lpaf'][0]['created_at']))}}  &emsp; Date Reported:{{date('d-m-Y H:i:s', time()) }} &emsp; Reported by(Name and Signature):{{ $data['microbio_name']}} -->
-														Date Result:{{date('d-m-Y', strtotime($lpaf['test_date']))}}  &emsp; &emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;
-														Date Reported:{{date('d-m-Y H:i:s', strtotime($lpaf['sent_to_nikshay_date']))}} &emsp; &emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;
-														Reported by:{{ $lpaf['name']}} 
-														@endif
-														@endforeach
-													@else
-														Date Result:_____________ Date Reported:_____________ Reported by:__________________
-													@endif
+					<tr>
+						<td colspan="4">
+							<table width="100%" cellspacing="5" cellpadding="5">
+								<tr>
+									<td>										
+										<strong>Interpretation:-</strong>						
 												
-											</td>
-										</tr>
+														@if($data['lpa1']->mtb_result != "")
+																MTB Result:{{ $data['lpa1']->mtb_result }}&nbsp;	&nbsp; &nbsp;	&nbsp;	&nbsp;	&nbsp;	&nbsp; &nbsp;	&nbsp;	&nbsp; &nbsp;	&nbsp; &nbsp;	&nbsp;	&nbsp;	&nbsp;	&nbsp; &nbsp;	&nbsp;	&nbsp;		
+														@endif 
+									
+														@if( $data['lpa1']->rif != "" )
+																RIF Resi:{{ $data['lpa1']->rif }} &nbsp;	&nbsp; &nbsp;	&nbsp;	&nbsp;	&nbsp;	&nbsp; &nbsp;	&nbsp;	&nbsp; &nbsp;	&nbsp; &nbsp;	&nbsp;	&nbsp;	&nbsp;	&nbsp; &nbsp;	&nbsp;	&nbsp;
+														@endif
 
-									</table>
-								</td>
-						</tr>
-					@endif
+														@if($data['lpa1']->kat_g != "")
+																KatG Resi:{{ $data['lpa1']->kat_g }} &nbsp;	&nbsp; &nbsp;	&nbsp;	&nbsp;	&nbsp;	&nbsp; &nbsp;	&nbsp;	&nbsp; &nbsp;	&nbsp; &nbsp;	&nbsp;	&nbsp;	&nbsp;	&nbsp; &nbsp;
+														@endif
+							 
+							 
+														@if( $data['lpa1']->inh != "" )
+																H Resi:{{ $data['lpa1']->inh }} &nbsp;	&nbsp; &nbsp;	&nbsp;	&nbsp;	&nbsp;	&nbsp; &nbsp;	&nbsp;	&nbsp; &nbsp;	&nbsp; &nbsp;	&nbsp;	&nbsp;	&nbsp;	&nbsp; &nbsp;
+														@endif														
+														
+														@if( $data['lpa1']->finalterpretation != "" )
+																<br>
+																Final Interpretation:- {{ $data['lpa1']->finalterpretation }} 
+														@endif	
+														
+														@if( $data['lpa1']->clinical_interpretation != "" )
+																<br>
+																Clinical Interpretation:- {{ $data['lpa1']->clinical_interpretation }} 
+														@endif
+														
+									</td>
+								</tr>
+								<tr>
+									<td>
+					
+										@if($data['lpa1'])												
+												Date Result:{{date('d-m-Y', strtotime($data['lpa1']->created_at))}}  &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+												Date Reported:{{ date('d-m-Y H:i:s', strtotime($data['lpa1']->sent_to_nikshay_date)) }}&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+												Reported by:{{ Auth::user()->name }}
+												<br /><br />
+							Remarks : {{ $data['microbio_comment'] }}
+										@else
+												Date Result:_____________ Date Reported:_____________ Reported by(Name and Signature):__________________
+										@endif
+									</td>
+								</tr>								
+							</table>
+						</td>
+					</tr>
 
-					@if($data['lpa2'])
+					</table>
+				</td>
+			</tr>
+			@endif
+
+			@if(isset($data['hybridization_data']))
+					@foreach ($data['hybridization_data'] as $key=> $hybridization_data)
+						@if($hybridization_data->result=="Invalid")	
 						<tr>
-								<th colspan="4">Second Line LPA (Sample ID: {{ !empty($data['lpa2']->sample_label)?$data['lpa2']->sample_label:"" }} )</th>
+							<td colspan="2">
+								<table width="100%" cellspacing="5" cellpadding="5">
+										
+											@if($hybridization_data->tag=='1st line LPA')
+												
+												<th colspan="4">Line Probe Assay(LPA) - First Line LPA - Hybridization: The result is invalid of Sample  {{$hybridization_data->sample_label}} </th>
+													
+											@endif											
+								</table>
+							</td>
+						</tr>		
+						@endif
+					@endforeach		
+			@endif
+		@endif
+
+
+		@if( $data['serviceId'] == '15' && $data['tag'] == '2nd line LPA' )
+
+			@if( $data['lpa2'] )
+
+			<tr>
+				<td colspan="2">
+					<table width="100%" cellspacing="5" cellpadding="5">
+						<tr>
+							<th colspan="4" style="text-align:center;">Line Probe Assay(LPA)</th>
 						</tr>
+						<tr>
+							@if($data['lpa2']->type != "")
+							<th colspan="4"><input type="checkbox" name="" value="" <?php if($data['lpa2']->type == 'Direct'): echo "checked"; endif; ?> >Direct <input type="checkbox"<?php if($data['lpa2']->type == 'Indirect'): echo "checked"; endif; ?> >Indirect Lab serial :<?php if(!empty($data['lab_serial'])){ echo $data['lab_serial']->type; } ?> </th>
+							@else
+							<th colspan="4"><input type="checkbox" name="" value="">Direct <input type="checkbox">Indirect   Lab serial______________</th>
+							@endif
+						</tr>
+
+						<tr>
+							{{-- <th colspan="4">Second line LPA (Sample ID: {{$data['lpa2']->sample_label}} )</th>  --}}
+
+							<th colspan="4">Second line LPA (Sample ID: {{ $data['sampleLable'] }} )</th>
+						</tr>						
 						<tr>
 							<td>
-								gyrA :-Locus Control : 	@if($data['lpa2']->gyra == 1) Present @else Absent  @endif</br>
+								gyrA :- Locus Control : @if($data['lpa2']->gyra == 1) Present @else Absent  @endif</br>
 								WT1(85-90) :@if($data['lpa2']->wt18590 == 1) Present @else Absent  @endif</br>
 								WT2(89-93) :@if($data['lpa2']->wt28993 == 1) Present @else Absent  @endif</br>
 								WT3(92-97) :@if($data['lpa2']->wt39297 == 1) Present @else Absent  @endif</br>
@@ -1024,293 +1060,356 @@ if(!empty($data['test_requests'])){
 							<td colspan="4">
 								<table width="100%" cellspacing="5" cellpadding="5">
 									<tr>
-										<td>
-											<!--<strong>Final LPA Interpretation:-</strong>-->
-											<strong>Interpretation:-</strong>
-											<?php  //echo "<pre>"; print_r($data['lpaf']); die;?>
-											@if(isset($data['lpaf']) && !empty($data['lpaf']))
-											  @foreach($data['lpaf'] as $lpaf)
-												@if($lpaf['tag']=='2nd line LPA')
+										<td>										
+											<strong>Interpretation:-</strong>						
 													
-												    @if(!empty($lpaf['mtb_result']))
-															MTB Result:{{ $lpaf['mtb_result'] }} &nbsp;	&nbsp; &nbsp;	&nbsp;	&nbsp;	&nbsp;	&nbsp; &nbsp;	&nbsp;	&nbsp; &nbsp;	&nbsp; &nbsp;	&nbsp;	&nbsp;	&nbsp;	&nbsp; &nbsp;	&nbsp;	&nbsp;	
-													@endif 
-													
-											 
-												   @if(!empty($lpaf['quinolone'])) 
-															FQ Resi:
-															{{$lpaf['quinolone']}} &nbsp;	&nbsp; &nbsp;	&nbsp;	&nbsp;	&nbsp;	&nbsp; &nbsp;	&nbsp;	&nbsp; &nbsp;	&nbsp; &nbsp;	&nbsp;	&nbsp;	&nbsp;	&nbsp; &nbsp;	&nbsp;	&nbsp;
-															&nbsp;
-												   @endif
-												
-													@if(!empty($lpaf['slid']))
-															SLID Resi:
-															{{$lpaf['slid']}} &nbsp;	&nbsp; &nbsp;	&nbsp;	&nbsp;	&nbsp;	&nbsp; &nbsp;	&nbsp;	&nbsp; &nbsp;	&nbsp; &nbsp;	&nbsp;	&nbsp;	&nbsp;	&nbsp; &nbsp;	&nbsp;	&nbsp;
-															&nbsp;
-													@endif
-													
-													@if(!empty($lpaf['nikshey_final_interpretation']))
-															<br>
-															Final LPA Interpretation:- {{$lpaf['nikshey_final_interpretation']}} 
-													@endif
-												@endif
-											@endforeach
+															@if($data['lpa2']->mtb_result != "")
+																	MTB Result:{{ $data['lpa2']->mtb_result }}&nbsp;	&nbsp; &nbsp;	&nbsp;	&nbsp;	&nbsp;	&nbsp; &nbsp;	&nbsp;	&nbsp; &nbsp;	&nbsp; &nbsp;	&nbsp;	&nbsp;	&nbsp;	&nbsp; &nbsp;	&nbsp;	&nbsp;		
+															@endif 
 										
-										@endif
+															@if( $data['lpa2']->quinolone != "" )
+																	FQ Resi:{{ $data['lpa2']->quinolone }} &nbsp;	&nbsp; &nbsp;	&nbsp;	&nbsp;	&nbsp;	&nbsp; &nbsp;	&nbsp;	&nbsp; &nbsp;	&nbsp; &nbsp;	&nbsp;	&nbsp;	&nbsp;	&nbsp; &nbsp;	&nbsp;	&nbsp;
+															@endif
+	
+															@if($data['lpa2']->slid != "")
+																	SLI (rrs):{{ $data['lpa2']->slid }} &nbsp;	&nbsp; &nbsp;	&nbsp;	&nbsp;	&nbsp;	&nbsp; &nbsp;	&nbsp;	&nbsp; &nbsp;	&nbsp; &nbsp;	&nbsp;	&nbsp;	&nbsp;	&nbsp; &nbsp;
+															@endif
+								 
+								 
+															@if( $data['lpa2']->slid_eis != "" )
+																	SLI (eis):{{ $data['lpa2']->slid_eis }} &nbsp;	&nbsp; &nbsp;	&nbsp;	&nbsp;	&nbsp;	&nbsp; &nbsp;	&nbsp;	&nbsp; &nbsp;	&nbsp; &nbsp;	&nbsp;	&nbsp;	&nbsp;	&nbsp; &nbsp;
+															@endif														
+															
+															@if( $data['lpa2']->finalInterpretation != "" )
+																	<br>
+																	Final Interpretation:- {{ $data['lpa2']->finalInterpretation }} 
+															@endif	
+															
+															@if( $data['lpa2']->clinical_interpretation != "" )
+																	<br>
+																	Clinical Interpretation:- {{ $data['lpa2']->clinical_interpretation }} 
+															@endif
+															
 										</td>
 									</tr>
 									<tr>
 										<td>
-												@if(isset($data['lpaf']) && !empty($data['lpaf']))
-												   @foreach($data['lpaf'] as $lpaf)
-													@if($lpaf['tag']=='2nd line LPA')
-												<!--Date Result:{{date('d-m-Y', strtotime($data['lpaf'][0]['created_at']))}}  &emsp; Date Reported:{{date('d-m-Y H:i:s', time()) }} &emsp; Reported by(Name and Signature):{{ $data['microbio_name']}} -->
-													Date Result:{{date('d-m-Y', strtotime($lpaf['test_date']))}}  &emsp; &emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;
-													Date Reported:{{date('d-m-Y H:i:s', strtotime($lpaf['sent_to_nikshay_date']))}} &emsp; &emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;
-													Reported by:{{$lpaf['name']}} 
-													@endif
-													@endforeach
-												@else
-												Date Result:_____________ Date Reported:_____________ Reported by:__________________
-												@endif
+						
+											@if($data['lpa2'])												
+													Date Result:{{date('d-m-Y', strtotime($data['lpa2']->created_at))}}  &nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+													Date Reported:{{date('d-m-Y H:i:s', strtotime($data['lpa2']->sent_to_nikshay_date))}}&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+													Reported by:{{ Auth::user()->name }}
+													<br /><br />
+							Remarks : {{ $data['microbio_comment'] }}
+											@else
+													Date Result:_____________ Date Reported:_____________ Reported by(Name and Signature):__________________
+											@endif
 										</td>
-									</tr>
-
+									</tr>								
 								</table>
 							</td>
 						</tr>
-					@endif
-					
-				</table>
-			</td>
-		</tr>
-        
-        @endif
-		
-        @if(isset($data['hybridization_data']))
-			@foreach ($data['hybridization_data'] as $key=> $hybridization_data)
-				@if($hybridization_data->result=="Invalid")	
+					</table>
+				</td>
+			</tr>
+			@endif
+
+			@if(isset($data['hybridization_data']))
+					@foreach ($data['hybridization_data'] as $key=> $hybridization_data)
+						@if($hybridization_data->result=="Invalid")	
+						<tr>
+							<td colspan="2">
+								<table width="100%" cellspacing="5" cellpadding="5">										
+											
+											@if($hybridization_data->tag=='2nd line LPA')
+												
+												<th colspan="4">Line Probe Assay(LPA) - Second Line LPA - Hybridization: The result is invalid of Sample  {{$hybridization_data->sample_label}} </th>
+												
+											@endif										
+								</table>
+							</td>
+						</tr>		
+						@endif
+					@endforeach		
+				@endif
+		@endif		
+
+
+
+		@if( $data['serviceId'] == '21' && $data['tag'] == 'LC' )
+
+			@if(!empty($data['lc_dst_fld']['s'])
+			|| !empty($data['lc_dst_fld']['H(inh A)'])
+			|| !empty($data['lc_dst_fld']['H(Kat G)']) 
+			|| !empty($data['lc_dst_fld']['r'])
+			|| !empty($data['lc_dst_fld']['e'])
+			|| !empty($data['lc_dst_fld']['z'])
+			|| !empty($data['lc_dst_fld']['km'])
+			|| !empty($data['lc_dst_fld']['cm'])
+			|| !empty($data['lc_dst_fld']['am'])
+			|| !empty($data['lc_dst_fld']['lfx'])			
+			|| !empty($data['lc_dst_fld']['mfx2'])
+			|| !empty($data['lc_dst_fld']['pas'])
+			|| !empty($data['lc_dst_fld']['lzd'])
+			|| !empty($data['lc_dst_fld']['cfz'])
+			|| !empty($data['lc_dst_fld']['eto'])
+			|| !empty($data['lc_dst_fld']['clr'])
+			|| !empty($data['lc_dst_fld']['Dim'])
+			|| !empty($data['lc_dst_fld']['BDQ'])
+			)
+
 				<tr>
 					<td colspan="2">
-						<table width="100%" cellspacing="5" cellpadding="5">
-							@if($hybridization_data->tag=='1st line LPA')
-								
-								<th colspan="4">Line Probe Assay(LPA) - First Line LPA - Hybridization: The result is invalid of Sample  {{$hybridization_data->sample_label}} </th>
-								
-								
-							@endif
-							@if($hybridization_data->tag=='2nd line LPA')
-								
-								<th colspan="4">Line Probe Assay(LPA) - Second Line LPA - Hybridization: The result is invalid of Sample  {{$hybridization_data->sample_label}} </th>
-								
-							@endif
 						
-							<!-- <tr>
-								<th colspan="4">Line Probe Assay(LPA)- {{$hybridization_data->tag}}<br/>The result is invalid of Sample  {{ !empty($hybridization_data->sample_label)?$hybridization_data->sample_label:"" }}</th>
-							</tr> -->
+						<table WIDTH=100%>
+							<tr>
+								<th colspan="20" style="text-align:center;">Drug Susceptibility Test (DST) results</th>
+							</tr>
+							<tr>
+								<td rowspan="2"; style="text-align:center;">Sample ID</td>
+								<td colspan="6"; style="text-align:center;">1st Line drugs</td>
+								<td colspan="3"; style="text-align:center;">SLI</td>
+								<td colspan="3"; style="text-align:center;">FQ</td>
+								<td colspan="6"; style="text-align:center;">Others</td>
+							</tr>
+							<tr>
+								<td style="text-align:center;" width="45">S</td>
+								<td style="text-align:center;"  width="45">H</td>
+								<!--<td style="text-align:center;" width="30">H(0.4)</td>-->
+								<td style="text-align:center;" width="45">R</td>
+								<td style="text-align:center;" width="45">E</td>
+								<td style="text-align:center;" width="45">Z</td>
+								<td style="text-align:center;" width="45">Km</td>
+								<td style="text-align:center;" width="45">Cm</td>
+								<td style="text-align:center;" width="45">Am</td>
+								<td style="text-align:center;" width="40">Lfx</td>								
+								<td style="text-align:center;" width="40">Mfx (1)</td>
+								<td style="text-align:center;" width="40">PAS</td>
+								<td style="text-align:center;" width="40">Lzd</td>
+								<td style="text-align:center;" width="40">Cfz</td>
+								<td style="text-align:center;" width="40">Eto</td>
+								<td style="text-align:center;" width="40">Clr</td>
+								<td style="text-align:center;" width="40">Dim</td>
+								<td style="text-align:center;" width="40">BDQ</td>
+							</tr>
+
+							@if(isset($data['lc_dst_fld'])&& !empty($data['lc_dst_fld']))
+								@if(!empty($data['lc_dst_fld']['s'])
+								|| !empty($data['lc_dst_fld']['H'])								
+								|| !empty($data['lc_dst_fld']['r'])
+								|| !empty($data['lc_dst_fld']['e'])
+								|| !empty($data['lc_dst_fld']['z'])
+								|| !empty($data['lc_dst_fld']['km'])
+								|| !empty($data['lc_dst_fld']['cm'])
+								|| !empty($data['lc_dst_fld']['am'])
+								|| !empty($data['lc_dst_fld']['lfx'])								
+								|| !empty($data['lc_dst_fld']['mfx2'])
+								|| !empty($data['lc_dst_fld']['pas'])
+								|| !empty($data['lc_dst_fld']['lzd'])
+								|| !empty($data['lc_dst_fld']['cfz'])
+								|| !empty($data['lc_dst_fld']['eto'])
+								|| !empty($data['lc_dst_fld']['clr'])
+								|| !empty($data['lc_dst_fld']['Dim'])
+								|| !empty($data['lc_dst_fld']['BDQ']))	
+									<tr>
+									<?php //echo '<pre>'; echo $data['lc_dst_fld']['am']; die();?>
+										{{-- <td style="text-align:center;">LC DST-{{ !empty($data['culturelc']->sample_label)?$data['culturelc']->sample_label:"" }}</td> --}}
+
+										<td style="text-align:center;">LC DST-{{ $data['sampleLable'] }}</td>
+										
+										<td style="text-align:center;"><?php echo isset($data['lc_dst_fld']['s'])&&!empty($data['lc_dst_fld']['s'])? mb_substr($data['lc_dst_fld']['s'],0,1)=="N"?"--":mb_substr($data['lc_dst_fld']['s'],0,1):""; ?></td>	
+										<td style="text-align:center;"><?php echo isset($data['lc_dst_fld']['H(inh A)'])&&!empty($data['lc_dst_fld']['H(inh A)'])?mb_substr($data['lc_dst_fld']['H(inh A)'],0,1)=="N"?"--":mb_substr($data['lc_dst_fld']['H(inh A)'],0,1):""; ?></td>
+										<!-- <td style="text-align:center;"></*?php echo isset($data['lc_dst_fld']['H(Kat G)'])&&!empty($data['lc_dst_fld']['H(Kat G)'])?mb_substr($data['lc_dst_fld']['H(Kat G)'],0,1)=="N"?"--":mb_substr($data['lc_dst_fld']['H(Kat G)'],0,1):""; ?></td> -->
+										<td style="text-align:center;"><?php echo isset($data['lc_dst_fld']['r'])&&!empty($data['lc_dst_fld']['r'])?mb_substr($data['lc_dst_fld']['r'],0,1)=="N"?"--":mb_substr($data['lc_dst_fld']['r'],0,1):""; ?></td>
+										<td style="text-align:center;"><?php echo isset($data['lc_dst_fld']['e'])&&!empty($data['lc_dst_fld']['e'])?mb_substr($data['lc_dst_fld']['e'],0,1)=="N"?"--":mb_substr($data['lc_dst_fld']['e'],0,1):""; ?></td>
+										<td style="text-align:center;"><?php echo isset($data['lc_dst_fld']['z'])&&!empty($data['lc_dst_fld']['z'])?mb_substr($data['lc_dst_fld']['z'],0,1)=="N"?"--":mb_substr($data['lc_dst_fld']['z'],0,1):""; ?></td>
+										<td style="text-align:center;"><?php echo isset($data['lc_dst_fld']['km'])&&!empty($data['lc_dst_fld']['km'])?mb_substr($data['lc_dst_fld']['km'],0,1)=="N"?"--":mb_substr($data['lc_dst_fld']['km'],0,1):""; ?></td>
+										<td style="text-align:center;"><?php echo isset($data['lc_dst_fld']['cm'])&&!empty($data['lc_dst_fld']['cm'])?mb_substr($data['lc_dst_fld']['cm'],0,1)=="N"?"--":mb_substr($data['lc_dst_fld']['cm'],0,1):""; ?></td>
+										<td style="text-align:center;"><?php echo isset($data['lc_dst_fld']['am'])&&!empty($data['lc_dst_fld']['am'])?mb_substr($data['lc_dst_fld']['am'],0,1)=="N"?"--":mb_substr($data['lc_dst_fld']['am'],0,1):""; ?></td>
+										<td style="text-align:center;"><?php echo isset($data['lc_dst_fld']['lfx'])&&!empty($data['lc_dst_fld']['lfx'])?mb_substr($data['lc_dst_fld']['lfx'],0,1)=="N"?"--":mb_substr($data['lc_dst_fld']['lfx'],0,1):""; ?></td>										
+										<td style="text-align:center;"><?php echo isset($data['lc_dst_fld']['mfx2'])&&!empty($data['lc_dst_fld']['mfx2'])?mb_substr($data['lc_dst_fld']['mfx2'],0,1)=="N"?"--":mb_substr($data['lc_dst_fld']['mfx2'],0,1):""; ?></td>
+										<td style="text-align:center;"><?php echo isset($data['lc_dst_fld']['pas'])&&!empty($data['lc_dst_fld']['pas'])?mb_substr($data['lc_dst_fld']['pas'],0,1)=="N"?"--":mb_substr($data['lc_dst_fld']['pas'],0,1):""; ?></td>
+										<td style="text-align:center;"><?php echo isset($data['lc_dst_fld']['lzd'])&&!empty($data['lc_dst_fld']['lzd'])?mb_substr($data['lc_dst_fld']['lzd'],0,1)=="N"?"--":mb_substr($data['lc_dst_fld']['lzd'],0,1):""; ?></td>
+										<td style="text-align:center;"><?php echo isset($data['lc_dst_fld']['cfz'])&&!empty($data['lc_dst_fld']['cfz'])?mb_substr($data['lc_dst_fld']['cfz'],0,1)=="N"?"--":mb_substr($data['lc_dst_fld']['cfz'],0,1):""; ?></td>
+										<td style="text-align:center;"><?php echo isset($data['lc_dst_fld']['eto'])&&!empty($data['lc_dst_fld']['eto'])?mb_substr($data['lc_dst_fld']['eto'],0,1)=="N"?"--":mb_substr($data['lc_dst_fld']['eto'],0,1):""; ?></td>
+										<td style="text-align:center;"><?php echo isset($data['lc_dst_fld']['clr'])&&!empty($data['lc_dst_fld']['clr'])?mb_substr($data['lc_dst_fld']['clr'],0,1)=="N"?"--":mb_substr($data['lc_dst_fld']['clr'],0,1):""; ?></td>
+										<td style="text-align:center;"><?php echo isset($data['lc_dst_fld']['Dim'])&&!empty($data['lc_dst_fld']['Dim'])?mb_substr($data['lc_dst_fld']['Dim'],0,1)=="N"?"--":mb_substr($data['lc_dst_fld']['Dim'],0,1):""; ?></td>
+										<td style="text-align:center;"><?php echo isset($data['lc_dst_fld']['BDQ'])&&!empty($data['lc_dst_fld']['BDQ'])?mb_substr($data['lc_dst_fld']['BDQ'],0,1)=="N"?"--":mb_substr($data['lc_dst_fld']['BDQ'],0,1):""; ?></td>
+																				
+										</tr>
+									@endif	
+								@endif
+						</table>
+
+						<tr>	
+							<td>	
+								
+								@if($data['lc_dst']->count() > 0)
+									LCDST - Date Result: {{ date ('d-m-Y', strtotime($data['lc_dst'][0]->result_date)) }} &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+									Date Reported:{{date('d-m-Y H:i:s', strtotime($data['lc_dst'][0]->sent_to_nikshay_date))}}  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+									Reported by: {{ Auth::user()->name }} 
+									<br /><br />
+							Remarks : {{ $data['microbio_comment'] }}
+								@endif
+							</td>
+						</tr>
+					</td>
+					</tr>
+				@endif
+				@if(count($data['lc_dst'])>0)
+					<th style="text-align:center;">R: Resistant; S: Susceptible; C: Contaminated; -- Not done</th>
+        		@endif
+			@endif
+
+		
+		@if( $data['serviceId'] == '22' && $data['tag'] == 'LJ' )
+
+				@if(!empty($data['lj_dst_fld']['s'])
+					|| !empty($data['lj_dst_fld']['H(inh A)'])
+					|| !empty($data['lj_dst_fld']['H(Kat G)']) 
+					|| !empty($data['lj_dst_fld']['r'])
+					|| !empty($data['lj_dst_fld']['e'])
+					|| !empty($data['lj_dst_fld']['z'])
+					|| !empty($data['lj_dst_fld']['km'])
+					|| !empty($data['lj_dst_fld']['cm'])
+					|| !empty($data['lj_dst_fld']['am'])
+					|| !empty($data['lj_dst_fld']['lfx'])					
+					|| !empty($data['lj_dst_fld']['mfx2'])
+					|| !empty($data['lj_dst_fld']['pas'])
+					|| !empty($data['lj_dst_fld']['lzd'])
+					|| !empty($data['lj_dst_fld']['cfz'])
+					|| !empty($data['lj_dst_fld']['eto'])
+					|| !empty($data['lj_dst_fld']['clr'])
+					|| !empty($data['lj_dst_fld']['Dim'])
+					|| !empty($data['lj_dst_fld']['BDQ']))
+
+					<tr>
+						<td colspan="2">
 							
-							
-							
-							
+							<table WIDTH=100%>
+								<tr>
+									<th colspan="20" style="text-align:center;">Drug Susceptibility Test (DST) results</th>
+								</tr>
+								<tr>
+									<td rowspan="2"; style="text-align:center;">Sample ID</td>
+									<td colspan="6"; style="text-align:center;">1st Line drugs</td>
+									<td colspan="3"; style="text-align:center;">SLI</td>
+									<td colspan="3"; style="text-align:center;">FQ</td>
+									<td colspan="6"; style="text-align:center;">Others</td>
+								</tr>
+								<tr>
+									<td style="text-align:center;" width="45">S</td>
+									<td style="text-align:center;"  width="45">H</td>				
+									<td style="text-align:center;" width="45">R</td>
+									<td style="text-align:center;" width="45">E</td>
+									<td style="text-align:center;" width="45">Z</td>
+									<td style="text-align:center;" width="45">Km</td>
+									<td style="text-align:center;" width="45">Cm</td>
+									<td style="text-align:center;" width="45">Am</td>
+									<td style="text-align:center;" width="40">Lfx</td>									
+									<td style="text-align:center;" width="40">Mfx (1)</td>
+									<td style="text-align:center;" width="40">PAS</td>
+									<td style="text-align:center;" width="40">Lzd</td>
+									<td style="text-align:center;" width="40">Cfz</td>
+									<td style="text-align:center;" width="40">Eto</td>
+									<td style="text-align:center;" width="40">Clr</td>
+									<td style="text-align:center;" width="40">Dim</td>
+									<td style="text-align:center;" width="40">BDQ</td>
+								</tr>
+
+								@if(isset($data['lj_dst_fld'])&& !empty($data['lj_dst_fld']))
+									@if( !empty($data['lj_dst_fld']['s'])
+									|| !empty($data['lj_dst_fld']['H(inh A)'])
+									|| !empty($data['lj_dst_fld']['H(Kat G)']) 
+									|| !empty($data['lj_dst_fld']['r'])
+									|| !empty($data['lj_dst_fld']['e'])
+									|| !empty($data['lj_dst_fld']['z'])
+									|| !empty($data['lj_dst_fld']['km'])
+									|| !empty($data['lj_dst_fld']['cm'])
+									|| !empty($data['lj_dst_fld']['am'])
+									|| !empty($data['lj_dst_fld']['lfx'])									
+									|| !empty($data['lj_dst_fld']['mfx2'])
+									|| !empty($data['lj_dst_fld']['pas'])
+									|| !empty($data['lj_dst_fld']['lzd'])
+									|| !empty($data['lj_dst_fld']['cfz'])
+									|| !empty($data['lj_dst_fld']['eto'])
+									|| !empty($data['lj_dst_fld']['clr'])
+									|| !empty($data['lj_dst_fld']['Dim'])
+									|| !empty($data['lj_dst_fld']['BDQ']))							
+									<tr>
+										{{-- <td style="text-align:center;">LJ DST-{{ !empty($data['culturelj']->sample_label)?$data['culturelj']->sample_label:"" }}</td> --}}
+
+										<td style="text-align:center;">LJ DST-{{ $data['sampleLable'] }}</td>
+										<td style="text-align:center;">{{ mb_substr($data['lj_dst_fld']['s'],0,1)=="N"?"--":mb_substr($data['lj_dst_fld']['s'],0,1) }}</td>
+										<td style="text-align:center;">{{ mb_substr($data['lj_dst_fld']['H(inh A)'],0,1)=="N"?"--":mb_substr($data['lj_dst_fld']['H(inh A)'],0,1) }}</td>
+										<!--<td style="text-align:center;">{{ mb_substr($data['lj_dst_fld']['H(Kat G)'],0,1)=="N"?"--":mb_substr($data['lj_dst_fld']['H(Kat G)'],0,1) }}</td>-->
+										<td style="text-align:center;">{{ mb_substr($data['lj_dst_fld']['r'],0,1)=="N"?"--":mb_substr($data['lj_dst_fld']['r'],0,1) }}</td>
+										<td style="text-align:center;">{{ mb_substr($data['lj_dst_fld']['e'],0,1)=="N"?"--":mb_substr($data['lj_dst_fld']['e'],0,1) }}</td>
+										<td style="text-align:center;">{{ mb_substr($data['lj_dst_fld']['z'],0,1)=="N"?"--":mb_substr($data['lj_dst_fld']['z'],0,1) }}</td>
+										<td style="text-align:center;">{{ mb_substr($data['lj_dst_fld']['km'],0,1)=="N"?"--":mb_substr($data['lj_dst_fld']['km'],0,1) }}</td>
+										<td style="text-align:center;">{{ mb_substr($data['lj_dst_fld']['cm'],0,1)=="N"?"--":mb_substr($data['lj_dst_fld']['cm'],0,1) }}</td>
+										<td style="text-align:center;">{{ mb_substr($data['lj_dst_fld']['am'],0,1)=="N"?"--":mb_substr($data['lj_dst_fld']['am'],0,1) }}</td>
+										<td style="text-align:center;">{{ mb_substr($data['lj_dst_fld']['lfx'],0,1)=="N"?"--":mb_substr($data['lj_dst_fld']['lfx'],0,1) }}</td>										
+										<td style="text-align:center;">{{ mb_substr($data['lj_dst_fld']['mfx2'],0,1)=="N"?"--":mb_substr($data['lj_dst_fld']['mfx2'],0,1) }}</td>
+										<td style="text-align:center;">{{ mb_substr($data['lj_dst_fld']['pas'],0,1)=="N"?"--":mb_substr($data['lj_dst_fld']['pas'],0,1) }}</td>
+										<td style="text-align:center;">{{ mb_substr($data['lj_dst_fld']['lzd'],0,1)=="N"?"--":mb_substr($data['lj_dst_fld']['lzd'],0,1) }}</td>
+										<td style="text-align:center;">{{ mb_substr($data['lj_dst_fld']['cfz'],0,1)=="N"?"--":mb_substr($data['lj_dst_fld']['cfz'],0,1) }}</td>
+										<td style="text-align:center;">{{ mb_substr($data['lj_dst_fld']['eto'],0,1)=="N"?"--":mb_substr($data['lj_dst_fld']['eto'],0,1) }}</td>
+										<td style="text-align:center;">{{ mb_substr($data['lj_dst_fld']['clr'],0,1)=="N"?"--":mb_substr($data['lj_dst_fld']['clr'],0,1) }}</td>
+										<td style="text-align:center;">{{ mb_substr($data['lj_dst_fld']['Dim'],0,1)=="N"?"--":mb_substr($data['lj_dst_fld']['Dim'],0,1) }}</td>
+										<td style="text-align:center;">{{ mb_substr($data['lj_dst_fld']['BDQ'],0,1)=="N"?"--":mb_substr($data['lj_dst_fld']['BDQ'],0,1) }}</td>
+									</tr>
+									@endif
+								@endif
+							</table>
+							<tr>	
+								<td>	
+									@if(!empty($data['lj_dst']))
+										LJDST - Date Result: {{ date ('d-m-Y', strtotime($data['lj_dst'][0]->created_at)) }} &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+										Date Reported:{{date('d-m-Y H:i:s', strtotime($data['lj_dst'][0]->sent_to_nikshay_date))}} &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+										Reported by: {{ Auth::user()->name }} 
+										<br /><br />
+							Remarks : {{ $data['microbio_comment'] }}
+									@endif								
+								</td>
+							</tr>
+						</td>
+					</tr>
+				@endif
+
+				@if(count((array)$data['lj_dst'])>0)
+					<th style="text-align:center;">R: Resistant; S: Susceptible; C: Contaminated; -- Not done</th>
+				@endif
+			@endif
+			
+			
+			<?php if(!empty($data['final_remark_list'])){ ?>
+				<tr>
+					<td colspan="2">
+						<table width="100%" align="center">
+							<tbody>
+							@php( $final_remark_list = array_pop( $data['final_remark_list'] ) )
+							<tr align="left">
+								<th width="120">Remarks</th>
+								<td>{{ $final_remark_list->remark }}</td>
+							</tr>
+							@if(!empty($final_remark_list->detail))
+							<tr align="left">
+								<th width="120">Details</th>
+								<td>{{ $final_remark_list->detail }}</td>
+							</tr>
+							@endif
+							</tbody>
 						</table>
 					</td>
-				</tr>			
-				@endif
-			@endforeach		
-        @endif
-      
-		@if(count($data['lc_dst'])>0 || count((array)$data['lj_dst'])>0)
-		
-        <tr>
-			<td colspan="2">
-			
-				<table WIDTH=100%>
-					<tr>
-						<th colspan="20" style="text-align:center;">Drug Susceptibility Test (DST) results</th>
-					</tr>
-					<tr>
-						<td rowspan="2";  style="text-align:center;" >Sample ID</td>
-						<td colspan="6";  style="text-align:center;">1st Line drugs</td>
-						<td colspan="3";  style="text-align:center;">SLI</td>
-						<td colspan="3";  style="text-align:center;">FQ</td>
-						<td colspan="6";  style="text-align:center;">Others</td>
-					</tr>
-					<tr>
-						<td style="text-align:center;" width="45">S</td>
-						<td style="text-align:center;" width="45">H (0.1)</td>
-						<!-- <td style="text-align:center;" width="45">H(0.4)</td> -->
-						<td style="text-align:center;" width="45">R</td>
-						<td style="text-align:center;" width="45">E</td>
-						<td style="text-align:center;" width="45">Z</td>
-						<td style="text-align:center;" width="45">Km</td>
-						<td style="text-align:center;" width="45">Cm</td>
-						<td style="text-align:center;" width="45">Am</td>
-						<td style="text-align:center;" width="40">Lfx</td>
-						<td style="text-align:center;" width="30">Mfx (0.25)</td>
-						<td style="text-align:center;" width="40">Mfx (1)</td>
-						<td style="text-align:center;" width="40">PAS</td>
-						<td style="text-align:center;" width="40">Lzd</td>
-						<td style="text-align:center;" width="40">Cfz</td>
-						<td style="text-align:center;" width="40">Eto</td>
-						<td style="text-align:center;" width="40">Clr</td>
-						<td style="text-align:center;" width="40">Azi</td>
-						<td style="text-align:center;" width="40">BDQ</td>
-
-					</tr>
-				    @if(isset($data['lj_dst_fld'])&& !empty($data['lj_dst_fld']))
-						@if(!empty($data['lj_dst_fld']['s']) || !empty($data['lj_dst_fld']['H(inh A)']) || !empty($data['lj_dst_fld']['H(Kat G)']) || !empty($data['lj_dst_fld']['r']) || !empty($data['lj_dst_fld']['e']) || !empty($data['lj_dst_fld']['z']) || !empty($data['lj_dst_fld']['km']) || !empty($data['lj_dst_fld']['cm']) || !empty($data['lj_dst_fld']['am']) || !empty($data['lj_dst_fld']['lfx']) || !empty($data['lj_dst_fld']['mfx1']) || !empty($data['lj_dst_fld']['mfx2']) || !empty($data['lj_dst_fld']['pas']) || !empty($data['lj_dst_fld']['lzd']) || !empty($data['lj_dst_fld']['cfz']) || !empty($data['lj_dst_fld']['eto']) || !empty($data['lj_dst_fld']['clr']) || !empty($data['lj_dst_fld']['azi']))						
-						<tr>
-							<td style="text-align:center;">LJ DST-{{ !empty($data['culturelj']->sample_label)?$data['culturelj']->sample_label:"" }}</td>
-							<td style="text-align:center;">{{ mb_substr($data['lj_dst_fld']['s'],0,1)=="N"?"--":mb_substr($data['lj_dst_fld']['s'],0,1) }}</td>
-							<td style="text-align:center;">{{ mb_substr($data['lj_dst_fld']['H(inh A)'],0,1)=="N"?"--":mb_substr($data['lj_dst_fld']['H(inh A)'],0,1) }}</td>
-							<!-- <td style="text-align:center;">{{ mb_substr($data['lj_dst_fld']['H(Kat G)'],0,1)=="N"?"--":mb_substr($data['lj_dst_fld']['H(Kat G)'],0,1) }}</td> -->
-							<td style="text-align:center;">{{ mb_substr($data['lj_dst_fld']['r'],0,1)=="N"?"--":mb_substr($data['lj_dst_fld']['r'],0,1) }}</td>
-							<td style="text-align:center;">{{ mb_substr($data['lj_dst_fld']['e'],0,1)=="N"?"--":mb_substr($data['lj_dst_fld']['e'],0,1) }}</td>
-							<td style="text-align:center;">{{ mb_substr($data['lj_dst_fld']['z'],0,1)=="N"?"--":mb_substr($data['lj_dst_fld']['z'],0,1) }}</td>
-							<td style="text-align:center;">{{ mb_substr($data['lj_dst_fld']['km'],0,1)=="N"?"--":mb_substr($data['lj_dst_fld']['km'],0,1) }}</td>
-							<td style="text-align:center;">{{ mb_substr($data['lj_dst_fld']['cm'],0,1)=="N"?"--":mb_substr($data['lj_dst_fld']['cm'],0,1) }}</td>
-							<td style="text-align:center;">{{ mb_substr($data['lj_dst_fld']['am'],0,1)=="N"?"--":mb_substr($data['lj_dst_fld']['am'],0,1) }}</td>
-							<td style="text-align:center;">{{ mb_substr($data['lj_dst_fld']['lfx'],0,1)=="N"?"--":mb_substr($data['lj_dst_fld']['lfx'],0,1) }}</td>
-							<td style="text-align:center;">{{ mb_substr($data['lj_dst_fld']['mfx1'],0,1)=="N"?"--":mb_substr($data['lj_dst_fld']['mfx1'],0,1) }}</td>
-							<td style="text-align:center;">{{ mb_substr($data['lj_dst_fld']['mfx2'],0,1)=="N"?"--":mb_substr($data['lj_dst_fld']['mfx2'],0,1) }}</td>
-							<td style="text-align:center;">{{ mb_substr($data['lj_dst_fld']['pas'],0,1)=="N"?"--":mb_substr($data['lj_dst_fld']['pas'],0,1) }}</td>
-							<td style="text-align:center;">{{ mb_substr($data['lj_dst_fld']['lzd'],0,1)=="N"?"--":mb_substr($data['lj_dst_fld']['lzd'],0,1) }}</td>
-							<td style="text-align:center;">{{ mb_substr($data['lj_dst_fld']['cfz'],0,1)=="N"?"--":mb_substr($data['lj_dst_fld']['cfz'],0,1) }}</td>
-							<td style="text-align:center;">{{ mb_substr($data['lj_dst_fld']['eto'],0,1)=="N"?"--":mb_substr($data['lj_dst_fld']['eto'],0,1) }}</td>
-							<td style="text-align:center;">{{ mb_substr($data['lj_dst_fld']['clr'],0,1)=="N"?"--":mb_substr($data['lj_dst_fld']['clr'],0,1) }}</td>
-							<td style="text-align:center;">{{ mb_substr($data['lj_dst_fld']['azi'],0,1)=="N"?"--":mb_substr($data['lj_dst_fld']['azi'],0,1) }}</td>
-							<td style="text-align:center;">{{ mb_substr($data['lj_dst_fld']['BDQ'],0,1)=="N"?"--":mb_substr($data['lj_dst_fld']['BDQ'],0,1) }}</td>
-						</tr>
-						@endif
-					@endif
-					
-					@if(isset($data['lc_dst_fld'])&& !empty($data['lc_dst_fld']))
-						@if(!empty($data['lc_dst_fld']['s']) || !empty($data['lc_dst_fld']['H(inh A)']) || !empty($data['lc_dst_fld']['H(Kat G)']) || !empty($data['lc_dst_fld']['r']) || !empty($data['lc_dst_fld']['e']) || !empty($data['lc_dst_fld']['z']) || !empty($data['lc_dst_fld']['km']) || !empty($data['lc_dst_fld']['cm']) || !empty($data['lc_dst_fld']['am']) || !empty($data['lc_dst_fld']['lfx']) || !empty($data['lc_dst_fld']['mfx1']) || !empty($data['lc_dst_fld']['mfx2']) || !empty($data['lc_dst_fld']['pas']) || !empty($data['lc_dst_fld']['lzd']) || !empty($data['lc_dst_fld']['cfz']) || !empty($data['lc_dst_fld']['eto']) || !empty($data['lc_dst_fld']['clr']) || !empty($data['lc_dst_fld']['azi'] ))						
-							<tr>
-							   <?php //echo '<pre>'; echo $data['lc_dst_fld']['am']; die();?>
-								<td style="text-align:center;">LC DST-{{ !empty($data['culturelc']->sample_label)?$data['culturelc']->sample_label:"" }}</td>
-								
-								<td style="text-align:center;"><?php echo isset($data['lc_dst_fld']['s'])&&!empty($data['lc_dst_fld']['s'])? mb_substr($data['lc_dst_fld']['s'],0,1)=="N"?"--":mb_substr($data['lc_dst_fld']['s'],0,1):""; ?></td>								
-								<td style="text-align:center;"><?php echo isset($data['lc_dst_fld']['H(inh A)'])&&!empty($data['lc_dst_fld']['H(inh A)'])?mb_substr($data['lc_dst_fld']['H(inh A)'],0,1)=="N"?"--":mb_substr($data['lc_dst_fld']['H(inh A)'],0,1):""; ?></td>
-								<!--<td style="text-align:center;"><?php echo isset($data['lc_dst_fld']['H(Kat G)'])&&!empty($data['lc_dst_fld']['H(Kat G)'])?mb_substr($data['lc_dst_fld']['H(Kat G)'],0,1)=="N"?"--":mb_substr($data['lc_dst_fld']['H(Kat G)'],0,1):""; ?></td> -->
-								<td style="text-align:center;"><?php echo isset($data['lc_dst_fld']['r'])&&!empty($data['lc_dst_fld']['r'])?mb_substr($data['lc_dst_fld']['r'],0,1)=="N"?"--":mb_substr($data['lc_dst_fld']['r'],0,1):""; ?></td>
-								<td style="text-align:center;"><?php echo isset($data['lc_dst_fld']['e'])&&!empty($data['lc_dst_fld']['e'])?mb_substr($data['lc_dst_fld']['e'],0,1)=="N"?"--":mb_substr($data['lc_dst_fld']['e'],0,1):""; ?></td>
-								<td style="text-align:center;"><?php echo isset($data['lc_dst_fld']['z'])&&!empty($data['lc_dst_fld']['z'])?mb_substr($data['lc_dst_fld']['z'],0,1)=="N"?"--":mb_substr($data['lc_dst_fld']['z'],0,1):""; ?></td>
-								<td style="text-align:center;"><?php echo isset($data['lc_dst_fld']['km'])&&!empty($data['lc_dst_fld']['km'])?mb_substr($data['lc_dst_fld']['km'],0,1)=="N"?"--":mb_substr($data['lc_dst_fld']['km'],0,1):""; ?></td>
-								<td style="text-align:center;"><?php echo isset($data['lc_dst_fld']['cm'])&&!empty($data['lc_dst_fld']['cm'])?mb_substr($data['lc_dst_fld']['cm'],0,1)=="N"?"--":mb_substr($data['lc_dst_fld']['cm'],0,1):""; ?></td>
-								<td style="text-align:center;"><?php echo isset($data['lc_dst_fld']['am'])&&!empty($data['lc_dst_fld']['am'])?mb_substr($data['lc_dst_fld']['am'],0,1)=="N"?"--":mb_substr($data['lc_dst_fld']['am'],0,1):""; ?></td>
-								<td style="text-align:center;"><?php echo isset($data['lc_dst_fld']['lfx'])&&!empty($data['lc_dst_fld']['lfx'])?mb_substr($data['lc_dst_fld']['lfx'],0,1)=="N"?"--":mb_substr($data['lc_dst_fld']['lfx'],0,1):""; ?></td>
-								<td style="text-align:center;"><?php echo isset($data['lc_dst_fld']['mfx1'])&&!empty($data['lc_dst_fld']['mfx1'])?mb_substr($data['lc_dst_fld']['mfx1'],0,1)=="N"?"--":mb_substr($data['lc_dst_fld']['mfx1'],0,1):""; ?></td>
-								<td style="text-align:center;"><?php echo isset($data['lc_dst_fld']['mfx2'])&&!empty($data['lc_dst_fld']['mfx2'])?mb_substr($data['lc_dst_fld']['mfx2'],0,1)=="N"?"--":mb_substr($data['lc_dst_fld']['mfx2'],0,1):""; ?></td>
-								<td style="text-align:center;"><?php echo isset($data['lc_dst_fld']['pas'])&&!empty($data['lc_dst_fld']['pas'])?mb_substr($data['lc_dst_fld']['pas'],0,1)=="N"?"--":mb_substr($data['lc_dst_fld']['pas'],0,1):""; ?></td>
-								<td style="text-align:center;"><?php echo isset($data['lc_dst_fld']['lzd'])&&!empty($data['lc_dst_fld']['lzd'])?mb_substr($data['lc_dst_fld']['lzd'],0,1)=="N"?"--":mb_substr($data['lc_dst_fld']['lzd'],0,1):""; ?></td>
-								<td style="text-align:center;"><?php echo isset($data['lc_dst_fld']['cfz'])&&!empty($data['lc_dst_fld']['cfz'])?mb_substr($data['lc_dst_fld']['cfz'],0,1)=="N"?"--":mb_substr($data['lc_dst_fld']['cfz'],0,1):""; ?></td>
-								<td style="text-align:center;"><?php echo isset($data['lc_dst_fld']['eto'])&&!empty($data['lc_dst_fld']['eto'])?mb_substr($data['lc_dst_fld']['eto'],0,1)=="N"?"--":mb_substr($data['lc_dst_fld']['eto'],0,1):""; ?></td>
-								<td style="text-align:center;"><?php echo isset($data['lc_dst_fld']['clr'])&&!empty($data['lc_dst_fld']['clr'])?mb_substr($data['lc_dst_fld']['clr'],0,1)=="N"?"--":mb_substr($data['lc_dst_fld']['clr'],0,1):""; ?></td>
-								<td style="text-align:center;"><?php echo isset($data['lc_dst_fld']['azi'])&&!empty($data['lc_dst_fld']['azi'])?mb_substr($data['lc_dst_fld']['azi'],0,1)=="N"?"--":mb_substr($data['lc_dst_fld']['azi'],0,1):""; ?></td>
-								<td style="text-align:center;"><?php echo isset($data['lc_dst_fld']['BDQ'])&&!empty($data['lc_dst_fld']['BDQ'])?mb_substr($data['lc_dst_fld']['BDQ'],0,1)=="N"?"--":mb_substr($data['lc_dst_fld']['BDQ'],0,1):""; ?></td>
-								
-								
-							</tr>
-						@endif	
-					@endif	
-					
-						<?php
-					//if(count($data['microbio'])>0){
-						//foreach ($data['microbio'] as $key=> $val){
-							//if($val['service_id']== 20){ ?>
-							<!--<tr>
-								<td>
-								<?php 
-								//if($val['created_at']){
-								?>	
-										Date Result:<?php //echo date('d-m-Y', strtotime($val['created_at'])); ?>  &emsp; Date Reported:<?php //echo date('d-m-Y H:i:s', time()); ?> &emsp; Reported by(Name and Signature):<?php //echo Auth::user()->name; ?>
-								<?php 
-								/*}
-								else
-								{*/	
-								?>	
-										Date Result:_____________ Date Reported:_____________ Reported by(Name and Signature):__________________
-								<?php 
-								//} 
-								?>
-								</td>
-							</tr>-->
-							<?php 
-							 //}
-						//}
-					//}
-					?>
-					</table>
-					<tr>
-					<td>
-					<!----
-					<?php 
-					//if($val['created_at']){
-					?>
-							Date Result:<?php //echo date('d-m-Y', strtotime($val['created_at']));?>  &emsp; Date Reported:<?php //echo date('d-m-Y H:i:s', time());?> &emsp; Reported by(Name and Signature):<?php //echo $data['microbio_name'];?>
-						    Date Result:<?php //echo date('d-m-Y', strtotime($data['lc_dst'][0]['created_at'])); ?>  &emsp; Date Reported:<?php //echo date('d-m-Y H:i:s', strtotime($data['lc_dst'][0]['sent_to_nikshay_date'])); ?> &emsp; Reported by(Name and Signature):<?php //echo $data['lc_dst'][0]['name']; ?>
-					
-					<?php //}else{ ?>
-							Date Result:_____________ Date Reported:_____________ Reported by(Name and Signature):__________________
-					<?php //} ?> 
-					-->
-						@if(!empty($data['lj_dst']))
-							LJDST - Date Result: {{ date ('d-m-Y', strtotime($data['lj_dst']->created_at)) }} &emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;
-							Date Reported: {{date('d-m-Y H:i:s', strtotime($data['lj_dst']->sent_to_nikshay_date))}}  &emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;
-							Reported by: {{ $data['lj_dst']->name}} 
-							<br />
-						@endif
-						
-						@if($data['lc_dst']->count() > 0)
-							LCDST - Date Result: {{ date ('d-m-Y', strtotime($data['lc_dst'][0]->result_date)) }} &emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;
-							Date Reported: {{date('d-m-Y H:i:s', strtotime($data['lc_dst'][0]->sent_to_nikshay_date))}}  &emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;
-							Reported by: {{ $data['lc_dst'][0]->uname}} 
-							<br />
-						@endif
-					
-					</td>
-					</tr>
-					
-					
-			
-			</td>
-		</tr>
-        @endif
-		
-		@if(count($data['lc_dst'])>0 || count((array)$data['lj_dst'])>0)
-		<th style="text-align:center;">R: Resistant; S: Susceptible; C: Contaminated; -- Not done</th>
-        @endif
-
-<?php if(!empty($data['final_remark_list'])){ ?>
-	<tr>
-		<td colspan="2">
-			<table width="100%" align="center">
-				<tbody>
-				@php( $final_remark_list = array_pop( $data['final_remark_list'] ) )
-				<tr align="left">
-                    <th width="120">Remarks</th>
-                    <td>{{ $final_remark_list->remark }}</td>
 				</tr>
-				@if(!empty($final_remark_list->detail))
-                <tr align="left">
-                    <th width="120">Details</th>
-                    <td>{{ $final_remark_list->detail }}</td>
-				</tr>
-				@endif
-				</tbody>
-			</table>
-		</td>
-	</tr>
-<?php } ?>
-
-
-
-</table>
-	<!-- @if( request('remarks') )
-		<strong>Remarks: {{ request('remarks') }}</strong>
-	@endif-->
-	<h6 align="center">(<?php echo $data['report_type']; ?>)</h6>
+			<?php } ?>
+		</table>
+		<h6 align="center">(<?php echo $data['report_type']; ?>)</h6>
 </div>
 </body>
 </html>
+
+        
+      
+		

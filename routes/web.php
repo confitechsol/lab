@@ -30,6 +30,7 @@ Route::group(['middleware' => 'auth:web'], function () {
 	Route::get('/get_drugs','Web\Admin\MicroController@get_drugs');
 	Route::get('/annexure15a', 'Web\Admin\MicroController@annexure15A');
 	Route::post('/ajax_annexure15A_list', 'Web\Admin\MicroController@ajaxAnnexure15AList');
+    Route::post('/annexure15astore', 'Web\Admin\MicroController@annexure15AStore');
 	Route::get('/history', 'Web\Admin\MicroController@history');
 	//////////vendor login///////////
 	Route::resource('/shipment-tracker', 'Web\Admin\ShipmentTrackerController');
@@ -44,12 +45,19 @@ Route::group(['middleware' => 'auth:web'], function () {
     Route::get('/sample/print/{sample_str}', 'Web\Admin\SampleController@barCodePrint');
 
 
-    Route::get('/pdfview/{id}/{pdf?}', 'Web\Admin\SampleController@pdfview');
-    Route::get('/interimview/{id}/{pdf?}', 'Web\Admin\SampleController@interimview');
+    Route::get('/pdfview/{id}/{service_id}/{tag}/{rec_flag}/{drug_name}/{pdf?}', 'Web\Admin\SampleController@pdfview')->name('pdfview');
+    Route::get('/interimview/{id}/{service_id}/{tag}/{drug_ids}/{pdf?}', 'Web\Admin\SampleController@interimview');
 
     Route::get('/annexurek', 'Web\Admin\SampleController@annexurek');
     Route::get('/annexurel', 'Web\Admin\SampleController@annexurel');
 
+    Route::get('/nikshay-verification-list', 'Web\Admin\EnrollController@nikshayVerificationList')->name('nikshay-verification-list');
+    Route::post('/nikshay-verification', 'Web\Admin\EnrollController@ajaxenrollVerification')->name('nikshay-verification');
+    Route::post('/updateEnrollmentStatus', 'Web\Admin\EnrollController@updateEnrollmentStatus')->name('updateEnrollmentStatus');
+    Route::post('/bulk_updateEnrollmentStatus', 'Web\Admin\EnrollController@updateBulkEnrollmentStatus')->name('bulk_updateEnrollmentStatus');
+
+    
+    
     Route::get('/sample/create/{id}', 'Web\Admin\SampleController@create');
     Route::get('/sample/editnew/{id}', 'Web\Admin\SampleController@editNew');
     Route::post('/sample/sample-update', 'Web\Admin\SampleController@newUpdate');
@@ -58,10 +66,13 @@ Route::group(['middleware' => 'auth:web'], function () {
     
     Route::get('/check_for_lcdst_sample_exist/{enroll_id}', 'Web\Admin\MicroController@checkForRequestLCDstDataExist');
 
+    Route::get('/check_for_ljdst_sample_exist/{enroll_id}', 'Web\Admin\MicroController@checkForRequestLJDstDataExist');
+
+    
     Route::get('/check_for_request_service/{enroll_id}', 'Web\Admin\MicroController@checkForRequestSeviceDataExist');	
     //Route::get('/check_for_sample_exist/{enroll_id}/{sentStep}', 'Web\Admin\SampleController@checkForSampleExist');	
     Route::get('/get_dst_drugs', 'Web\Admin\MicroController@getDstDrugs');
-	Route::get('/get_add_dst_drugs/{enroll_id}', 'Web\Admin\MicroController@getAddTestDstDrugs');
+	Route::get('/get_add_dst_drugs/{enroll_id}/{service}', 'Web\Admin\MicroController@getAddTestDstDrugs');
 	Route::get('/get_add_test_list/{enroll_id}', 'Web\Admin\MicroController@getAddTestList');
 	Route::get('/get_existing_service_ids/{enroll_id}', 'Web\Admin\MicroController@getExistingServiceIds');
     Route::get('/check_for_nikshayid_exist/{enroll_id}', 'Web\Admin\PatientController@checkForNikshayIdExist');
@@ -69,7 +80,8 @@ Route::group(['middleware' => 'auth:web'], function () {
     Route::post('/microbiologist/sendnikshay', 'Web\Admin\MicroController@sendToNikshay');
     Route::post('/microbiologist/sendnikshaybulk', 'Web\Admin\MicroController@sendToNikshayBulk');
     Route::get('/send_to_bmw/{log_id}/{enroll_id}/{sample_id}/{service_id}', 'Web\Admin\MicroController@sendToBMW');	
-	Route::get('test_request/create/{id}', [
+    
+	Route::get('test_request/create/{id}/{sample_id}', [
         'as' => 'test_request.create',
         'uses' => 'Web\Admin\TestRequestController@create'
     ]);
@@ -78,7 +90,11 @@ Route::group(['middleware' => 'auth:web'], function () {
         'create',
     ]]);
 
-    Route::get('/result/{serviceId}/{sampleId}/{enrollmentId}/{tag_service_nm}', 'Web\Admin\MicroController@result')->name('result');
+    Route::get('/get_dis_tu_st_fac', 'Web\Admin\TestRequestController@districtWiseTSF');	
+
+    
+
+    Route::get('/result/{serviceId}/{sampleId}/{enrollmentId}/{tag_service_nm}/{drug_list}', 'Web\Admin\MicroController@result')->name('result');
     Route::get('/restest_sento_to_map/{serviceId}/{optionId}/{tagId}', 'Web\Admin\MicroController@getRetestSentToMap')->name('restest_sento_to_map');
    
     Route::resource('/adduser', 'Web\Admin\AddUserController');
@@ -122,6 +138,8 @@ Route::group(['middleware' => 'auth:web'], function () {
     });
    
    Route::get('/check_for_sample_already_process_decontamination/{sample_id}/{enroll_id}/{sent_for?}/{DecontStatus?}', 'Web\Admin\DecontaminationController@checkForSampleAlreadyInProcessInDecontamination')->name('check_for_sample_already_process_decontamination');
+
+   Route::get('/check_sample_receive_date/{sample_id}/{enroll_id}', 'Web\Admin\DashboardDecontaminationController@getSampleReceiveDate')->name('check_sample_receive_date');
     
     Route::group(['middleware' => ['role:decontamination,can_view']], function () {
         Route::resource('/dash_decontamination', 'Web\Admin\DashboardDecontaminationController');
@@ -141,6 +159,8 @@ Route::group(['middleware' => 'auth:web'], function () {
     });
 	Route::get('/changenikshayid', 'Web\Admin\EnrollWithNikshayController@changeNikshayIdList')->name('changenikshayid');
 	Route::post('/updatewithnikshayid', 'Web\Admin\EnrollWithNikshayController@updateWithNikshayId');
+    Route::post('/updateWithNikshayIdChange', 'Web\Admin\EnrollController@updateWithNikshayIdChange');
+    
     Route::post('/enrollwithnikshay/print', 'Web\Admin\EnrollWithNikshayController@enrollPrint');
 //  Route::get('enroll/index/{id}', [
 //     'as' => 'enroll.index',
@@ -155,6 +175,25 @@ Route::group(['middleware' => 'auth:web'], function () {
     Route::group(['middleware' => ['role:lpa_interpretation,can_view']], function () {
         Route::resource('/lpa_interpretation', 'Web\Admin\LPAController');        
     });
+
+    Route::post('/lpa_bulkstore', 'Web\Admin\LPAController@bulkStore')->name('lpa_bulkstore');
+
+    Route::post('/cbnaat_bulkstore', 'Web\Admin\CbnaatController@bulkStore')->name('cbnaat_bulkstore');
+    
+    Route::post('/ajax_lpa_list', 'Web\Admin\LPAController@ajaxLPAList')->name('ajax_lpa_list');
+
+    Route::post('/get-mtb-1st-result', 'Web\Admin\LPAController@get1stMTBResult')->name('get-mtb-1st-result');
+
+    Route::post('/get-mtb-2nd-result', 'Web\Admin\LPAController@get2ndMTBResult')->name('get-mtb-2nd-result');
+
+    Route::post('/ajax_dnaextra_list', 'Web\Admin\DNAextractionController@ajaxDNAList')->name('ajax_dnaextra_list');
+
+    Route::post('/ajax_pcr_list', 'Web\Admin\PCRController@ajaxPCRList')->name('ajax_pcr_list');
+
+    Route::post('/ajax_hydra_list', 'Web\Admin\HybridizationController@ajaxHybridizationList')->name('ajax_hydra_list');
+
+    Route::post('/ajax_sample_list', 'Web\Admin\SampleController@ajaxSampleList')->name('ajax_sample_list');
+
     //ajax call for final interpretation
     Route::get('/getFinalInterpretation/{linetype}', 'Web\Admin\LPAController@getFinalInterpretation');
 	
@@ -178,6 +217,11 @@ Route::group(['middleware' => 'auth:web'], function () {
         Route::resource('/lc_result_review', 'Web\Admin\LCResultReviewController');
         Route::post('/dash_lc_result_review_bulk', 'Web\Admin\LCResultReviewController@bulkStore')->name('lc_result_review.send-review.bulk');
     });
+
+    Route::post('/check-for-sample-lc-review', 'Web\Admin\LCResultReviewController@checkForSampleLcReview')->name('check-for-sample-lc-review');
+
+    Route::post('/check-for-sample-lj-review', 'Web\Admin\LCResultReviewController@checkForSampleLjReview')->name('check-for-sample-lj-review');
+    
 	
 	Route::get('/check_for_sample_exist_in_storage/{enroll_id}', 'Web\Admin\LCResultReviewController@checkForSampleExistInStorage')->name('check_for_sample_exist_in_storage');
     
@@ -206,6 +250,8 @@ Route::group(['middleware' => 'auth:web'], function () {
         Route::resource('/searchform', 'Web\Admin\SearchformController');
     });
 
+    Route::get('/check_sample_log_exists/{sample_id}/{enroll_id}/{service_tag_id}', 'Web\Admin\SearchformController@checkSampleLogExists')->name('check_sample_log_exists');
+
     Route::post('/DNANext', 'Web\Admin\DNAextractionController@DNANext');
 
     Route::post('/lj_dst_ln1/inoculation', 'Web\Admin\LJDST1Controller@inoculation');
@@ -213,7 +259,9 @@ Route::group(['middleware' => 'auth:web'], function () {
 	Route::post('/lj_dst_ln2/reading', 'Web\Admin\LJDST2Controller@reading');
     Route::post('/lj_dst_ln1/readingReview', 'Web\Admin\LJDST1Controller@reading_review');
     Route::get('/lj_dst_ln1/detail/{id}/{week}', 'Web\Admin\LJDST1Controller@detail');
-   Route::get('/lj_dst_ln2/detail/{id}/{week}', 'Web\Admin\LJDST2Controller@detail');  
+    Route::get('/lj_dst_ln2/detail/{id}/{week}', 'Web\Admin\LJDST2Controller@detail');  
+
+    
 
     Route::group(['middleware' => ['role:lj_dst_2st_line,can_view']], function () {
         Route::resource('/lj_dst_ln2', 'Web\Admin\LJDST2Controller');
@@ -225,6 +273,8 @@ Route::group(['middleware' => 'auth:web'], function () {
     Route::get('/phi/{state}/{tbu}/{district}', 'Web\Admin\TestRequestController@phi_collect')->name('phi');
 
     Route::get('/tbunit/{state}/{district}', 'Web\Admin\TestRequestController@tbunit_collect')->name('tbunit');
+
+    Route::get('/newtbunit/{state}/{district}', 'Web\Admin\TestRequestController@new_tbunit_collect')->name('newtbunit');
 
     Route::get('/pcr', 'Web\Admin\TestController@pcr')->name('pcr');
 
@@ -241,6 +291,12 @@ Route::group(['middleware' => 'auth:web'], function () {
     Route::post('/hr/yearOrganizationFilter', 'Web\Admin\HRController@yearOrganizationFilter');
     Route::post('/hr/yearTypeFilter', 'Web\Admin\HRController@yearTypeFilter');
     Route::get('/hr/{id}/delete_hr', 'Web\Admin\HRController@delete_hr');
+
+    Route::get('/tu-update', 'Web\Admin\TuController@showList');
+    Route::get('/get_district/{state_code}', 'Web\Admin\TuController@showDistrict');
+    Route::post('/ajax_tu_list', 'Web\Admin\TuController@ajaxTUList')->name('ajax_tu_list');
+    Route::post('/tu_request', 'Web\Admin\TuController@store')->name('tu_request');   
+    
 
     Route::resource('/equipment', 'Web\Admin\EquipmentController');
     Route::post('/equipment/downtimeAnalysis', 'Web\Admin\EquipmentController@downtimeAnalysis');
@@ -339,7 +395,15 @@ Route::group(['middleware' => 'auth:web'], function () {
         Route::get('/report/performance_indicator', 'Web\Admin\ReportController@performance_indicator');
         Route::post('/report/performance_indicator', 'Web\Admin\ReportController@performance_indicator');
 		Route::get('/report/annexurel', 'Web\Admin\ReportController@annexure15L');
-        Route::post('/report/annexurel', 'Web\Admin\ReportController@annexure15L');
+
+        Route::get('/report/fl_lpa_proble', 'Web\Admin\ReportController@fLpaProbe');
+        Route::post('/ajax-fl-lpa', 'Web\Admin\ReportController@ajaxfLpa')->name('ajax-fl-lpa');
+
+        Route::get('/report/sl_lpa_proble', 'Web\Admin\ReportController@sLpaProbe');
+        Route::post('/ajax-sl-lpa', 'Web\Admin\ReportController@ajaxsLpa')->name('ajax-sl-lpa');
+
+        Route::get('/getQuarterWiseMonth/{quarter_id}', 'Web\Admin\ReportController@getQuarterWiseMonth');
+        Route::post('/ajax-annexure15l', 'Web\Admin\ReportController@ajaxAnnexure15l')->name('ajax-annexure15l');
         Route::get('/report/cbnaat_monthly_report', 'Web\Admin\ReportController@cbnaat_monthly_report')->name('reports.cbnaat.monthly');
        // Route::post('/report/cbnaat_monthly_report/submit', 'Web\Admin\ReportController@cbnaat_monthly_report_submit');
         Route::get('/report/referral_indicator', 'Web\Admin\ReportController@referral_indicator');
@@ -366,7 +430,7 @@ Route::group(['middleware' => 'auth:web'], function () {
     Route::get('/editResultCbnaat/{sample}', 'Web\Admin\EditResultController@edit_result_cbnaat');
     Route::get('/edit_result_lc/{sample}', 'Web\Admin\EditResultController@edit_result_lc');
     Route::get('/edit_result_lj/{sample}', 'Web\Admin\EditResultController@edit_result_lj');
-    Route::get('/edit_result_lj_dst1/{sample}/{serviceid}', 'Web\Admin\EditResultController@edit_result_lj_dst1');
+    Route::get('/edit_result_lj_dst1/{sample}/{serviceid}/{drug_list}', 'Web\Admin\EditResultController@edit_result_lj_dst1');
     Route::get('/edit_result_lj_dst2/{sample}', 'Web\Admin\EditResultController@edit_result_lj_dst2');
     Route::get('/edit_result_lc_dst/{sample}', 'Web\Admin\EditResultController@edit_result_lc_dst');
     Route::get('/editResultLpa/{sample}/{tag}', 'Web\Admin\EditResultController@editResultLpa');

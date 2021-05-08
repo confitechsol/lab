@@ -1,51 +1,88 @@
 @extends('admin.layout.app')
 @section('content')
 <style>
-#pageloader
-{
-	top: 0;
-    bottom: 0;
-    left: 0;
-    right: 0;
-	position: fixed;
-    height:100%;
-	width:100%;
-	background:rgba(0, 0, 0, 0.2);
-	opacity:.7;
-	z-index:9999;
-	display:none;
-}
-#pageloader .loader
-{
-  left: 50%;
-  margin-left: -32px;
-  margin-top: -32px;
-  position: absolute;
-  top: 50%;
-}
-.loader {
-  border: 16px solid #f3f3f3;
-  border-radius: 50%;
-  border-top: 16px solid blue;
-  border-right: 16px solid green;
-  border-bottom: 16px solid red;
-  border-left: 16px solid pink;
-  width: 120px;
-  height: 120px;
-  -webkit-animation: spin 2s linear infinite;
-  animation: spin 2s linear infinite;
-}
-
-@-webkit-keyframes spin {
-  0% { -webkit-transform: rotate(0deg); }
-  100% { -webkit-transform: rotate(360deg); }
-}
-
-@keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
-}
-</style>
+  .activa{
+    background-color:#FFDFBF!important;
+    color:#1E88E5;
+    font-weight: bold;
+    font-family: serif;
+  }
+  .history-activa{
+    background-color:#FFDFBF!important;
+    color:#1E88E5;
+    font-weight: bold;
+    font-family: serif;
+  }
+  input[type="checkbox"][readonly] {
+    pointer-events: none;
+  }
+  #pageloader
+  {
+    top: 0;
+      bottom: 0;
+      left: 0;
+      right: 0;
+    position: fixed;
+      height:100%;
+    width:100%;
+    background:rgba(0, 0, 0, 0.2);
+    opacity:.7;
+    z-index:9999;
+    display:none;
+  }
+  #pageloader .loader
+  {
+    left: 50%;
+    margin-left: -32px;
+    margin-top: -32px;
+    position: absolute;
+    top: 50%;
+  }
+  .loader {
+    border: 16px solid #f3f3f3;
+    border-radius: 50%;
+    border-top: 16px solid blue;
+    border-right: 16px solid green;
+    border-bottom: 16px solid red;
+    border-left: 16px solid pink;
+    width: 120px;
+    height: 120px;
+    -webkit-animation: spin 2s linear infinite;
+    animation: spin 2s linear infinite;
+  }
+  
+  @-webkit-keyframes spin {
+    0% { -webkit-transform: rotate(0deg); }
+    100% { -webkit-transform: rotate(360deg); }
+  }
+  
+  @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+  .hide_column {
+      display : none;
+  }
+  @keyframes spinner {
+    to {transform: rotate(360deg);}
+  }
+   
+  .spinner:before {
+    content: '';
+    box-sizing: border-box;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 20px;
+    height: 20px;
+    margin-top: -10px;
+    margin-left: -10px;
+    border-radius: 50%;
+    border: 2px solid #ccc;
+    border-top-color: #333;
+    animation: spinner .6s linear infinite;
+  }
+  </style>
  <div class="page-wrapper">
             <div class="container-fluid">
               <div class="row page-titles">
@@ -72,7 +109,8 @@
                         <div class="card" style="border: none;">
                             <div class="card-block">
                                 <div class="col-lg-12 col-xlg-12 col-md-12 col-sm-12 col-sm-12" style="width: auto;overflow-y: scroll;">
-
+                                  <button class="btn-sm btn-info filterBtn" id="default-btn" value="1st line LPA">1st line LPA&nbsp;<span id="tot_1st_lpa">( 0 )</span></button>
+                                  <button class="btn-sm btn-info filterBtn" value="2nd line LPA">2nd line LPA&nbsp;<span id="tot_2nd_lpa">( 0 )</span></button>
                                     <table id="exampl" class="table table-striped table-bordered responsive col-xlg-12" cellspacing="0" width="100%">
                                         <thead>
                                           <tr>
@@ -91,7 +129,20 @@
                                         </thead>
                                         <tbody>
 
-                                          @foreach ($data['sample'] as $key=> $samples)
+                                          <tr class="sel"> 
+                                            <td></td>
+                                            <td class="hide"></td>                                                                                                                      
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>                                            
+                                          </tr>
+
+                                          {{-- @foreach ($data['sample'] as $key=> $samples)
                                           <tr>
                                             <td>
                                                     @if($samples->status && $samples->status==1)
@@ -101,11 +152,7 @@
                                             <td class="hide">{{$samples->ID}}</td>
                                             <td>{{$samples->samples}}</td>
                                             <td>{{$samples->no_of_samples}}</td>
-                                            <td>
-                                              @if($samples->decontamination_date)
-                                              <?php echo date('d/m/Y', strtotime($samples->decontamination_date)); ?>
-                                              @endif
-                                            </td>
+                                            
                                             <td>
                                               @if($samples->STATUS == 0)
                                               Done
@@ -114,11 +161,7 @@
                                               @endif
                                             </td>
                                             <td>{{$samples->result}}</td>
-                                            <td>
-                                              @if($samples->date_of_extraction)
-                                                <?php echo date('d/m/Y', strtotime($samples->date_of_extraction)); ?>
-                                              @endif
-                                            </td>
+                                           
                                             <td>{{$samples->tag}}</td>
                                             <td>
                                               @if($samples->pcr_completed==1)
@@ -129,7 +172,7 @@
                                             </td>
                                             
                                           </tr>
-                                          @endforeach
+                                          @endforeach --}}
 
                                       </tbody>
                                         </table>
@@ -142,7 +185,7 @@
                 </div>
 
             </div>
-            <footer class="footer"> © Copyright Reserved 2017-2018, LIMS </footer>
+            <footer class="footer">  </footer>
         </div>
 
 
@@ -202,7 +245,6 @@
                         <button class="btn btn-default add-button cancel btn-md"
                                 type="button"
                                 data-dismiss="modal">Cancel</button>
-
                         <button class="pull-right btn btn-primary btn-md" type="submit">Ok</button>
                     </div>
 
@@ -249,7 +291,9 @@ function openNextForm(sample_label, log_id, enroll_id, tag, no,sample_id,service
 
 <script>
 
-$(document).ready(function() {
+function arrangeTable(tag)
+{
+
   var today = new Date();
   var dd = today.getDate();
   var mm = today.getMonth()+1; //January is 0!
@@ -264,23 +308,91 @@ $(document).ready(function() {
   }
 
   today = dd + '-' + mm + '-' + yyyy;
+
+  var url = '{{ route("ajax_hydra_list") }}';
+
     $('#exampl').DataTable({
         dom: 'Bfrtip',
-        stateSave: true,
+        bDestroy: true,
+            //stateSave: true,
 		pageLength:25,
+    processing: true,
+    serverSide: true,
+            serverMethod: 'post',
+                          language: {
+                              loadingRecords: '&nbsp;',
+                              //processing: 'Loading...'
+                              processing: '<div class="spinner"></div>'
+                          } ,        
+                ajax: {
+                          url: url,	
+                          data: {tag: tag},	  
+                          headers: 
+                          {
+                            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                          }
+                        },
+                        drawCallback: function (settings) { 
+                            // Here the response
+                            var response = settings.json;
+                            //console.log(response);                            
+                             $('#tot_1st_lpa').html('('+response.no_1st_lpa+')');
+                            $('#tot_2nd_lpa').html('('+response.no_2st_lpa+')');                            
+                          },
+                columns: [  
+                          { data: 'inputs'}, 
+                          { data: 'ID',className: "hide_column"},                                                                                    
+                          { data: 'sample_id'},
+                          { data: 'sample_submitted' },
+                          { data: 'date_of_deconta' },
+                          { data: 'action' },
+                          { data: 'next_result' },
+                          { data: 'date_of_extraction' },
+                          { data: 'lpa_test' },
+                          { data: 'pcr_completed' },                        
+                      ],
         buttons: [
             {
                 extend: 'excelHtml5',
-                title: 'LIMS_HYBRIDIZATION_'+today+''
-            }
-            ,
+                title: 'LIMS_DNAextraction_'+today+''
+            },
             {
-                text: 'Submit',            
+              text: 'Submit',            
                 action: bulk_action_review
             }
         ],
-       // "order": [[ 1, "desc" ]]
+        "order": [[ 1, "desc" ]],
+        columnDefs: [
+                          { targets: [0], orderable: false }
+                        ]
     });
+}
+
+$(document).ready(function() {
+
+  arrangeTable('1st line LPA'); 
+  $('#default-btn').css('background', '#1e88e5');
+  $('#default-btn').css('border', '#1e88e5');
+
+    $('#default-btn').css('background', '#FFA500');
+    $('#default-btn').css('border', '#FFA500');
+
+
+  $('.filterBtn').on('click', function(){
+
+    var tag = "";
+
+    tag = $(this).val();
+
+    $('.filterBtn').css('background', '#1e88e5');
+        $('.filterBtn').css('border', '#1e88e5');
+
+        $(this).css('background', '#FFA500');
+        $(this).css('border', '#FFA500');
+
+    arrangeTable(tag);
+
+});
 	
 	//Confirm ok submit
 	$('.nextbtn, #nxtconfirm').click( function(e) {

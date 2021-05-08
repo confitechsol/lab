@@ -44,7 +44,7 @@ class ServiceLogController extends Controller
     public function store(Request $request)
     {
         
-        //dd($request->all());
+       // dd($request->all());
 		
         if($request->service_log_id > 0){ //service_log_id=auto increment id of t_service_log
 		DB::beginTransaction();
@@ -56,7 +56,7 @@ class ServiceLogController extends Controller
 
          //dd($pre_service_id);
 			if($request->service_id=='12' && ($pre_service_id==1 || $pre_service_id==2)){
-				$microbio = Microbio::create([
+				/* $microbio = Microbio::create([
 				'enroll_id' => $service->enroll_id,
 				'sample_id' => $service->sample_id,
 				'service_id' => $pre_service_id,
@@ -67,7 +67,7 @@ class ServiceLogController extends Controller
 				'created_by' => $request->user()->id,
 				 'updated_by' => $request->user()->id
 			  ]);
-				return $microbio;
+				return $microbio; */
 			}
 
 			if( $request->service_id == '25' )
@@ -132,16 +132,49 @@ class ServiceLogController extends Controller
 			  
 		  }else{//Else insert
 		      //updating the current service status to 0 and creating new service if new service is different
-			  $service->comments=$request->comments;
-			  $service->tested_by=$request->user()->name;
-			  $service->released_dt=date('Y-m-d');
-			  $service->status = 0;
-			  $service->updated_by = $request->user()->id;
-			  $service->save();
+			  
+			 if( $request->service_id == '25' )
+			 {
+				$service->comments=$request->comments;
+				$service->tested_by=$request->user()->name;
+				$service->released_dt=date('Y-m-d');
+				$service->status = 0;
+				$service->updated_by = $request->user()->id;
+				$service->save();
+				
+					$nwService = $service;
+
+			 } else
+			 {
+
+				$service->comments=$request->comments;
+				$service->tested_by=$request->user()->name;
+				$service->released_dt=date('Y-m-d');
+				$service->status = 0;
+				$service->updated_by = $request->user()->id;
+				$service->save();
+				
+					//$nwService = $service;
+
+				$new_service = [
+					'enroll_id' => $service->enroll_id,
+					'sample_id' => $service->sample_id,
+					'service_id' => $request->service_id,
+					'status' => $status,
+					'tag' => $request->tag,
+					'rec_flag' => $request->rec_flag,
+					'reported_dt' => date('Y-m-d'),
+					'created_by' => $request->user()->id,
+					'updated_by' => $request->user()->id,
+					'enroll_label' => $service->enroll_label,
+					'sample_label' => $service->sample_label,
+				  ];
+	
+				  $nwService = ServiceLog::create($new_service);
+			 }
+			  
 			   
-			   
-			   
-			  $new_service = [
+			 /*  $new_service = [
 				'enroll_id' => $service->enroll_id,
 				'sample_id' => $service->sample_id,
 				'service_id' => $request->service_id,
@@ -155,7 +188,7 @@ class ServiceLogController extends Controller
 				'sample_label' => $service->sample_label,
 			  ];
 
-			  $nwService = ServiceLog::create($new_service);
+			  $nwService = ServiceLog::create($new_service); */
 		  }
           // if($pre_service_id==1 || $pre_service_id==2){
           //   ServiceLog::microscopyLog($request);
@@ -165,7 +198,7 @@ class ServiceLogController extends Controller
 		  DB::commit();		
 		 }catch(\Exception $e){ 
 		  
-			  //dd($e->getMessage());
+			  dd($e->getMessage());
 			  $error = $e->getMessage();		  
 			  DB::rollback(); 		 
 			  return $error;

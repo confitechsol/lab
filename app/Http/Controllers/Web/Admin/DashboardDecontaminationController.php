@@ -32,7 +32,7 @@ class DashboardDecontaminationController extends Controller
            
              $data['sample'] = ServiceLog::select('s.id as sample_id', 't_service_log.updated_at as ID','t_service_log.enroll_label',
 			 't_service_log.enroll_id','t_service_log.sample_label as samples','t_service_log.status',
-			 DB::raw('date_format(d.test_date,"%d-%m-%y") as date'), 's.sample_type as sample_type', 's.others_type as others_type', 's.test_reason','m.result','s.fu_month','t_service_log.tag',
+			 DB::raw('date_format(d.test_date,"%d-%m-%y") as date'), DB::raw('date_format(s.receive_date, "%d-%m-%Y") as receive_date'), 's.sample_type as sample_type', 's.others_type as others_type', 's.test_reason','m.result','s.fu_month','t_service_log.tag',
                         't_service_log.status as STATUS','t_service_log.sample_id','t_service_log.service_id','t_service_log.rec_flag','d.sent_for AS Deconta_sent_for')
                         ->leftjoin('t_microscopy as m','m.sample_id','=','t_service_log.sample_id')
                         ->leftjoin('t_decontamination as d','d.sample_id','t_service_log.sample_id')
@@ -90,6 +90,24 @@ class DashboardDecontaminationController extends Controller
               $error = $e->getMessage();
               return view('admin.layout.error',$error);   // insert query
         }
+    }
+
+    public function getSampleReceiveDate($sample_id, $enroll_id)
+    {
+            $get_receive_date = DB::table('sample')
+                                ->select(DB::raw('date_format(receive_date, "%Y-%m-%d") as receive_date'))
+                                ->where('id', $sample_id)
+                                ->where('enroll_id', $enroll_id)
+                                ->first();
+            $response = array();
+            if(!empty($get_receive_date))
+            {
+                $response = array('receive_date' => $get_receive_date->receive_date, 'success' => true);
+            } else {
+                $response = array('receive_date' => "", 'success' => false);
+            }
+
+            echo json_encode($response);
     }
 
     /**

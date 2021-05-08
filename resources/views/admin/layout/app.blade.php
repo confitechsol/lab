@@ -191,9 +191,21 @@
                         </li>
                         @endrole
 
+                        @role('nikshay-verification-list')
+                        <li class="#">
+                          <a href="{{ url('/nikshay-verification-list') }}"><i class="mdi mdi-account-edit"></i>Enrollment with Nikshay Verification</a>
+                        </li>
+                        @endrole
+
+                        @role('tu-update')
+                        <li class="#">
+                          <a href="{{ url('/tu-update') }}"><i class="mdi mdi-account-edit"></i>Define TU</a>
+                        </li>
+                        @endrole
+
                         @role('enroller')
                         <li class="#">
-                          <a href="{{ url('/enroll') }}"><i class="mdi mdi-account-edit"></i>Enrolment</a>
+                          <a href="{{ url('/enroll') }}"><i class="mdi mdi-account-edit"></i>New Enrolment</a>
                         </li>
                         @endrole
 						
@@ -295,6 +307,9 @@
 									<li><a onclick="$('#subForm15A').toggle();" href="#"><i class="mdi mdi-information"></i>Annexure 15A</a>
 									  <ul id="subForm15A" class="submenu">
 										<li><a href="{{ url('/annexure15a') }}">CURRENT</a></li>
+                                        @role('view_naat_result')
+                                        <li><a href="#">View Field NAAT Result</a></li>
+                                        @endrole
 										<li><a href="{{ url('/history') }}">HISTORY</a></li>
 									  </ul>
 									</li>
@@ -323,6 +338,8 @@
 									<li><a href="{{ url('/report/cbnaat_monthly_report') }}">CBNAAT Monthly Reports</a></li>
 									<!--<li><a href="{{ url('/annexurel') }}" target="_blank">Annexure 15L</a></li>--->
 									<li><a href="{{ url('/report/annexurel') }}">Annexure 15L</a></li>
+                                    <li><a href="{{ url('/report/fl_lpa_proble') }}">FL Lpa Proble</a></li>
+                                    <li><a href="{{ url('/report/sl_lpa_proble') }}">SL Lpa Probe</a></li>
 									<li><a href="{{ url('/report/referral_indicator') }}">Referral indicators</a></li>
                                     <li><a href="{{ url('/report/workload') }}">Sample workload</a></li>
                                     <li><a href="{{ url('/report/lqc_indicator') }}">LAB QC indicator</a></li>
@@ -441,7 +458,7 @@
             <!-- ============================================================== -->
             <!-- footer -->
             <!-- ============================================================== -->
-            <footer class="footer"> © Copyright Reserved 2017-2018, LIMS </footer>
+            <footer class="footer"></footer>
             <!-- ============================================================== -->
             <!-- End footer -->
             <!-- ============================================================== -->

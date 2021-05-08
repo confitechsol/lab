@@ -159,6 +159,7 @@ class DecontaminationController extends Controller
         $sample_arr = array();
         $sample_arr = $request->sampleID;
         $data_arr = $request->all();
+        $serviceidpd = $request->service_id;
 
         /* foreach($sample_arr as $sampleID)
         {
@@ -184,13 +185,19 @@ class DecontaminationController extends Controller
 		 //$data['services'] = ['1' => 'ZN Microscopy', '2' => 'FM Microscopy', '3' => 'Liquid Culture', '4' => 'Solid Culture', '5' => 'Solid and Liquid Culture', '8' => 'LPA 1st line', '10' => 'LPA 2nd line', '7' => 'For storage','9'=>'Cbnaat'];
 		 $serviceids = $request->service_id;
 		 //echo "<pre>"; print_r($serviceids); die;
-		 $serviceidpd = $request->service_id;
+		 
+
+         //print_r( $serviceidpd );
+
+         //dd($serviceidpd);
 		 
 		 foreach( $serviceids as &$service_id ){
-			 if( $service_id == 10 || $service_id == 11 ) $service_id = 8;
-			 
+			 if( $service_id == 10 || $service_id == 11 ) $service_id = 8;			 
 		 }
+
 		 $request->service_id = $serviceids ;
+
+         //print_r($request->service_id);
 		 //echo $service_id; die;
          foreach($data['services'] as $key=>$value){
            if(in_array($key, $request->service_id)){
@@ -291,21 +298,23 @@ class DecontaminationController extends Controller
 				$tag = 'CBNAAT';
             }
 /*Pradip */
-			//echo "<pre>"; print_r($serviceidpd); die;
+			//echo "<pre>"; print_r($serviceidpd); 
 			if( $send_to_service_id == 8 ){
+                //echo count($serviceidpd);                
+
+                    if($serviceidpd[$key]==8) {
+                        $data_arr['tag'.$sampleID] = 'LPA 1st line';
+                        $tag = 'LPA 1st line';
+                    }
+                    if($serviceidpd[$key]==10) {
+                        $data_arr['tag'.$sampleID] = 'LPA 2nd line';
+                        $tag = 'LPA 2nd line';
+                    }
+                    if($serviceidpd[$key]==11) {
+                        $data_arr['tag'.$sampleID] = 'Both LPA 1st & 2nd Line';
+                        $tag = 'Both LPA 1st & 2nd Line';
+                    }			
 				
-				if($serviceidpd[$key]==8) {
-					$data_arr['tag'.$sampleID] = 'LPA 1st line';
-					$tag = 'LPA 1st line';
-				}
-				if($serviceidpd[$key]==10) {
-					$data_arr['tag'.$sampleID] = 'LPA 2nd line';
-					$tag = 'LPA 2nd line';
-				}
-				if($serviceidpd[$key]==11) {
-					$data_arr['tag'.$sampleID] = 'Both LPA 1st & 2nd Line';
-				    $tag = 'Both LPA 1st & 2nd Line';
-				}
 			}
 			//echo "tag".$request->tag; die;
             if($send_to_service_id=='Send to BWM') {
@@ -438,6 +447,8 @@ class DecontaminationController extends Controller
 				$send_to_service_id = 3;
 			}
 	        if($send_to_service_id!='Send to BWM') {
+
+               //echo !empty($tag)?$tag:$data_arr['tag'.$sampleID];
 		    //DB::enableQueryLog();		
             ServiceLog::create([
               'enroll_id' => $data_arr['enrollId'.$sampleID],
@@ -456,6 +467,8 @@ class DecontaminationController extends Controller
 			//dd(DB::getQueryLog());
 		  }
         }
+
+        
 
         // if($service_id=='Send to BWM'){
         //   $decon = Decontamination::select('id')->where('sample_id',$sample_id)->where('enroll_id',$request->enrollId)->first();
@@ -485,6 +498,9 @@ class DecontaminationController extends Controller
              return redirect( route('sample-storage.index') );
         }
 		DB::commit();
+
+        //die;
+
 		return redirect( route('decontamination.index') );
 		//return true;
        }catch(\Exception $e){

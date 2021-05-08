@@ -15,6 +15,7 @@ use App\Model\District;
 use App\Model\Sample;
 use Illuminate\Support\Facades\DB;
 use App\User;
+use App\Model\Labtu;
 use App\Model\Occupation;
 use App\Model\Tbunits_master;
 use App\Model\PHI_master;
@@ -121,7 +122,11 @@ class PatientController extends Controller
 
             $data['phi'] = PHI_master::select('m_dmcs_phi_relation.id','m_dmcs_phi_relation.DMC_PHI_Name','m_dmcs_phi_relation.DMC_PHI_Code')->where('m_dmcs_phi_relation.TBUCode',$data['patient']->tb)->where('m_dmcs_phi_relation.DTOCode',$data['patient']->district)->where('m_dmcs_phi_relation.isPhiContinue',1)->get();
             $data['tb'] = Tbunits_master::select('m_tbunits_relation.id','m_tbunits_relation.TBUnitCode','m_tbunits_relation.TBUnitName')->where('m_tbunits_relation.DTOCode',$data['patient']->district)->where('m_tbunits_relation.STOCode',$data['patient']->state)->where('m_tbunits_relation.isTuContinue',1)->get();
-            $data['landmark_tu'] = Tbunits_master::select('m_tbunits_relation.id','m_tbunits_relation.TBUnitCode','m_tbunits_relation.TBUnitName')->where('m_tbunits_relation.DTOCode',$data['patient']->landmark_district)->where('m_tbunits_relation.STOCode',$data['patient']->landmark_state)->where('m_tbunits_relation.isTuContinue',1)->get();
+
+            //$data['landmark_tu'] = Tbunits_master::select('m_tbunits_relation.id','m_tbunits_relation.TBUnitCode','m_tbunits_relation.TBUnitName')->where('m_tbunits_relation.DTOCode',$data['patient']->landmark_district)->where('m_tbunits_relation.STOCode',$data['patient']->landmark_state)->where('m_tbunits_relation.isTuContinue',1)->get();
+
+            $data['landmark_tu'] = Labtu::select('m_lab_tu.id','m_lab_tu.tuname')->where('m_lab_tu.DTOCode',$data['patient']->landmark_district)->where('m_lab_tu.STOCode',$data['patient']->landmark_state)->get();
+
 			//dd($data['patient']);
             //$data['nikshay_id'] = $nikshay_id;
             //dd($data['patient']);
@@ -161,7 +166,7 @@ class PatientController extends Controller
      */
     public function update(Request $request, $id)
     {
-       //dd($request->all());
+       //dd(2);
 
         try{
           // dd("d4dd");
@@ -226,6 +231,7 @@ class PatientController extends Controller
 
         }catch(\Exception $e){
             $error = $e->getMessage();
+            //dd($error);
             return view('admin.layout.error',$error);   // insert query
         }
     }
@@ -274,7 +280,7 @@ class PatientController extends Controller
 			AND   B.enroll_id = A.id
 			AND   C.id = A.patient_id
 			AND   A.status_id in (1) AND A.id=".$enroll_id);
-		  //dd($patient[0]->nikshay_cnt);
+		  
 		  $nikshayidexist=0;		
 			
 			if(!empty($patient)){
@@ -283,8 +289,7 @@ class PatientController extends Controller
 				}else{
 					$nikshayidexist=0;
 				}
-			}else{
-					
+			}else{					
 					$nikshayidexist=0;
 			}
 

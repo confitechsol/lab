@@ -39,7 +39,7 @@
             <div class="col">
             <label class="col-md-12">Reason for Edit</label>
                <div class="col-md-12">
-                   <input type="text" name="reason_edit" class="form-control form-control-line"  id="reason_edit" required>
+                   <input type="text" name="reason_edit" class="form-control form-control-line microscopy_reason_eidt"  id="reason_edit" required>
                </div>
             </div>
           </div>

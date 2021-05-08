@@ -404,7 +404,7 @@ overflow-x: auto;
 
 </div>
 
-<footer class="footer"> © Copyright Reserved 2017-2018, LIMS </footer>
+<footer class="footer">  </footer>
 
 </div>
 <script>

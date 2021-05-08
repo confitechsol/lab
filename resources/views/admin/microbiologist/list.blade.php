@@ -215,15 +215,33 @@ input[type="checkbox"][readonly] {
                     <div class="col-lg-12 col-xlg-12 col-md-12 col-sm-12">
                         <div class="card" >
                             <div class="card-block col-lg-12 col-xlg-12 col-md-12 col-sm-12 col-sm-12">
-                              <button class="btn-sm btn-info" value="CBNAAT">CBNAAT</button>
-                              <button class="btn-sm btn-info" value="LPA 1st Line">LPA 1st Line</button>
-                              <button class="btn-sm btn-info" value="LPA 2nd Line">LPA 2nd Line</button>
-                              <button class="btn-sm btn-info" value="Liquid Culture">Liquid Culture</button>
-                              <button class="btn-sm btn-info" value="LC-DST">LC-DST</button>
-                              <button class="btn-sm btn-info" value="Solid Culture" >Solid Culture</button>
-                              <button class="btn-sm btn-info" value="LJ-DST">LJ-DST</button>
-                              <button class="btn-sm btn-info" value="Microscopy">Microscopy</button>
-                              <button class="btn-sm btn-info" value="BMW" >BMW</button>
+                              <button class="btn-sm btn-info checkActive" value="CBNAAT">
+                                CBNAAT&nbsp;<span id="tot_cbnnat ">( {{$cbnaat_with_filter}} )</span>
+                              </button>
+                              <button class="btn-sm btn-info checkActive" value="LPA 1st Line">
+                                LPA 1st Line&nbsp;<span id="tot_lpa1stline">( {{$lpa_1st_with_filter}} )</span>
+                              </button>
+                              <button class="btn-sm btn-info checkActive" value="LPA 2nd Line">
+                              LPA 2nd Line&nbsp;<span id="tot_lpa2ndline">( {{ $lpa_2nd_with_filter }} )</span>
+                              </button>
+                              <button class="btn-sm btn-info checkActive" value="Liquid Culture">
+                              Liquid Culture&nbsp;<span id="tot_lc">( {{$lc_with_filter}} )</span>
+                              </button>
+                              <button class="btn-sm btn-info checkActive" value="Solid Culture">
+                                Solid Culture&nbsp;<span id="tot_lj">( {{$lj_with_filter}} )</span>
+                              </button>
+                              <button class="btn-sm btn-info checkActive" value="LC-DST">
+                                LC-DST&nbsp;<span id="tot_lcdst">( {{$lcdst_with_filter}} )</span>
+                              </button>                              
+                              <button class="btn-sm btn-info checkActive" value="LJ">
+                                LJ-DST&nbsp;<span id="tot_ljdst">({{$ljdst_with_filter}})</span>
+                              </button>
+                              <button class="btn-sm btn-info checkActive" value="Microscopy">
+                                Microscopy&nbsp;<span id="tot_microscopy">({{$microscopy_with_filter}})</span>
+                              </button>
+                              <button class="btn-sm btn-info checkActive" value="BMW" >
+                                BMW&nbsp;<span id="tot_bmw">({{$bmw_with_filter}})</span>
+                              </button>
                               <div id="no_sample" style="color: gray;font-weight: bold;"></div>
                                 <div class="scroll-table scroll-table-micro" >
                                     <table id="example1" class="table table-striped table-bordered responsive col-xlg-12" cellspacing="0" width="100%">
@@ -281,7 +299,7 @@ input[type="checkbox"][readonly] {
                 </div>
 
             </div>
-            <footer class="footer"> © Copyright Reserved 2017-2018, LIMS </footer>
+            <footer class="footer">  </footer>
         </div>
 
 
@@ -422,14 +440,14 @@ input[type="checkbox"][readonly] {
  </div>
 
 
- <div class="modal fade" id="myModal_naat" role="dialog" >
-  <div class="modal-dialog">
+ <div class="modal fade" id="myModal_naat" role="dialog" width="100%" >
+  <div class="modal-dialog" style="max-width: 898px !important; width:898px !important;">
 
     <!-- Modal content-->
-    <div class="modal-content">
+    <div class="modal-content" >
       <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal">&times;</button>
-        <h4 class="modal-title">Field NAAT Result</h4>
+        <h4 class="modal-title">View Field NAAT Result</h4>
       </div>
 
        <form class="form-horizontal form-material" action="" method="post" enctype='multipart/form-data' id="naat_result">
@@ -441,51 +459,90 @@ input[type="checkbox"][readonly] {
           <div class="modal-body">
 
               <input type="hidden" name="_token" value="{{ csrf_token() }}">
+
+              <div class="row col-lg-12">
+                
+                  <div class="col-lg-4 col-md-4 col-sm-4">
+                    <label class="col-md-12"><h5>Enrollment Id:</h5></label>
+                    <div class="col-md-12">
+                      <input type="text" name="enrollid" class="form-control form-control-line sampleId" readonly  id="enroll-id">
+                   </div>
+                  </div>
+                  <div class="col-lg-4 col-md-4 col-sm-4">
+                    <label class="col-md-12"><h5>Nikashay Id:</h5></label>
+                    <div class="col-md-12">
+                      <input type="text" name="nikshayID" class="form-control form-control-line sampleId" readonly  id="nikshayID">
+                   </div>
+                  </div>
+                  <div class="col-lg-4 col-md-4 col-sm-4">
+                    <label class="col-md-12"><h5>Patient Name:</h5></label>
+                    <div class="col-md-12">
+                      <input type="text" name="patientname" class="form-control form-control-line sampleId" readonly  id="patientname">
+                   </div>
+                  </div>
+                
+              </div>
+
+              <div class="row col-lg-12">
+                
+                <div class="col-lg-4 col-md-4 col-sm-4">
+                  <label class="col-md-12"><h5>Type of Result:</h5></label>
+                  <div class="col-md-12">
+                    <input type="text" name="typeofresult" class="form-control form-control-line sampleId" readonly  id="typeofresult">
+                 </div>
+                </div>
+                <div class="col-lg-4 col-md-4 col-sm-4">
+                  <label class="col-md-12"><h5>Valid/Invalid:</h5></label>
+                  <div class="col-md-12">
+                    <input type="text" name="valid_invalid" class="form-control form-control-line sampleId" readonly  id="valid_invalid">
+                 </div>
+                </div>
+                <div class="col-lg-4 col-md-4 col-sm-4">
+                  <label class="col-md-12"><h5>If not valid:</h5></label>
+                  <div class="col-md-12">
+                    <input type="text" name="not_valid" class="form-control form-control-line sampleId" readonly  id="not_valid">
+                 </div>
+                </div>
               
-              <label class="col-md-12"><h5>Enrollment Id:</h5></label>
-                  <div class="col-md-12">
-                    <input type="text" name="enrollid" class="form-control form-control-line sampleId"  id="enroll-id">
-                 </div>
-                 <label class="col-md-12"><h5>Field Sample Id:</h5></label>
-                  <div class="col-md-12">
-                    <input type="text" name="sampleid" class="form-control form-control-line sampleId"  id="sample-id">
-                 </div>
-                 <label class="col-md-12"><h5>Patient Name:</h5></label>
-                  <div class="col-md-12">
-                    <input type="text" name="patientname" class="form-control form-control-line sampleId"  id="patientname">
-                 </div>
-                 <label class="col-md-12"><h5>Name of PHI where<br> testing was done:</h5></label>
-                  <div class="col-md-12">
-                    <input type="text" name="phitest" class="form-control form-control-line sampleId"  id="phitest">
-                 </div>
-                 <label class="col-md-12"><h5>Type of Result <br>(CBNAAT/TrueNAT):</h5></label>
-                  <div class="col-md-12">
-                    <input type="text" name="resultcbnnat" class="form-control form-control-line sampleId"  id="resultcbnnat">
-                 </div>
+            </div>
 
-                 <label class="col-md-12"><h5>Vaid/Invalid:</h5></label>
-                  <div class="col-md-12">
-                    <input type="text" name="valid" class="form-control form-control-line sampleId"  id="valid">
-                 </div>
+            <div class="row col-lg-12">
+                
+              <div class="col-lg-4 col-md-4 col-sm-4">
+                <label class="col-md-12"><h5>Name of Facility:</h5></label>
+                <div class="col-md-12">
+                  <input type="text" name="facility" class="form-control form-control-line sampleId" readonly  id="facility">
+               </div>
+              </div>
+              <div class="col-lg-4 col-md-4 col-sm-4">
+                <label class="col-md-12"><h5>MTB Result:</h5></label>
+                <div class="col-md-12">
+                  <input type="text" name="mtb_result" class="form-control form-control-line sampleId" readonly  id="mtb_result">
+               </div>
+              </div>
+              <div class="col-lg-4 col-md-4 col-sm-4">
+                <label class="col-md-12"><h5>Rif Result:</h5></label>
+                <div class="col-md-12">
+                  <input type="text" name="rif_result" class="form-control form-control-line sampleId" readonly  id="rif_result">
+               </div>
+              </div>
+            
+          </div>
 
-                 <label class="col-md-12"><h5>If Not valid <br>(Invalid/NA/ No result/Error- specifiy):</h5></label>
-                  <div class="col-md-12">
-                    <input type="text" name="invalid" class="form-control form-control-line sampleId"  id="invalid">
-                 </div>
-
-                 <label class="col-md-12"><h5>MTB Result:</h5></label>
-                  <div class="col-md-12">
-                    <input type="text" name="mtb_result" class="form-control form-control-line sampleId"  id="mtb_result">
-                 </div>
-                 <label class="col-md-12"><h5>RIF Result:</h5></label>
-                  <div class="col-md-12">
-                    <input type="text" name="rif_result" class="form-control form-control-line sampleId"  id="rif_result">
-                 </div>
-                 <label class="col-md-12"><h5>Date of Result:</h5></label>
-                  <div class="col-md-12">
-                    <input type="text" name="dor_result" class="form-control form-control-line sampleId"  id="dor_result">
-                 </div>
-             
+          <div class="row col-lg-12">
+                
+            <div class="col-lg-4 col-md-4 col-sm-4">
+              <label class="col-md-12"><h5>Date of Result:</h5></label>
+              <div class="col-md-12">
+                <input type="text" name="result_date" class="form-control form-control-line sampleId" readonly  id="result_date">
+             </div>
+            </div>
+            <div class="col-lg-4 col-md-4 col-sm-4">              
+            </div>
+            <div class="col-lg-4 col-md-4 col-sm-4">             
+            </div>
+          
+        </div>             
               <br>
           </div>
           <div class="modal-footer">
@@ -741,6 +798,7 @@ input[type="checkbox"][readonly] {
 
                       <input type="hidden" name="tsl_id" id="tsl_id" value="">
                       <input type="hidden" name="isBMW" id="isBMW_sub" value=""/>
+                      <input type="hidden" name="rec_flag" id="rec_flag" value=""/>
                       <!--<input type="hidden" name="reqServ_service_id" id="reqServ_service_id" value="">--->
                     
 
@@ -801,11 +859,11 @@ input[type="checkbox"][readonly] {
 
               <br/> 
 
-              <div class="row">
+              <div class="row" style="display: none;">
                 <div class="col">
                     <label class="col-md-12">Comments: <span class="red">*</span></label>
                     <div class="col-md-12">
-                          <textarea name="comments" class="form-control form-control-line" id="comments" rows="5" cols="5" required></textarea>
+                          <textarea name="comments" class="form-control form-control-line" id="comments" rows="5" cols="5"></textarea>
   
                    </div>
                 </div>
@@ -896,7 +954,6 @@ input[type="checkbox"][readonly] {
          <form class="form-horizontal form-material" action="{{ url('/microbiologist') }}" method="post" enctype='multipart/form-data' id="cbnaat_result_add">
                      <div class="alert alert-danger"><h4></h4></div>                  
             <div class="modal-body">
-
                 <input type="hidden" name="_token" value="{{ csrf_token() }}">
                 <input type="hidden" name="enrollId1" id="enrollId1Add" value="">
                 <input type="hidden" name="sample" id="sampleIDAdd" value="">
@@ -910,6 +967,7 @@ input[type="checkbox"][readonly] {
                  <input type="hidden" name="rec_flag" id="recFlagID" value=""> 
                  <input type="hidden" name="third_onwards_afb_second_onwards_lcdst" id="third_onwards_afb_second_onwards_lcdst" value="0">       
                  <input type="hidden" name="first_time_another_sample" id="first_time_another_sample" value="0">
+                 <input type="hidden" name="data-tag" id="data-tag" value="">
                 <label class="col-md-12"><h5>Sample ID:</h5></label>
                     <div class="col-md-12">
                        <input type="text" readonly class="form-control form-control-line sampleId" name="sampleid1" id="sampleid1">
@@ -950,11 +1008,7 @@ input[type="checkbox"][readonly] {
 				  <!--</div>-->
                  			  
                    <br>
-
-                
-
-
-            </div>
+                              </div>
             <div class="modal-footer">
               <!-- <button type="submit" class="btn btn-default" data-dismiss="modal">Save</button> -->
               <button type="button" class="btn btn-default add-button cancel btn-md" data-dismiss="modal">Cancel</button>
@@ -965,6 +1019,8 @@ input[type="checkbox"][readonly] {
       </div>
     </div>
  </div>
+
+
  
  <div class="modal fade micro_log" id="myModalForm15A" role="dialog"  id="confirmDelete">
     <div class="modal-dialog">
@@ -1182,15 +1238,7 @@ $("#myModal")
 
         $('#confirmok').prop('disabled', !enable);
     }
-
-
-
-
-
-
-
-
-
+    
     $('#sentstep,#detail,#remark').change( validate_fields );
 
     $('#nextStep').change(function(){
@@ -1231,7 +1279,7 @@ function editResultForm(sample_id, enroll_id, sample_label,service,tag,druglist,
       $("#sampleidljdst2").val(sample_label);
       drugs=druglist.split(',');
       drugs_id=drugid.split(',');
-      var text="";
+      var text="";      
        for(i=0;i<drugs.length;i++){
             text=text+" <div ><div class='col drug_names_ljdst'>"+
                 "<label class='col-md-12'>"+drugs[i]+"</label>"+
@@ -1297,10 +1345,20 @@ function editResultForm(sample_id, enroll_id, sample_label,service,tag,druglist,
       drugs=druglist.split(',');
       drugs_id=drugid.split(',');
       var text="";
+      var lbl_id = "";
+      var hddn_text = "";
+      var hddn_id = "";
+
+      //console.log(drugs[0]);
+
        for(i=0;i<drugs.length;i++){
+        lbl_id = 'lbl_id'+i;
+        hddn_text = 'hddn_text'+i;
+        hddn_id = 'hddn_id'+i;
             text=text+" <div ><div class='col drug_names_ljdst'>"+
-                "<label class='col-md-12'>"+drugs[i]+"</label>"+
-                "<input type='hidden' name='drugname[]' value='"+drugs[i]+"'' />"+
+                "<label class='col-md-12' id="+lbl_id+">"+drugs[i]+"</label>"+
+                "<input type='hidden' id="+hddn_text+" name='drugname[]' value='"+drugs[i]+"'' />"+
+                "<input type='hidden' id="+hddn_id+" name='ids[]' value='' />"+
                 "<div class='col-md-12'>"+
                    "<select  name='drugvalue[]' id='ljdst"+i+"' class='form-control form-control-line' >"+
                      "<option value=''>--Select Result--</option>"+
@@ -1316,23 +1374,30 @@ function editResultForm(sample_id, enroll_id, sample_label,service,tag,druglist,
           dateFormat: "dd/mm/yyyy"
       }).datepicker("setDate", "0");
       $.ajax({
-            url: "{{url('edit_result_lj_dst1')}}"+'/'+sample_id+'/'+service,
+            url: "{{url('edit_result_lj_dst1')}}"+'/'+sample_id+'/'+service+'/'+druglist,
             type:"GET",
             processData: false,
             contentType: false,
             dataType : "html",
             success: function(data) {
                 var result = JSON.parse(data);
-                var resultDrug = JSON.parse(result.drug_reading);
-                  var drug = resultDrug.dil_4;
-                  for(var i=0; i<drug.length; i++){
-                    console.log(drug[i].value);
+                var resultDrug = result.drug_reading;
+                console.log(result);
+                  //var drug = resultDrug.dil_4;
+                  for(var i=0; i<result.length; i++){
+                    console.log(result[i].drug_reading);
                     //$("#drug"+i).val(drug[i].value);
-                    // alert(drug[i].value);
-                   
+                    // alert(drug[i].value);                   
                     //$("#"+i).val('');
-                    $("#ljdst"+i).val(drug[i].value);
+                    //$("#ljdst"+i).attr()
+                    $('#hddn_id'+i).val(result[i].id);
+                    $('#lbl_id'+i).text(result[i].drug_name);
+                    $('#hddn_text'+i).text(result[i].drug_name);
+                    $("#ljdst"+i).val(result[i].drug_reading);
+                    $('.edit_reason_ljdst_1').val(result[i].comments);
                   }
+
+                  
 
             },
             error: function() {
@@ -1377,6 +1442,7 @@ function editResultForm(sample_id, enroll_id, sample_label,service,tag,druglist,
                 console.log(result);
                 for(var i=0; i<result.length; i++){
                   $("#"+i).val(result[i].result);
+                  $('.lc_dst_edit_reason').val(result[i].comments);
                 }
 
             },
@@ -1417,6 +1483,7 @@ function editResultForm(sample_id, enroll_id, sample_label,service,tag,druglist,
                 $("#test_id").val(JSON.parse(data).test_id);
                 $("#culture_smear_lj").val(JSON.parse(data).culture_smear);
                 $("#final_result_lj").val(JSON.parse(data).final_result);
+                $('.lj_edit_result').val(JSON.parse(data).comments);
             },
             error: function() {
               console.log("err")
@@ -1460,6 +1527,7 @@ function editResultForm(sample_id, enroll_id, sample_label,service,tag,druglist,
                 $("#culture_smear").val(JSON.parse(data).culture_smear);
                 $("#bhi").val(JSON.parse(data).bhi);
                 $("#resultlc").val(JSON.parse(data).result);
+                $('.lc_edit_comments').val(JSON.parse(data).comments);
             },
             error: function() {
               console.log("err")
@@ -1663,7 +1731,6 @@ function editResultForm(sample_id, enroll_id, sample_label,service,tag,druglist,
       }
 
 
-
       $.ajax({
             url: "{{url('edit_result_micro')}}"+'/'+sample_id,
             type:"GET",
@@ -1672,8 +1739,8 @@ function editResultForm(sample_id, enroll_id, sample_label,service,tag,druglist,
             dataType : "html",
             success: function(data) {
 
-
                 $("#result_microscopy").val(JSON.parse(data).result);
+                $(".microscopy_reason_eidt").val(JSON.parse(data).reason_edit);
             },
             error: function() {
               console.log("err")
@@ -1940,43 +2007,64 @@ function editResultForm(sample_id, enroll_id, sample_label,service,tag,druglist,
                 $("#type_direct").val(JSON.parse(data).type_direct);
                 $("#type_indirect").val(JSON.parse(data).type_indirect);
 				//alert(JSON.parse(data).mtb_result);
-                $("#mtb_result").val(JSON.parse(data).mtb_result);
+                $(".new_mtb_result").val(JSON.parse(data).mtb_result);
 				//alert(JSON.parse(data).rif);
-                if(JSON.parse(data).rif=='Detected')
-				{
-				  $('.main_rif_val option[value="Detected"]').attr('selected','selected');	
-                 //$("#rif").val('5');
-				}else if(JSON.parse(data).rif=='Not detected')
-				{					
-					$('.main_rif_val option[value="Not detected"]').attr('selected','selected');
-                   //$("#rif").val('Not detected');
-				}
+                if(JSON.parse(data).tag == '1st line LPA')
+                {
+                  $(".rif_1st_lpa").removeAttr('disabled');
+                  $('.katg_resi_1st').removeAttr('disabled');
+                  $('.inh_1st_lpa').removeAttr('disabled');
+
+                  $(".rif_1st_lpa").val(JSON.parse(data).rif);
+                  $('.katg_resi_1st').val(JSON.parse(data).kat_g);
+                  $('.inh_1st_lpa').val(JSON.parse(data).inh);
+
+                  $('.quinolone_2nd_lpa').attr('disabled', true);
+                  $('.sli_rss_2nd').attr('disabled', true);
+                  $('.slid_2nd_lpa').attr('disabled', true);
+
+                  $(".final_interpretation").val(JSON.parse(data).finalterpretation);
+                  $(".clinical_trail").val(JSON.parse(data).clinical_interpretation);
+                  $('.comments_edit').val(JSON.parse(data).comments);
+                  
+                }
+
+                if(JSON.parse(data).tag == '2nd line LPA')
+                {
+                  $(".rif_1st_lpa").prop('selectedIndex', 0);
+                  $(".rif_1st_lpa").attr('disabled', true);
+
+                  $(".katg_resi_1st").prop('selectedIndex', 0);
+                  $('.katg_resi_1st').attr('disabled', true);
+
+                  $('.inh_1st_lpa').attr('selectedIndex', 0);
+                  $('.inh_1st_lpa').attr('disabled', true);
+
+                  $('.quinolone_2nd_lpa').val(JSON.parse(data).quinolone);
+                  $('.sli_rss_2nd').val(JSON.parse(data).slid);
+                  $('.slid_2nd_lpa').val(JSON.parse(data).slid_eis);
+
+                  $('.quinolone_2nd_lpa').removeAttr('disabled');
+                  $('.sli_rss_2nd').removeAttr('disabled');
+                  $('.slid_2nd_lpa').removeAttr('disabled');
+
+                  $(".final_interpretation").val(JSON.parse(data).finalInterpretation);
+                  $(".clinical_trail").val(JSON.parse(data).clinical_interpretation);
+                  $('.comments_edit').val(JSON.parse(data).comments);
+
+                }           
 				
-                $("#inh").val(JSON.parse(data).inh);
-                $("#quinolone").val(JSON.parse(data).quinolone);
-                $("#slid").val(JSON.parse(data).slid);
+                
+                
 				//alert(JSON.parse(data).tub_band);
                 $("#tbu_band").val(JSON.parse(data).tub_band);
 				$("#hid_final_interpretation").val(JSON.parse(data).nikshey_final_interpretation);
+       
+        
 				//alert(JSON.parse(data).nikshey_final_interpretation);
+        
 				
-                var _sample = $("#mtb_result").val();
-				//alert(_sample);
-                if (_sample == 'Invalid' || _sample == 'MTB not detected') { //alert();
-                    //document.getElementById("quinolone").value = "";
-                    //document.getElementById("slid").value = "";
-                    //document.getElementById("inh").value = "";
-                    document.getElementById("quinolone").setAttribute("disabled", "disabled");
-                    document.getElementById("inh").setAttribute("disabled", "disabled");
-                    document.getElementById("slid").setAttribute("disabled", "disabled");
-                    //document.getElementById("rif").value = "";
-                    document.getElementById("rif").setAttribute("disabled", "disabled");
-                } else {
-                    document.getElementById("quinolone").removeAttribute("disabled", "disabled");
-                    document.getElementById("inh").removeAttribute("disabled", "disabled");
-                    document.getElementById("slid").removeAttribute("disabled", "disabled");
-                    document.getElementById("rif").removeAttribute("disabled", "disabled");
-                }
+                
 
             },
             error: function () {
@@ -2078,7 +2166,7 @@ if($('input[name="services[]"]:checked').length > 0){
 });
 
 
- function openCbnaatForm1(enroll_id, sample_id, service, sample_ids,tag_service_nm=null){
+ function openCbnaatForm1(enroll_id, sample_id, service, sample_ids,tag_service_nm=null, drug_list){
     //console.log("sample_ids", sample_ids.split(','));
     $("#enrollId").val(enroll_id);
     $("#service").val(service);
@@ -2093,7 +2181,7 @@ if($('input[name="services[]"]:checked').length > 0){
     // });
 
     //load data
-    var details = service + '/' + sample_id + '/' + enroll_id+'/'+tag_service_nm;
+    var details = service + '/' + sample_id + '/' + enroll_id+'/'+tag_service_nm+'/'+drug_list;
 	//var urlll="{{url('result')}}"+'/'+details;
    // alert(urlll);
 	//console.log(urlll);
@@ -2105,7 +2193,7 @@ if($('input[name="services[]"]:checked').length > 0){
           dataType : "html",
           success: function(data) {
 
-             // console.log(data);
+              console.log(data);
               $("#resultData").html(data);
           },
           error: function() {
@@ -2293,17 +2381,28 @@ var error_print=0;
 			}
 		}
 	});
+
+
   $('#sentstepadd').change(function(){ //alert($(this).find(':selected').data('tag'));
 	   var sentStep=$(this).val();
 	   var enroll_id=$("#enrollId1Add").val();
      var sample_id = $('#sampleIDAdd').val();
 	   var rec_flag=$("#recFlagID").val();
-	   if ($(this).find(':selected').data('tag').length != 0){
-		   var tag=$(this).find(':selected').data('tag'); 
-		   $("#lpa_tagAdd").val(tag);
-	   }else{
-		    var tag="NULL";
-	   }
+     var tag=$(this).find(':selected').data('tag');
+
+     if(tag != "")
+     {
+      $("#lpa_tagAdd").val(tag);
+     } else {
+
+      tag="NULL";
+
+     }	   
+
+     //alert($(this).find(':selected').data('tag'));
+
+     //$('#data-tag').val(data_tag);
+     
 	   if(sentStep==3){//If decontamination
 		   $('#confirmokadd').prop('disabled', false);
 	   }else{
@@ -2316,7 +2415,8 @@ var error_print=0;
 				  success: function(response){
 					  console.log(response);					  
                         if(response==0){
-                            $('.alert-danger').hide();							
+
+                $('.alert-danger').hide();							
 							//var sList = "";
 							//$('input[type=checkbox]').each(function () {
 							$("input[name='addtest[]']").each(function () {	
@@ -2326,6 +2426,27 @@ var error_print=0;
 								//sList += "(" + $(this).val() + "-" + (this.checked ? "checked" : "not checked") + ")";
 							});
 							//console.log (sList);
+
+                    if( sentStep == '21' )
+                      {
+                        $('#confirmokadd').prop('disabled', false);
+                        $.ajax({
+                                      url: "{{ url('check_for_lcdst_sample_exist') }}"+'/'+enroll_id,
+                                      type:"GET",
+                                      processData: false,
+                                      contentType: false,
+                                      dataType: 'json',
+                                      success: function(result){
+                                        console.log(result.data.service_id);
+                                        if(result.result)
+                                        {
+                                          $('#service1Add').val(result.data.service_id);
+                                          $('#recFlagID').val(result.data.rec_flag);
+                                          $('#third_onwards_afb_second_onwards_lcdst').val(result.data.third_onwards_afb_second_onwards_lcdst);
+                                        }
+                                      }
+                                  }); 
+                      }
 
              if($('#choose_sample').val() == '2')
              {
@@ -2366,6 +2487,7 @@ var error_print=0;
                       if( sentStep == '21' )
                       {
                         $('#confirmokadd').prop('disabled', false);
+
                         $.ajax({
                                       url: "{{ url('check_for_lcdst_sample_exist') }}"+'/'+enroll_id,
                                       type:"GET",
@@ -2382,7 +2504,31 @@ var error_print=0;
                                         }
                                       }
                                   }); 
-                      } else {                                
+
+                      } else if( sentStep == '22' ) { 
+
+                        $.ajax({
+                                      url: "{{ url('check_for_ljdst_sample_exist') }}"+'/'+enroll_id,
+                                      type:"GET",
+                                      processData: false,
+                                      contentType: false,
+                                      dataType: 'json',
+                                      success: function(result){
+                                        console.log(result.data.service_id);
+                                        if(result.result)
+                                        {
+                                          //$('#service1Add').val(result.data.service_id);
+                                          $('#recFlagID').val(result.data.rec_flag);
+                                          $('#third_onwards_afb_second_onwards_lcdst').val(result.data.third_onwards_afb_second_onwards_lcdst);
+                                        }
+                                      }
+                                  }); 
+
+                              //alert(sentStep);
+                              $('#confirmokadd').prop('disabled', false);
+                              //$('#third_onwards_afb_second_onwards_lcdst').val(0);
+
+                      } else {                               
 
                           $('.alert-danger').show();
                           $('.alert-danger').html("Selected test already considered in the same enrollment");
@@ -2406,6 +2552,17 @@ var error_print=0;
 	   var enroll_id=$("#enrollId1Add").val();	   
 	   var tag=$("#lpa_tagAdd").val();
 	   var rec_flag=$("#recFlagID").val();
+
+     var tag=$("#sentstepadd").find(':selected').data('tag'); 
+
+     if(tag != "")
+     {
+      $("#lpa_tagAdd").val(tag);
+     } else{
+      tag="NULL";
+     }
+
+     
 	   
 	   if(sentStep==3){//If decontamination
 		   $('#confirmokadd').prop('disabled', false);
@@ -2472,16 +2629,22 @@ var error_print=0;
 	$('.dst_drugs_lj_section').hide();
 	
     //$("#sample-id").val(sample_ids);
-    
+    //alert(service);
 	//DST Drugs ajax
 	$.ajax({
-          url: "{{url('get_add_dst_drugs')}}"+'/'+enroll_id,
+          url: "{{url('get_add_dst_drugs')}}"+'/'+enroll_id+'/'+service,
           type:"GET",
           processData: false,
           contentType: false,
           dataType : "html",		  
           success: function(data) {
               console.log(data);
+
+              $("div .ajax_druglist > .dst_drugs_lj_section").show();
+              $(".ajax_druglist").html(data);
+              //alert(service);
+              
+
               $(".ajax_druglist").html(data);
           },
           error: function() {
@@ -2498,7 +2661,9 @@ var error_print=0;
           dataType : "html",
           success: function(data){
               console.log(data);
+              
               $(".ajax_addtest_list").html(data);
+
           },
           error: function() {
             console.log("err")
@@ -2518,33 +2683,38 @@ var error_print=0;
 				len = response.length;
 			}
 			//alert(len);
-            $(".dst_drugs_lc_section").hide();
-		    $(".dst_drugs_lj_section").hide();      
+          $(".dst_drugs_lc_section").hide();
+		    $(".dst_drugs_lj_section").hide();   
+
             if(len > 0){
-				 $(".dst_drugs_lc_section").hide();
-		         $(".dst_drugs_lj_section").hide();   
-			   $.each(response, function (key, val) { 
-			      $(".dst_drugs_lc_section").hide();
-		          $(".dst_drugs_lj_section").hide(); 
-				   if(val==21){ //alert(val);
-					 $(".dst_drugs_lc_section").show();
-				   }
-				   else if(val==22){ //alert(val);
-					 $(".dst_drugs_lj_section").show();
-				   }else if(val==21 && val==22){ //alert(val);
-				      $(".dst_drugs_lc_section").show();
-					  $(".dst_drugs_lj_section").show();
-				   }
-				   else{
-					    $(".dst_drugs_lc_section").hide();
-						$(".dst_drugs_lj_section").hide();
-				   }
-				   
-			   });
+
+				    $(".dst_drugs_lc_section").hide();
+		         $(".dst_drugs_lj_section").hide();
+
+          $.each(response, function (key, val) {
+            
+              /* $(".dst_drugs_lc_section").hide();
+                $(".dst_drugs_lj_section").hide(); */ 
+
+            if(val==21){ //alert(val);
+            $(".dst_drugs_lc_section").show();
+            }
+            if(val==22){ //alert(val);
+            //alert(e);
+            $("div .ajax_druglist > .dst_drugs_lj_section").show();
+            //break;
+            }if(val==21 && val==22){ //alert(val);
+                $(".dst_drugs_lc_section").show();
+              $(".dst_drugs_lj_section").show();
+            }				   
+          });
+
 		    }else{
+          //alert('test');
 				 $(".dst_drugs_lc_section").hide();
 				 $(".dst_drugs_lj_section").hide();
-			}
+			} 
+
 		},
           error: function() {
             console.log("err");
@@ -2555,7 +2725,18 @@ var error_print=0;
     });
 	  ///////////////////////////
 
-    $('#myModalAddtest').modal('toggle');
+            /* if(service == '21')
+              {
+                $(".dst_drugs_lc_section").show();
+              }
+
+              if(service == '22')
+              {
+                //alert(service);
+                $("div .ajax_druglist > .dst_drugs_lj_section").show();
+              }
+ */
+          $('#myModalAddtest').modal('toggle');
  }
     
 function openForm15AGenerate(enroll_id, sample_ids, service, sample, bwm_status, no, reg_by){
@@ -2738,6 +2919,7 @@ function openForm15AGenerate(enroll_id, sample_ids, service, sample, bwm_status,
                       html+= '<input type="hidden" name="sampleid_nikshay'+reponse_log_id+'" value="'+$("#samples_"+reponse_log_id).val()+'">';
                       html+= '<input type="hidden" name="enrolid_nikshay'+reponse_log_id+'" value="'+$("#enroll_1_"+reponse_log_id).val()+'">';              
                       html+='<input type="hidden" name="tsl_id[]"  value="'+result.log_id+'">';                       
+
                   },
                 failure: function(result){
                   console.log("err")
@@ -2747,33 +2929,49 @@ function openForm15AGenerate(enroll_id, sample_ids, service, sample, bwm_status,
             //$('#result1').html(testreqresult);
             //$('#result2').html(nikshayresult);
             //alert(testreqresult);
-            //alert(nikshayresult);
-            if(nikshayresult==0 && testreqresult==0){
+            //alert($('#isBMW').val());
+
+            if( $('#isBMW').val() == '1' )
+            {
+
+              $("#node").append(html);
+                      html = "";
+
+              $('.testReqDanger').hide();			
+              $('.nikshayDanger').hide();
+              $('.nikshayDanger').css('display', 'none');
+              $('#confirmok_nikshay').prop('disabled', false);
+
+            } else {
+
+              if(nikshayresult==0 && testreqresult==0){
               $('.testReqDanger').show();
               $('.testReqDanger').html("Selected Test Result is not available in Test Requests.");
               $('.nikshayDanger').show();
               $('.nikshayDanger').html("Nikshay ID is not available of the selected enrolment");
               $('#confirmok_nikshay_bulk').prop('disabled', true);              										
               
-            }else if(nikshayresult==1 && testreqresult==0){
-              $('.testReqDanger').show();
-              $('.testReqDanger').html("Selected Test Result is not available in Test Requests.");
-              $('.nikshayDanger').hide();			
-              $('#confirmok_nikshay_bulk').prop('disabled', true);	
-              
-            }else if(nikshayresult==0 && testreqresult==1){
-             $('.testReqDanger').hide();			
-              $('.nikshayDanger').show();
-              $('.nikshayDanger').html("Nikshay ID is not available of the selected enrolment"); 
-              $('#confirmok_nikshay_bulk').prop('disabled', true);               
-            }
-            else if(nikshayresult==1 && testreqresult==1){
+              }else if(nikshayresult==1 && testreqresult==0){
+                $('.testReqDanger').show();
+                $('.testReqDanger').html("Selected Test Result is not available in Test Requests.");
+                $('.nikshayDanger').hide();			
+                $('#confirmok_nikshay_bulk').prop('disabled', true);	
+                
+              }else if(nikshayresult==0 && testreqresult==1){
               $('.testReqDanger').hide();			
-              $('.nikshayDanger').hide();
-              $('#confirmok_nikshay_bulk').prop('disabled', true);
-              $("#node").append(html);
-                    html = "";
-            }
+                $('.nikshayDanger').show();
+                $('.nikshayDanger').html("Nikshay ID is not available of the selected enrolment"); 
+                $('#confirmok_nikshay_bulk').prop('disabled', true);               
+              }
+              else if(nikshayresult==1 && testreqresult==1){
+                $('.testReqDanger').hide();			
+                $('.nikshayDanger').hide();
+                $('#confirmok_nikshay_bulk').prop('disabled', true);
+                $("#node").append(html);
+                      html = "";
+              }
+
+            }            
             
           });
 
@@ -2803,11 +3001,14 @@ function openForm15AGenerate(enroll_id, sample_ids, service, sample, bwm_status,
 		  });
     }
 	
- function openCbnaatFormNikshay(tServiceLogID,enroll_id,sample_id,service_id,sample_no,enroll_no,tag,reqServ_service_id, isBMW){    
+ function openCbnaatFormNikshay(tServiceLogID,enroll_id,sample_id,service_id,sample_no,enroll_no,tag,reqServ_service_id, isBMW, rec_flag){    
     $("#sampleid_nikshay").val(sample_no);
     $("#enrolid_nikshay").val(enroll_no);
 	$("#tsl_id").val(tServiceLogID);
   $('#isBMW_sub').val(isBMW);
+  $('#rec_flag').val(rec_flag);
+
+  //alert(reqServ_service_id);
 	//$("#reqServ_service_id").val(reqServ_service_id);
 	if(tag=='')
 	{
@@ -2815,6 +3016,17 @@ function openForm15AGenerate(enroll_id, sample_ids, service, sample, bwm_status,
 	}else{
 		var tag=tag;
 	}
+
+  if(reqServ_service_id=='')
+  {
+
+    var reqServ_service_id=null;
+
+  } else {
+
+    var reqServ_service_id=reqServ_service_id;
+
+  }
    //alert(tag);
 	var nikshayresult;
   var testreqresult;
@@ -2846,6 +3058,9 @@ function openForm15AGenerate(enroll_id, sample_ids, service, sample, bwm_status,
 					  console.log(response);
             testreqresult=response.servicesexist;                       
 				  },
+          /* complete: function () {
+                  alert("Alert showing after AJAX call successfully");
+          }, */
 				failure: function(response){
 					console.log("err")
 				}
@@ -2853,34 +3068,49 @@ function openForm15AGenerate(enroll_id, sample_ids, service, sample, bwm_status,
    ).then(function() {
 		//$('#result1').html(testreqresult);
 		//$('#result2').html(nikshayresult);
-		//alert(testreqresult);
+		//alert(testreqresult+'##'+nikshayresult);
 		//alert(nikshayresult);
-		if(nikshayresult==0 && testreqresult==0){
+
+    
+
+    if( isBMW == '1' )
+    {
+        
+        $('.testReqDanger').hide();			
+        $('.nikshayDanger').hide();
+        $('.nikshayDanger').css('display', 'none');
+        $('#confirmok_nikshay').prop('disabled', false);
+
+    } else 
+    {
+
+      if(nikshayresult==0 && testreqresult==0){
 			$('.testReqDanger').show();
 			$('.testReqDanger').html("Selected Test Result is not available in Test Requests.");
 			$('.nikshayDanger').show();
 			$('.nikshayDanger').html("Nikshay ID is not available of the selected enrolment");
 			$('#confirmok_nikshay').prop('disabled', true);										
 			
-		}else if(nikshayresult==1 && testreqresult==0){
-			$('.testReqDanger').show();
-			$('.testReqDanger').html("Selected Test Result is not available in Test Requests.");
-			$('.nikshayDanger').hide();			
-			$('#confirmok_nikshay').prop('disabled', true);	
-			
-		}else if(nikshayresult==0 && testreqresult==1){
-			$('.testReqDanger').hide();			
-			$('.nikshayDanger').show();
-			$('.nikshayDanger').html("Nikshay ID is not available of the selected enrolment");
-			$('#confirmok_nikshay').prop('disabled', true);	
-		}
-		else if(nikshayresult==1 && testreqresult==1){
-			$('.testReqDanger').hide();			
-			$('.nikshayDanger').hide();
-			$('#confirmok_nikshay').prop('disabled', false);
-		}
+        }else if(nikshayresult==1 && testreqresult==0){
+          $('.testReqDanger').show();
+          $('.testReqDanger').html("Selected Test Result is not available in Test Requests.");
+          $('.nikshayDanger').hide();			
+          $('#confirmok_nikshay').prop('disabled', true);	
+          
+        }else if(nikshayresult==0 && testreqresult==1){
+          $('.testReqDanger').hide();			
+          $('.nikshayDanger').show();
+          $('.nikshayDanger').html("Nikshay ID is not available of the selected enrolment");
+          $('#confirmok_nikshay').prop('disabled', true);	
+        }
+        else if(nikshayresult==1 && testreqresult==1){
+          $('.testReqDanger').hide();			
+          $('.nikshayDanger').hide();
+          $('#confirmok_nikshay').prop('disabled', false);
+        }
+    }	
 		
-	});
+	});  
 
     $('#myModalNikshay').modal('toggle');
  }
@@ -3383,7 +3613,7 @@ $(document).on('change', '.addtest_array', function() {
 		   if($(this).val()==21){ //alert("here");
 			$(".dst_drugs_lc_section").hide();   
 		   }
-		   if($(this).val()==22){ //alert("here");
+		   if($(this).val()==22){ //alert("here2");
 			$(".dst_drugs_lj_section").hide();   
 		   }
        if($(this).val()==16){ //alert("here");
@@ -3398,6 +3628,12 @@ $(document).on('change', '.addtest_array', function() {
         
         var tag = $(this).attr('value'); 
 
+        $('.checkActive').css('background', '#1e88e5');
+        $('.checkActive').css('border', '#1e88e5');
+
+        $(this).css('background', '#FFA500');
+        $(this).css('border', '#FFA500');
+
         if(tag == 'BMW' || tag == 'Microscopy')
         {
           $('#isBMW').val('1');
@@ -3405,12 +3641,7 @@ $(document).on('change', '.addtest_array', function() {
           $('#isBMW').val('0');
         }
 
-         arrangeTable(tag);
-
-                             
-          
-
-        
+         arrangeTable(tag);      
                       
       });
 
@@ -3446,6 +3677,7 @@ $(document).on('change', '.addtest_array', function() {
                           dom: 'Bfrtip',
                       pageLength:25,
                       bDestroy: true,
+                      bInfo : false,
                           processing: true,
                           language: {
                               loadingRecords: '&nbsp;',
@@ -3468,6 +3700,18 @@ $(document).on('change', '.addtest_array', function() {
                             var response = settings.json;
                             //console.log(response);
                             $('#no_sample').html('No. of Sample(s): '+response.rc_count);
+                            $('#tot_cbnnat').html('('+response.cbnaat+')');
+
+                            $('#tot_cbnnat').html('('+response.cbnaat+')');
+                            $('#tot_lpa1stline').html('('+response.lpa_1st_line+')');
+                            $('#tot_lpa2ndline').html('('+response.lpa_2nd_line+')');
+                            $('#tot_lc').html('('+response.lc+')');
+                            $('#tot_lj').html('('+response.lj+')');
+                            $('#tot_lcdst').html('('+response.lcdst+')');
+                            $('#tot_ljdst').html('('+response.ljdst+')');
+                            $('#tot_microscopy').html('('+response.microscopy+')');
+                            $('#tot_bmw').html('('+response.bmw+')');
+
                         },
                       columns: [
                         { data: 'ID',className: "hide_column"},

@@ -132,7 +132,14 @@
                </div>
             </div>
           </div>
-		  <div class="row"></div>
+          <div class="row">
+            <div class="col">
+              <label class="col-md-12"><h6>Comments : </h6></label>
+              <div class="col-md-12">
+                  <textarea name="comments" class="form-control form-control-line" id="comments" rows="5" cols="5"></textarea>
+             </div>
+            </div>
+          </div>
 
       </div>
       <div class="modal-footer" style="margin-top:100px;">

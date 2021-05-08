@@ -94,7 +94,7 @@ class LCFlaggedMGITFurtherController extends Controller
                 $lc->result = $request->result;
                 $lc->species =$request->result=="NTM"? $request->species:"";
                 $lc->other_result = $request->result=="Other Result"?$request->other_result:"";
-                $lc->result_date = $request->result_date;
+                $lc->result_date = date('Y-m-d', strtotime($request->result_date));
                 $lc->created_by = $request->user()->id;
                 $lc->reason_edit = $request->reason_edit;
                 $lc->is_moved = 0;
@@ -126,10 +126,26 @@ class LCFlaggedMGITFurtherController extends Controller
          LCFlaggedMGIT::where(['sample_id'=>$request->sampleID,'enroll_id'=>$request->enrollId])->update(['gu'=> $request->gu]);
         // LCFlaggedMGITFurther::where('sample_id',$logdata->sample_id)->where('enroll_id',$logdata->enroll_id)->delete();
 
+        $get_lab_code = "";
+                            $get_lab_code = DB::table('m_configuration')
+                                    ->select('lab_code')
+                                    ->where('status', '1')
+                                    ->first();
+
        DB::table('t_lc_flagged_mgit_further')
                    ->where('sample_id', $logdata->sample_id)
                    ->where('enroll_id',$logdata->enroll_id)
-                   ->update(['result' => $request->result,'species'=>$request->species,'other_result'=>$request->other_result,'result_date'=>$request->result_date,'created_by'=>$request->user()->id,'updated_by'=>$request->user()->id]);
+                   ->update([
+                    'result' => $request->result,
+                   'species'=>$request->species,
+                   'other_result'=>$request->other_result,
+                   'result_date'=>date('Y-m-d', strtotime($request->result_date)),
+                   'created_by'=>$request->user()->id,
+                   'updated_by'=>$request->user()->id,
+                   'sample_label' =>$request->sample_id,
+                   'lab_code' => $get_lab_code->lab_code,                   
+                   'comments' => $request->comments,
+                   ]);
 
 
          // if($request->result=='Mixed culture'){

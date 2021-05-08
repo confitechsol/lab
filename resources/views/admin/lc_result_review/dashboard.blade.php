@@ -148,7 +148,7 @@
                 </div>
 
             </div>
-            <footer class="footer"> © Copyright Reserved 2017-2018, LIMS </footer>
+            <footer class="footer">  </footer>
         </div>
 
 
@@ -176,17 +176,9 @@
                 <div class="col">
                     <label class="col-md-12">Sample Sent for :<span class="red">*</span></label>
                     <div class="col-md-12">
-                       <select name="service_id" id="service_id" class="form-control form-control-line test_reason" required>
-                         <option value="">--Select--</option>
-                         <option value="1">DNA Extraction LPA 1st line</option>
-                         <option value="2">DNA Extraction LPA 2nd line</option>
-                         <!--<option value="3">DNA Extraction LPA 1st line and LPA 2nd line</option>-->
-                         <option value="4">LC- DST- Inoculation</option>
-                        <option value="6">Do LC with standby sample</option>
-                        <option value="7">Result finalization</option>
-                        <!-- <option value="5">MB for further review </option>-->
-
-                       </select>
+                       <select name="service_id" id="service_id" class="form-control form-control-line test_reason" required>                         
+                          <option value="7">Result finalization</option>
+                      </select>
                    </div>
                 </div>
             </div>     

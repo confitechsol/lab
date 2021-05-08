@@ -135,6 +135,8 @@
                                     </thead>
                                     <tbody>
 
+                                        {{-- {{ dd($data['sample']) }} --}}
+
                                     @if($data['sample'])
                                         @foreach ($data['sample'] as $key => $samples)
                                             <tr>
@@ -188,7 +190,7 @@
             </div>
 
         </div>
-        <footer class="footer"> © Copyright Reserved 2017-2018, LIMS</footer>
+        <footer class="footer"> </footer>
     </div>
 
     <div class="modal fade" id="myModal" role="dialog" id="confirmDelete">
@@ -241,7 +243,7 @@
                         <button type="button" class="btn btn-default add-button cancel btn-md" data-dismiss="modal">
                             Cancel
                         </button>
-                        <button type="button" class="pull-right btn btn-primary btn-md" id="confirm"  data-dismiss="modal" >Ok
+                        <button type="button" class="pull-right btn btn-primary btn-md" id="confirm">Ok
                         </button>
                     </div>
 
@@ -326,6 +328,9 @@
 		  });//submit
 		});//document ready
 
+
+        
+
         $(function () {
 
             $('input.single-checkbox').on('change', function (evt) {
@@ -360,6 +365,7 @@
 
             /* Form confirm (yes/ok) handler, submits form*/
             $('#confirm').click(function (e) { //alert();
+                //alert('test');
                 
 				var enroll_id=$("#enrollId").val();
 				var sample_id=$("#sampleID").val();
@@ -372,33 +378,73 @@
 				}else{
 				  var decontamination_sent_for=0;
 				}
-				 
-			
-				$.ajax({
-						  url: "{{url('check_for_sample_already_process_decontamination')}}"+'/'+sample_id+'/'+enroll_id+'/'+decontamination_sent_for,
+
+                var msg_alert = false;
+
+                /* Date validation checking */
+
+                $.ajax({
+						  url: "{{url('check_sample_receive_date')}}"+'/'+sample_id+'/'+enroll_id,
 						  type:"GET",
 						  processData: false,
 						  contentType: false,
 						  dataType: 'json',
 						  success: function(response){
-							  //console.log(response);
-							  
-								if(response==1){
-									$('.alert-danger').removeClass('hide');
-									$('.alert-danger').show();
-									$('.alert-danger').html("Sorry!! Action already taken of the selected Sample");
-									$('#confirm').prop("type", "button");
-									e.preventDefault(); 
-                                    setTimeout(location.reload.bind(location), 1000);  // After 5 secs										
-									
-								}else{
-									$('.alert-danger').addClass('hide');
-									$('.alert-danger').hide();
-									//$('form#cbnaat_result').submit();	
-									//$('#confirm').prop("type", "submit");
-									//$("#confirm").text("OK");
-									var form = $(document).find('form#cbnaat_result');
-                                    form.submit();
+							  console.log(response);
+							  //alert(response.receive_date);
+								if(response.success){
+                                    //alert(response);
+                                    var deconta_date = new Date($('#test_date').val());
+                                    var sample_receive_date = new Date(response.receive_date);
+                                    
+                                    if(deconta_date.getTime() < sample_receive_date.getTime())
+                                    {
+                                        //alert(sample_receive_date);
+                                        
+                                        $('.alert-danger').removeClass('hide');
+                                        $('.alert-danger').show();
+                                        $('.alert-danger').html("Sorry!! Decontamination Date is less than Sample receive date");
+                                        $('#confirm').prop("type", "button");
+                                        e.preventDefault(); 
+                                        //setTimeout(location.reload.bind(location), 1000);
+                                        
+                                    } else {
+                                        
+                                        $('.alert-danger').addClass('hide');
+                                        $('.alert-danger').hide();									
+                                        var form = $(document).find('form#cbnaat_result');
+
+                                        $.ajax({
+                                                    url: "{{url('check_for_sample_already_process_decontamination')}}"+'/'+sample_id+'/'+enroll_id+'/'+decontamination_sent_for,
+                                                    type:"GET",
+                                                    processData: false,
+                                                    contentType: false,
+                                                    dataType: 'json',
+                                                    success: function(response){
+                                                        //console.log(response);
+                                                        
+                                                            if(response==1){
+                                                                $('.alert-danger').removeClass('hide');
+                                                                $('.alert-danger').show();
+                                                                $('.alert-danger').html("Sorry!! Action already taken of the selected Sample");
+                                                                $('#confirm').prop("type", "button");
+                                                                e.preventDefault(); 
+                                                                setTimeout(location.reload.bind(location), 1000);  // After 5 secs										
+                                                                
+                                                            }else{
+                                                                $('.alert-danger').addClass('hide');
+                                                                $('.alert-danger').hide();                                                                
+                                                                var form = $(document).find('form#cbnaat_result');
+                                                                form.submit();
+                                                                
+                                                            }
+                                                    },
+                                                    failure: function(response){
+                                                        console.log("err")
+                                                    }
+                                            }); 
+                                    }                                    
+									  // After 5 secs										
 									
 								}
 						  },
@@ -406,6 +452,15 @@
 							console.log("err")
 						}
 				});
+
+               
+				
+
+                
+
+               
+
+                    //return false;
 				
             });
 
@@ -431,7 +486,8 @@
             //         text : item
             //     }));
             // });
-
+            $('.alert-danger').addClass('hide');
+                $('.alert-danger').hide();
             $('#myModal').modal('toggle');
         }
     </script>

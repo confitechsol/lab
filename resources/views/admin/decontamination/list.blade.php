@@ -178,7 +178,7 @@
                                               <td>{{$samples->date}}</td>
                                               <td>                                                
                                                 @if($samples->sent_for_service=='' && $samples->status!=0)
-                                                <button type="button" onclick="openCbnaatForm({{$samples->sample_id}})"  class="btn btn-info btn-sm resultbtn" >Submit</button>
+                                                <button type="button" onclick="openCbnaatForm({{$samples->sample_id}}, '{{$samples->date}}')"  class="btn btn-info btn-sm resultbtn" >Submit</button>
                                                 @elseif($samples->status==0)
                                                 Done
                                                 @else
@@ -214,7 +214,7 @@
                 </div>
 
             </div>
-            <footer class="footer"> Â© Copyright Reserved 2017-2018, LIMS </footer>
+            <footer class="footer"> Â </footer>
         </div>
  @if($data['sample'])
 <div class="modal fade" id="myModal" role="dialog"  id="confirmDelete">
@@ -275,10 +275,12 @@
                   </div>
               </div>
               <br>
+              <div id="date_of_deconta">
                <label class="col-md-12"><h5>Date Of Decontamination</h5></label>
                     <div class="col-md-12">
-                       <input type="text" id="test_date" name="test_date" value="" class="form-control form-control-line datepicker" disabled>
+                       <input type="text" id="test_date" name="test_date" value="" class="form-control form-control-line datepicker">
                    </div>
+              </div>
 
                    <label class="col-md-12"><h5>Comments</h5></label>
                         <div class="col-md-12">
@@ -460,11 +462,15 @@ $(function(){
 
 
 
- function openCbnaatForm(sample_id){
+ function openCbnaatForm(sample_id, deconta_date){
   //console.log("sample_ids", sample_ids.split(','));
   //alert(no);
-    $('#smpl_id_'+sample_id).prop('checked', true);
-    bulk_action_review();
+  $("#node").html("");
+  $('.bulk-selected').prop('checked', false);
+  $('#bulk-select-all').prop('checked', false);
+  $('#smpl_id_'+sample_id).prop('checked', true);
+  $('#test_date').val(deconta_date);
+    bulk_action_review(1);
 
   /* $("#enrollId").val(enroll_id);
   $('#no_sample').val(no);
@@ -504,7 +510,7 @@ $(document).ready(function() {
     $('#table_decontamin').DataTable({
         dom: 'Bfrtip',
         stateSave: true,
-		pageLength:5,
+		pageLength:25,
         buttons: [
             {
                 extend: 'excelHtml5',
@@ -540,7 +546,7 @@ var $bulk_checkboxes = $('.bulk-selected');
             $('.bulk-selected').prop('checked', checked);
         });
 
-function bulk_action_review(){
+function bulk_action_review(ispopup=null){
             var $modal = $('#myModal');
             //var selected = [];
             var $checkboxes = $('.bulk-selected:checked');          
@@ -549,6 +555,13 @@ function bulk_action_review(){
             if( $checkboxes.length === 0 ){
                 alert("First select one or more items from the list.");
                 return;
+            }
+
+            if(ispopup=='1')
+            {
+              $('#date_of_deconta').show();
+            } else {
+              $('#date_of_deconta').hide();
             }
 
             var err_html = "";
@@ -566,6 +579,8 @@ function bulk_action_review(){
               var err_sample_id = [];
               var success_sample_id = "";
               var samples_data = [];
+
+              $("#node").html("");
 
             //
             $checkboxes.each(function(i, e){

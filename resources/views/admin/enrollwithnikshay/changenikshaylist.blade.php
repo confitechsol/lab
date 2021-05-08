@@ -160,7 +160,7 @@
         </div>
 
     </div>
-    <footer class="footer"> © Copyright Reserved 2017-2018, LIMS </footer>
+    <footer class="footer">  </footer>
 </div>
 
 
@@ -224,6 +224,7 @@
       </div>
     </div>
  </div>
+ 
 <script>
 $(document).ready(function(){
   $("#cbnaat_result").on("submit", function(){

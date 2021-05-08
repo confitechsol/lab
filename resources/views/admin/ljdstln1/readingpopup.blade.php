@@ -176,7 +176,7 @@ function saveReading(){
 							  },
 							  success: function(data){
 								console.log(data)
-								if(data == true){
+								if(data == 1){
 								  window.location.reload(true);
 								}
 							  },

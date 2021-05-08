@@ -82,7 +82,15 @@ class LJController extends Controller
 	    DB::beginTransaction();
         try {
 
+            $get_lab_code = "";
+            $get_lab_code = DB::table('m_configuration')
+                    ->select('lab_code')
+                    ->where('status', '1')
+                    ->first();
+
             if ($request->editresult) {
+
+                //dd( $request->all() );
 
                 $sample = Sample::select('id', 'enroll_id')->where('sample_label', $request->sample_id)->first();
                 if ($sample)
@@ -92,12 +100,14 @@ class LJController extends Controller
                     $lj->test_id = $request->test_id;
                     $lj->culture_smear = $request->culture_smear;
                     $lj->final_result = $request->final_result;
-                    $lj->lj_result_date = $request->lj_result_date;
+                    //$lj->lj_result_date = $request->lj_result_date;
+                    $lj->lj_result_date = date('Y-m-d');
 					$lj->species = $request->final_result=="NTM"?$request->species:"";
                     $lj->other_result = $request->final_result=="Other Result"?$request->other_result:"";
                     $lj->reason_edit = $request->reason_edit;
                     $lj->created_by = $request->user()->id;
                     $lj->is_moved = 0;
+                    $lj->comments = $request->reason_edit;
                     $lj->save();
                 }
 				 DB::commit();
@@ -170,22 +180,27 @@ class LJController extends Controller
                                     'created_by' => $request->user()->id,
                                     'updated_by' => $request->user()->id,
                                     'lj_result' => $request->result, // Save result in LJ Result
+                                    'sample_label'  => $logdata->sample_label,
+                                    'lab_code'      => $get_lab_code->lab_code,
                                 ]);
+
+                                /* dd($logdata);
                                 $logdata->released_dt = date('Y-m-d');
                                 $logdata->status = -1;
                                 $logdata->save();                                
 
-                                $service = ServiceLog::find($id);
+                                $service = ServiceLog::find($id); */
 
-                                $service->comments="";
-                                $service->tested_by=$request->user()->name;
-                                $service->released_dt=date('Y-m-d');
-                                $service->status = 0;
-                                $service->updated_by = $request->user()->id;
-                                $service->save();
+                                $logdata->comments="";
+                                $logdata->tested_by=$request->user()->name;
+                                $logdata->released_dt=date('Y-m-d');
+                                $logdata->status = -1;
+                                $logdata->updated_by = $request->user()->id;
+                                $logdata->save();
+
                                 $microbio = Microbio::create([
-                                    'enroll_id' => $service->enroll_id,
-                                    'sample_id' => $service->sample_id,
+                                    'enroll_id' => $logdata->enroll_id,
+                                    'sample_id' => $logdata->sample_id,
                                     'service_id' => 20,
                                     'next_step' => '',
                                     'detail' => '',
@@ -193,7 +208,7 @@ class LJController extends Controller
                                     'status' => 0,
                                     'created_by' => $request->user()->id,
                                     'updated_by' => $request->user()->id,
-                                    'tag'       => $service->tag
+                                    'tag'       => $logdata->tag
                                 ]);
 
                                 //dd($newdata);
@@ -212,22 +227,24 @@ class LJController extends Controller
                                     'created_by' => $request->user()->id,
                                     'updated_by' => $request->user()->id,
                                     'lj_result' => $request->result, // Save result in LJ Result
+                                    'sample_label'  => $logdata->sample_label,
+                                    'lab_code'      => $get_lab_code->lab_code,
                                 ]);
-                                $logdata->released_dt = date('Y-m-d');
+                                /* $logdata->released_dt = date('Y-m-d');
                                 $logdata->status = -1;
                                 $logdata->save();
 
-                                $service = ServiceLog::find($id);
+                                $service = ServiceLog::find($id); */
                                 
-                                $service->comments="";
-                                $service->tested_by=$request->user()->name;
-                                $service->released_dt=date('Y-m-d');
-                                $service->status = 0;
-                                $service->updated_by = $request->user()->id;
-                                $service->save();
+                                $logdata->comments="";
+                                $logdata->tested_by=$request->user()->name;
+                                $logdata->released_dt=date('Y-m-d');
+                                $logdata->status = 0;
+                                $logdata->updated_by = $request->user()->id;
+                                $logdata->save();
                                 $microbio = Microbio::create([
-                                    'enroll_id' => $service->enroll_id,
-                                    'sample_id' => $service->sample_id,
+                                    'enroll_id' => $logdata->enroll_id,
+                                    'sample_id' => $logdata->sample_id,
                                     'service_id' => 20,
                                     'next_step' => '',
                                     'detail' => '',
@@ -235,7 +252,7 @@ class LJController extends Controller
                                     'status' => 0,
                                     'created_by' => $request->user()->id,
                                     'updated_by' => $request->user()->id,
-                                    'tag'       => $service->tag
+                                    'tag'       => $logdata->tag
                                 ]);
                             }                            
                     }                   
@@ -340,10 +357,17 @@ class LJController extends Controller
     {
 
 
-//        dd( $request->all(), $request->is_pos == 1 );
+        //dd( $request->all(), $request->is_pos == 1 );
 
         $logdata = ServiceLog::find($id);
          //dd($request->all());
+
+                            $get_lab_code = "";
+                            $get_lab_code = DB::table('m_configuration')
+                                    ->select('lab_code')
+                                    ->where('status', '1')
+                                    ->first();
+
 
         if (!empty($request->lj_main)) {
 
@@ -384,6 +408,10 @@ class LJController extends Controller
                                     'created_by' => $request->user()->id,
                                     'updated_by' => $request->user()->id,
                                     'lj_result' => $request->result, // Save result in LJ Result
+                                    'sample_label'  => $logdata->sample_label,
+                                    'lab_code'      => $get_lab_code->lab_code,
+                                    'comments'      => $request->comments,
+
                                 ]);
                                 $logdata->released_dt = date('Y-m-d');
                                 $logdata->status = -1;
@@ -423,6 +451,9 @@ class LJController extends Controller
                     'created_by' => $request->user()->id,
                     'updated_by' => $request->user()->id,
                     'lj_result' => $request->result, // Save result in LJ Result
+                    'sample_label'  => $logdata->sample_label,
+                    'lab_code'      => $get_lab_code->lab_code,
+                    'comments'      => $request->comments,
                 ]);
                 $logdata->released_dt = date('Y-m-d');
                 $logdata->status = -1;
@@ -465,6 +496,9 @@ class LJController extends Controller
                     'created_by' => $request->user()->id,
                     'updated_by' => $request->user()->id,
                     'lj_result' => $request->result, // Save result in LJ Result
+                    'sample_label'  => $logdata->sample_label,
+                    'lab_code'      => $get_lab_code->lab_code,
+                    'comments'      => $request->comments,
                 ]);
                 $logdata->released_dt = date('Y-m-d');
                 $logdata->status = -1;
@@ -488,7 +522,8 @@ class LJController extends Controller
 //             dd($count);
 
             if ($count > 0) {
-                $ljdetail_data = LJDetail::select('id')->where('enroll_id', $logdata->enroll_id)->first();
+
+                $ljdetail_data = LJDetail::select('id')->where('enroll_id', $logdata->enroll_id)->where('sample_id', $logdata->sample_id)->first();
                 // dd($ljdetail_data->id);
 
 

@@ -43,11 +43,10 @@
 
           </div>
           <div class="row">
-
             <div class="col">
-            <label class="col-md-12">Reason for Edit</label>
+            <label class="col-md-12">Comments</label>
                <div class="col-md-12">
-                   <input type="text" name="reason_edit" class="form-control form-control-line"  id="reason_edit" >
+                   <input type="text" name="reason_edit" class="form-control form-control-line lc_dst_edit_reason"  id="reason_edit" >
                </div>
             </div>
           </div>

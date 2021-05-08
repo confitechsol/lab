@@ -1,51 +1,88 @@
 @extends('admin.layout.app')
 @section('content')
 <style>
-#pageloader
-{
-	top: 0;
-    bottom: 0;
-    left: 0;
-    right: 0;
-	position: fixed;
-    height:100%;
-	width:100%;
-	background:rgba(0, 0, 0, 0.2);
-	opacity:.7;
-	z-index:9999;
-	display:none;
-}
-#pageloader .loader
-{
-  left: 50%;
-  margin-left: -32px;
-  margin-top: -32px;
-  position: absolute;
-  top: 50%;
-}
-.loader {
-  border: 16px solid #f3f3f3;
-  border-radius: 50%;
-  border-top: 16px solid blue;
-  border-right: 16px solid green;
-  border-bottom: 16px solid red;
-  border-left: 16px solid pink;
-  width: 120px;
-  height: 120px;
-  -webkit-animation: spin 2s linear infinite;
-  animation: spin 2s linear infinite;
-}
-
-@-webkit-keyframes spin {
-  0% { -webkit-transform: rotate(0deg); }
-  100% { -webkit-transform: rotate(360deg); }
-}
-
-@keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
-}
-</style>
+  .activa{
+    background-color:#FFDFBF!important;
+    color:#1E88E5;
+    font-weight: bold;
+    font-family: serif;
+  }
+  .history-activa{
+    background-color:#FFDFBF!important;
+    color:#1E88E5;
+    font-weight: bold;
+    font-family: serif;
+  }
+  input[type="checkbox"][readonly] {
+    pointer-events: none;
+  }
+  #pageloader
+  {
+    top: 0;
+      bottom: 0;
+      left: 0;
+      right: 0;
+    position: fixed;
+      height:100%;
+    width:100%;
+    background:rgba(0, 0, 0, 0.2);
+    opacity:.7;
+    z-index:9999;
+    display:none;
+  }
+  #pageloader .loader
+  {
+    left: 50%;
+    margin-left: -32px;
+    margin-top: -32px;
+    position: absolute;
+    top: 50%;
+  }
+  .loader {
+    border: 16px solid #f3f3f3;
+    border-radius: 50%;
+    border-top: 16px solid blue;
+    border-right: 16px solid green;
+    border-bottom: 16px solid red;
+    border-left: 16px solid pink;
+    width: 120px;
+    height: 120px;
+    -webkit-animation: spin 2s linear infinite;
+    animation: spin 2s linear infinite;
+  }
+  
+  @-webkit-keyframes spin {
+    0% { -webkit-transform: rotate(0deg); }
+    100% { -webkit-transform: rotate(360deg); }
+  }
+  
+  @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+  .hide_column {
+      display : none;
+  }
+  @keyframes spinner {
+    to {transform: rotate(360deg);}
+  }
+   
+  .spinner:before {
+    content: '';
+    box-sizing: border-box;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 20px;
+    height: 20px;
+    margin-top: -10px;
+    margin-left: -10px;
+    border-radius: 50%;
+    border: 2px solid #ccc;
+    border-top-color: #333;
+    animation: spinner .6s linear infinite;
+  }
+  </style>
  <div class="page-wrapper">
             <div class="container-fluid">
               <div class="row page-titles">
@@ -76,7 +113,9 @@
                         <div class="card" style="border: none;">
                             <div class="card-block">
                                 <div class="col-lg-12 col-xlg-12 col-md-12 col-sm-12 col-sm-12" style="width: auto;overflow-y: scroll;">
-
+                                  <button class="btn-sm btn-info filterBtn" id="default-btn" value="1st line LPA">1st line LPA&nbsp;<span id="tot_1st_lpa">( 0 )</span></button>
+                                  <button class="btn-sm btn-info filterBtn" value="2nd line LPA">2nd line LPA&nbsp;<span id="tot_2nd_lpa">( 0 )</span></button>
+                                  <button class="btn-sm btn-info filterBtn" value="Both 1st line and 2nd line LPA">Both 1st line and 2nd line LPA&nbsp;<span id="tot_1st_2nd_lpa">( 0 )</span></button>
                                     <table id="exampl" class="table table-striped table-bordered responsive col-xlg-12" cellspacing="0" width="100%">
                                         <thead>
                                             <tr>
@@ -95,62 +134,22 @@
                                             </tr>
                                         </thead>
                                         <tbody>
-                                          @foreach ($data['sample'] as $key=> $samples)
-                                          <tr>
-                                            <td>
-                                              @if($samples->status!=0)
-                                                <input class="bulk-selected" type="checkbox" id="smpl_log_id_{{ $samples->sample_id }}" value="{{ $samples->sample_id }}" />                                    
-                                                <input type="hidden" name="samples_{{$samples->sample_id}}" id="samples_{{$samples->sample_id}}" value="{{ $samples->samples }}" />
-                                                <input type="hidden" name="sample_log_id_{{$samples->sample_id}}" id="sample_log_id_{{$samples->sample_id}}" value="{{ $samples->log_id }}" />
-                                                <input type="hidden" name="sample_enroll_id_{{$samples->sample_id}}" id="sample_enroll_id_{{$samples->sample_id}}" value="{{ $samples->enroll_id }}" />
-                                                <input type="hidden" name="sample_tag_{{$samples->sample_id}}" id="sample_tag_{{$samples->sample_id}}" value="{{ $samples->tag }}" />
-                                                <input type="hidden" name="sample_no_sample_{{$samples->sample_id}}" id="sample_no_sample_{{$samples->sample_id}}" value="{{ $samples->no_sample }}" />
-                                                <input type="hidden" name="sample_id_{{$samples->sample_id}}" id="sample_id_{{$samples->sample_id}}" value="{{ $samples->sample_id }}" />
-                                                <input type="hidden" name="sample_service_id_{{$samples->sample_id}}" id="sample_service_id_{{$samples->sample_id}}" value="{{ $samples->service_id }}" />
-                                                <input type="hidden" name="sample_status_{{$samples->sample_id}}" id="sample_status_{{$samples->sample_id}}" value="{{ $samples->STATUS }}" />
-                                                <input type="hidden" name="sample_rec_flag_{{$samples->sample_id}}" id="sample_rec_flag_{{$samples->sample_id}}" value="{{ $samples->rec_flag }}" />
-                                                 
-                                              @endif
-                                            </td>
-                                            <td class="hide">{{$samples->ID}}</td>
-                                            <td>{{$samples->samples}}</td>
-                                           <!--  <td></td> -->
-                                            <td>											
-                                              @if($samples->tag == '1st line LPA' || $samples->tag =='LPA1' || $samples->tag =='LPA 1st line' || $samples->tag =='LPA 1st Line' )
-                                                LPA 1st Line
-                                              @elseif($samples->tag == '2nd line LPA' || $samples->tag == 'LPA2' || $samples->tag =='LPA 2nd line' || $samples->tag =='LPA 2nd Line')
-                                                LPA 2nd Line
-											 @elseif($samples->tag =='1st line LPA  and for 2nd line LPA'||$samples->tag =='LPA 1st and 2nd Line')
-                                               1st line LPA  and for 2nd line LPA
-                                              @else
-                                                Pending
-                                              @endif
-                                            </td>
-                                            <td>{{$samples->no_of_samples}}</td>
-                                            <td>
-                                              @if($samples->status==0)
-                                              Done
-                                              @else
-                                              <button onclick="openNextForm('{{$samples->sample_id}}')" type="button" class = "btn btn-info btn-sm resultbtn">Submit</button>
-                                              @endif
-                                            </td>
-											<td  <?php echo $data['services_col_color['.$samples->enroll_id.']']=='Y'?'bgcolor="#ccffcc"':""; ?>><?php echo $data['test_requested['.$samples->enroll_id.']'];?></td>
-                                            <td>
-                                              @if($samples->decontamination_date)
-                                              {{$samples->decontamination_date}}</td>
-                                              @endif
-                                            <td>{{$samples->result}}</td>
-                                            <td>
-                                              @if(!$samples->extraction_date)
-                                              <!-- <button onclick="openForm('{{$samples->samples}}', {{$samples->log_id}})",  value="" type="button" class = "btn btn-default btn-sm resultbtn">Submit</button> -->
-                                              Pending 
-											                        @else
-                                              <?php echo date('d/m/Y', strtotime($samples->extraction_date)); ?>
-                                              @endif
-                                            </td>
-                                            
+
+                                          <tr class="sel"> 
+                                              <td></td>
+                                              <td class="hide"></td>                                                                                                                      
+                                              <td></td>
+                                              <td></td>
+                                              <td></td>
+                                              <td></td>
+                                              <td></td>
+                                              <td></td>
+                                              <td></td>
+                                              <td></td>                                            
                                           </tr>
-                                          @endforeach
+
+                                          
+
                                       </tbody>
                                         </table>
                                 </div>
@@ -161,7 +160,7 @@
                 </div>
 
             </div>
-            <footer class="footer"> © Copyright Reserved 2017-2018, LIMS </footer>
+            <footer class="footer">  </footer>
         </div>
 
 <!-- Modal -->
@@ -211,6 +210,9 @@ function openForm(sample_label, log_id){
 }
 function openNextForm(sample_id){
 
+  $("#node").html("");
+  $('.bulk-selected').prop('checked', false);
+  $('#bulk-select-all').prop('checked', false);
   $('#smpl_log_id_'+sample_id).prop('checked', true);
     bulk_action_review();
 
@@ -231,7 +233,9 @@ function openNextForm(sample_id){
 
 <script>
 
-$(document).ready(function() {
+function arrangeTable(tag)
+{
+
   var today = new Date();
   var dd = today.getDate();
   var mm = today.getMonth()+1; //January is 0!
@@ -246,10 +250,50 @@ $(document).ready(function() {
   }
 
   today = dd + '-' + mm + '-' + yyyy;
+
+  var url = '{{ route("ajax_dnaextra_list") }}';
+
     $('#exampl').DataTable({
         dom: 'Bfrtip',
-        stateSave: true,
+        bDestroy: true,
+            //stateSave: true,
 		pageLength:25,
+    processing: true,
+    serverSide: true,
+            serverMethod: 'post',
+                          language: {
+                              loadingRecords: '&nbsp;',
+                              //processing: 'Loading...'
+                              processing: '<div class="spinner"></div>'
+                          } ,        
+                ajax: {
+                          url: url,	
+                          data: {tag: tag},	  
+                          headers: 
+                          {
+                            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                          }
+                        },
+                        drawCallback: function (settings) { 
+                            // Here the response
+                            var response = settings.json;
+                            //console.log(response);                            
+                             $('#tot_1st_lpa').html('('+response.no_1st_lpa+')');
+                            $('#tot_2nd_lpa').html('('+response.no_2st_lpa+')');
+                            $('#tot_1st_2nd_lpa').html('('+response.both_1st_2st+')'); 
+                          },
+                columns: [  
+                          { data: 'inputs'}, 
+                          { data: 'ID',className: "hide_column"},                                                                                    
+                          { data: 'sample_label'},
+                          { data: 'tag' },
+                          { data: 'sample_submitted' },
+                          { data: 'action' },
+                          { data: 'test_requested' },
+                          { data: 'deconta_date' },
+                          { data: 'microscopy_result' },
+                          { data: 'extraction_date' },                        
+                      ],
         buttons: [
             {
                 extend: 'excelHtml5',
@@ -260,8 +304,12 @@ $(document).ready(function() {
                 action: bulk_action_review
             }
         ],
-        "order": [[ 1, "desc" ]]
+        "order": [[ 1, "desc" ]],
+        columnDefs: [
+                          { targets: [0], orderable: false }
+                        ]
     });
+}
 	
 	//Confirm ok submit
 	$('.nextbtn, #nxtconfirm').click( function(e) {
@@ -273,7 +321,36 @@ $(document).ready(function() {
 							$("#nxtconfirm").text("OK");	
 	});
 
-} );
+
+
+$(document).ready(function() {
+
+  arrangeTable('1st line LPA'); 
+
+  $('#default-btn').css('background', '#1e88e5');
+    $('#default-btn').css('border', '#1e88e5');
+
+    $('#default-btn').css('background', '#FFA500');
+    $('#default-btn').css('border', '#FFA500');
+  
+
+  $('.filterBtn').on('click', function(){
+
+var tag = "";
+
+tag = $(this).val();
+
+$('.filterBtn').css('background', '#1e88e5');
+    $('.filterBtn').css('border', '#1e88e5');
+
+    $(this).css('background', '#FFA500');
+    $(this).css('border', '#FFA500');
+
+arrangeTable(tag);
+
+});
+
+});
 
 var $bulk_checkboxes = $('.bulk-selected');
         var $bulk_select_all_checkbox = $('#bulk-select-all');
@@ -322,7 +399,7 @@ var $bulk_checkboxes = $('.bulk-selected');
               var err_sample_id = [];
               var success_sample_id = "";
               var samples_data = [];
-
+              $("#node").html("");
             //
             $checkboxes.each(function(i, e){
               

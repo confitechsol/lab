@@ -64,6 +64,8 @@ $(function(){
                              							
                             
 						}else{
+
+							//alert('here');
 							$('.datealertClss').addClass('hide');
 							$('.datealertClss').hide();
 							    $.ajax({
